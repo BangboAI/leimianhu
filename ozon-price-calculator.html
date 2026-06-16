@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OZON 箱包售价计算器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#222;padding:20px}
+.container{max-width:1000px;margin:0 auto}
+h1{font-size:22px;margin-bottom:4px}
+.subtitle{color:#666;font-size:13px;margin-bottom:24px}
+.card{background:#fff;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px}
+label{display:block;font-size:12px;color:#555;margin-bottom:4px;font-weight:500}
+input,select{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:14px}
+input:focus,select:focus{outline:none;border-color:#005bff;box-shadow:0 0 0 2px rgba(0,91,255,0.1)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.ritem{text-align:center;padding:14px;background:#f8f9ff;border-radius:8px}
+.rlabel{font-size:11px;color:#666;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.rvalue{font-size:24px;font-weight:700;color:#005bff}
+.rvalue.gn{color:#00a854}
+.rvalue.rd{color:#e53935}
+.rvalue.og{color:#f59e0b}
+.runit{font-size:12px;color:#888}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:8px 10px;border-bottom:2px solid #eee;color:#555;font-weight:600;font-size:11px;text-transform:uppercase}
+.tbl td{padding:8px 10px;border-bottom:1px solid #f0f0f0}
+.tbl tr:last-child td{border-bottom:none;font-weight:700}
+.bar{height:6px;border-radius:3px;background:#e5e7eb;overflow:hidden}
+.bfill{height:100%;border-radius:3px;transition:width .3s}
+.stitle{font-size:14px;font-weight:600;margin-bottom:12px}
+.cc{padding:12px;border-radius:8px;border:1px solid #eee}
+.cc h4{font-size:13px;margin-bottom:6px}
+.cc ul{list-style:none;font-size:12px;color:#555}
+.cc ul li{padding:3px 0}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.tg-h{background:#ffedd5;color:#c2410c}
+.tg-m{background:#dbeafe;color:#1d4ed8}
+.tg-l{background:#d1fae5;color:#065f46}
+.note{font-size:12px;color:#888;margin-top:12px;padding:10px;background:#f9fafb;border-radius:6px;line-height:1.6}
+@media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>OZON 箱包 FBO 售价计算器</h1>
+<p class="subtitle">输入成本和重量，自动计算建议售价、利润分析和竞品区间对比</p>
+<div class="card">
+<div class="stitle">基础参数</div>
+<div class="grid-4">
+<div><label>出厂价（CNY）</label><input type="number" id="fp" value="80" min="1" step="1"></div>
+<div><label>重量（kg）</label><input type="number" id="wt" value="0.8" min="0.1" step="0.1"></div>
+<div><label>汇率（1 CNY = ? RUB）</label><input type="number" id="rate" value="12" min="1" step="0.5"></div>
+<div><label>物流方式</label>
+<select id="logi">
+<option value="air">空运（$7/kg）</option>
+<option value="rail" selected>铁运（$3.5/kg）</option>
+<option value="sea">海运（$1.5/kg）</option>
+</select></div>
+</div>
+<div class="grid-4" style="margin-top:12px">
+<div><label>目标利润率 %</label><input type="number" id="tm" value="20" min="0" max="100" step="1"></div>
+<div><label>广告费占比 %</label><input type="number" id="ad" value="10" min="0" max="50" step="1"></div>
+<div><label>OZON 佣金率 %</label><input type="number" id="comm" value="14" min="1" max="30" step="0.5"></div>
+<div><label>尾程物流费（RUB）</label><input type="number" id="ful" value="180" min="0" step="10"></div>
+</div>
+</div>
+<div class="grid-2">
+
+<div class="card">
+<div class="stitle">建议售价</div>
+<div class="rgrid">
+<div class="ritem"><div class="rlabel">建议零售价</div><div class="rvalue" id="pRec">0</div><div class="runit">RUB</div></div>
+<div class="ritem"><div class="rlabel">单件利润</div><div class="rvalue" id="pProfit">0</div><div class="runit">RUB</div></div>
+<div class="ritem"><div class="rlabel">实际利润率</div><div class="rvalue" id="pMargin">0</div><div class="runit">%</div></div>
+<div class="ritem"><div class="rlabel">盈亏平衡价</div><div class="rvalue" id="pBE">0</div><div class="runit">RUB</div></div>
+</div>
+</div>
+
+<div class="card">
+<div class="stitle">OZON 箱包竞品价格区间</div>
+<div class="grid-3">
+<div class="cc"><h4>低端 <span class="tag tg-l">走量</span></h4><ul><li>售价：300 - 1,000 RUB</li><li>利润空间：低</li><li>适合：引流款</li></ul></div>
+<div class="cc"><h4>中端 <span class="tag tg-m">主力</span></h4><ul><li>售价：1,000 - 3,500 RUB</li><li>利润空间：中等</li><li>适合：利润款</li></ul></div>
+<div class="cc"><h4>高端 <span class="tag tg-h">品牌</span></h4><ul><li>售价：3,500 - 10,000+ RUB</li><li>利润空间：高</li><li>适合：品牌款</li></ul></div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="stitle">成本结构分解</div>
+<table class="tbl"><thead><tr><th style="width:140px">项目</th><th style="width:100px">金额</th><th style="width:60px">占比</th><th>占比图</th></tr></thead>
+<tbody id="cbd"></tbody></table>
+</div>
+
+<div class="card">
+<div class="stitle">售价区间分析</div>
+<div class="grid-2">
+<div>
+<div style="margin-bottom:8px;font-size:13px;color:#555">不同利润率下的建议售价</div>
+<table class="tbl"><thead><tr><th>利润率</th><th>售价RUB</th><th>利润RUB</th><th>市场定位</th></tr></thead>
+<tbody id="mtbl"></tbody></table>
+</div>
+<div>
+<div style="margin-bottom:8px;font-size:13px;color:#555">竞品价格与推荐价对比</div>
+<div style="position:relative;height:40px;background:linear-gradient(90deg,#d1fae5,#dbeafe,#ffedd5);border-radius:6px;margin-top:12px">
+<div id="marker" style="position:absolute;top:-8px;width:4px;height:56px;background:#e53935;border-radius:2px;transition:left .3s"></div>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:2px">
+<span>300</span><span>1,000</span><span>3,500</span><span>10,000+</span>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:9px;color:#aaa;margin-bottom:16px">
+<span>RUB</span><span>RUB</span><span>RUB</span><span>RUB</span>
+</div>
+<div class="note">
+<strong>说明：</strong><br>
+<strong>出厂价</strong>：供应商采购成本（含采购价+国内运费）<br>
+<strong>头程物流</strong>：中国到俄罗斯仓库的运输（含清关）<br>
+<strong>关税+VAT</strong>：俄进口关税约15% + VAT 20%<br>
+<strong>OZON佣金</strong>：箱包类目约12-15%，含支付处理费<br>
+<strong>尾程物流</strong>：OZON FBO配送费（按重量计）<br>
+<strong>广告费</strong>：建议预留8-15%做站内推广<br>
+<strong>退货损耗</strong>：箱包退货率约5-10%，已摊销进成本<br>
+<strong>汇差风险</strong>：RUB/CNY波动直接影响利润
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+function c(){
+var fp=parseFloat(document.getElementById('fp').value)||0;
+var wt=parseFloat(document.getElementById('wt').value)||0;
+var rate=parseFloat(document.getElementById('rate').value)||12;
+var logi=document.getElementById('logi').value;
+var tm=parseFloat(document.getElementById('tm').value)||20;
+var ad=parseFloat(document.getElementById('ad').value)||10;
+var comm=parseFloat(document.getElementById('comm').value)||14;
+var ful=parseFloat(document.getElementById('ful').value)||180;
+var lr=logi==='air'?7:logi==='rail'?3.5:1.5;
+var usd=85;
+var hl=wt*lr*usd;
+var pkg=25;
+var ret=0.07;
+var dr=0.15;
+var vr=0.20;
+var br=50;
+var fr=fp*rate;
+var cd=Math.round((fr+hl)*dr);
+var vat=Math.round((fr+hl+cd)*vr);
+var bc=fr+hl+cd+br+vat+pkg+ful;
+var m=[5,10,15,20,25,30,35,40];
+var mt=document.getElementById('mtbl');
+mt.innerHTML='';
+m.forEach(function(p){
+var d=1-(comm/100)-(ad/100)-ret-(p/100);
+var pr=d>0.01?Math.round(bc/d):0;
+var pf=pr>0?Math.round(pr-bc-pr*comm/100-pr*ad/100-pr*ret):0;
+var pos=pr<1000?'低端走量':pr<3500?'中端主力':'高端高利润';
+var r=document.createElement('tr');
+r.innerHTML='<td>'+p+'%</td><td>'+(pr>0?pr.toLocaleString():'-')+'</td><td style=color:'+(pf<0?'#e53935':'#222')+'>'+(pf>0?pf.toLocaleString():pf<0?'-'+Math.abs(pf).toLocaleString():'0')+'</td><td>'+pos+'</td>';
+mt.appendChild(r);
+});
+var d2=1-(comm/100)-(ad/100)-ret-(tm/100);
+var sp=d2>0.01?Math.round(bc/d2):0;
+var ap=sp>0?Math.round(sp-bc-sp*comm/100-sp*ad/100-sp*ret):0;
+var ar=sp>0?Math.round(ap/sp*100):0;
+var be=1-(comm/100)-(ad/100)-ret>0.01?Math.round(bc/(1-(comm/100)-(ad/100)-ret)):0;
+document.getElementById('pRec').textContent=sp>0?sp.toLocaleString():'-';
+var pe=document.getElementById('pProfit');
+pe.textContent=ap>0?ap.toLocaleString():ap<0?'-'+Math.abs(ap).toLocaleString():'0';
+pe.className='rvalue'+(ap>20?' gn':ap>0?' gn':ap<0?' rd':'');
+var pm=document.getElementById('pMargin');
+pm.textContent=ar;
+pm.className='rvalue'+(ar>=20?' gn':ar>=10?' og':'rd');
+document.getElementById('pBE').textContent=be>0?be.toLocaleString():'-';
+var cb=document.getElementById('cbd');
+cb.innerHTML='';
+var its=[
+{n:'出厂价(RUB)',v:fr,c:'#3b82f6'},
+{n:'头程物流',v:Math.round(hl),c:'#8b5cf6'},
+{n:'关税('+(dr*100)+'%)',v:cd,c:'#f59e0b'},
+{n:'VAT('+(vr*100)+'%)',v:vat,c:'#eab308'},
+{n:'清关杂费',v:br,c:'#a855f7'},
+{n:'尾程物流',v:Math.round(ful),c:'#06b6d4'},
+{n:'包装耗材',v:pkg,c:'#10b981'},
+];
+var cv=sp>0?Math.round(sp*comm/100):0;
+var av=sp>0?Math.round(sp*ad/100):0;
+var rv=sp>0?Math.round(sp*ret):0;
+its.push({n:'OZON佣金('+comm+'%)',v:cv,c:'#ec4899'});
+its.push({n:'广告费('+ad+'%)',v:av,c:'#f97316'});
+its.push({n:'退货损耗('+(ret*100)+'%)',v:rv,c:'#ef4444'});
+var tot=its.reduce(function(s,i){return s+i.v;},0);
+its.forEach(function(i){
+var pct=sp>0?(i.v/sp*100):0;
+var tr=document.createElement('tr');
+var pbar=pct<1&&i.v>0?1:pct;
+tr.innerHTML='<td>'+i.n+'</td><td>'+(i.v>0?i.v.toLocaleString()+' RUB':'0 RUB')+'</td><td>'+pct.toFixed(1)+'%</td><td><div class=bar><div class=bfill style=width:'+Math.min(pbar,100)+'%;background:'+i.c+'></div></div></td>';
+cb.appendChild(tr);
+});
+if(ap>0){
+var ppct=sp>0?(ap/sp*100):0;
+var ptr=document.createElement('tr');
+ptr.style.fontWeight='700';
+ptr.style.background='#f0fdf4';
+var pbar2=ppct<1&&ap>0?1:ppct;
+ptr.innerHTML='<td>利润</td><td>'+ap.toLocaleString()+' RUB</td><td>'+ppct.toFixed(1)+'%</td><td><div class=bar><div class=bfill style=width:'+Math.min(pbar2,100)+'%;background:#00a854></div></div></td>';
+cb.appendChild(ptr);
+}
+var ttr=document.createElement('tr');
+ttr.style.fontWeight='700';
+ttr.innerHTML='<td>总成本</td><td>'+sp.toLocaleString()+' RUB</td><td>100%</td><td></td>';
+cb.appendChild(ttr);
+var mk=document.getElementById('marker');
+if(sp>0){
+var p2=sp<=300?0:sp>=10000?100:(Math.log10(sp)-Math.log10(300))/(Math.log10(10000)-Math.log10(300))*100;
+p2=Math.max(0,Math.min(100,p2));
+mk.style.left='calc('+p2+'% - 2px)';
+}else{mk.style.left='0%';}
+}
+document.addEventListener('DOMContentLoaded',function(){
+document.querySelectorAll('input,select').forEach(function(el){el.addEventListener('input',c);el.addEventListener('change',c);});
+c();
+});
+</script>
+</body>
+</html>
