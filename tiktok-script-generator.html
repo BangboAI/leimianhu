@@ -1,0 +1,983 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok 带货脚本生成器</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+.header { text-align: center; padding: 40px 20px 30px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 0 0 24px 24px; margin: -20px -20px 30px; color: white; }
+.header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.header h1 span { color: #fe2c55; }
+.header p { font-size: 14px; opacity: 0.75; }
+
+/* Layout */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+.card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.card h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+.card h2 .badge { font-size: 11px; background: #fe2c55; color: white; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+
+/* Upload */
+.upload-area { border: 2px dashed #d9d9d9; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+.upload-area:hover { border-color: #fe2c55; background: #fff5f7; }
+.upload-area.dragover { border-color: #fe2c55; background: #fff5f7; }
+.upload-area.has-images { border-style: solid; border-color: #52c41a; background: #f6ffed; }
+.upload-area .icon { font-size: 36px; margin-bottom: 8px; }
+.upload-area .text { font-size: 14px; color: #666; }
+.upload-area .hint { font-size: 12px; color: #999; margin-top: 4px; }
+.upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+/* Image Preview Grid */
+.preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 12px; }
+.preview-item { position: relative; aspect-ratio: 9/16; border-radius: 8px; overflow: hidden; background: #f5f5f5; }
+.preview-item img { width: 100%; height: 100%; object-fit: cover; }
+.preview-item .remove-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(0,0,0,0.5); color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.preview-item .remove-btn:hover { background: #fe2c55; }
+.preview-item .index { position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.6); color: white; font-size: 10px; padding: 1px 6px; border-radius: 4px; }
+
+/* Form */
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: #333; }
+.form-group label .optional { font-weight: 400; color: #999; font-size: 12px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1.5px solid #e8e8e8; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s; font-family: inherit; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #fe2c55; }
+.form-group textarea { resize: vertical; min-height: 60px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+/* Tags */
+.tag-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-group label { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1.5px solid #e8e8e8; transition: all 0.15s; font-weight: 400; }
+.tag-group label:hover { border-color: #fe2c55; }
+.tag-group input[type=radio] { display: none; }
+.tag-group input[type=radio]:checked + span {  }
+.tag-group input[type=radio]:checked ~ i { color: white; }
+.tag-group label:has(input:checked) { background: #fe2c55; color: white; border-color: #fe2c55; }
+.tag-group label:has(input:checked) i { color: white !important; }
+.tag-group label i { margin-right: 2px; }
+
+/* Checkbox tags */
+.tag-group.multi label {  }
+.tag-group.multi input[type=checkbox] { display: none; }
+.tag-group.multi label:has(input:checked) { background: #fe2c55; color: white; border-color: #fe2c55; }
+
+/* Button */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 28px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #fe2c55; color: white; width: 100%; }
+.btn-primary:hover { background: #e6244a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(254,44,85,0.3); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-secondary { background: #f0f2f5; color: #333; }
+.btn-secondary:hover { background: #e5e7eb; }
+.btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 8px; }
+
+/* Script Output */
+.script-output { display: none; }
+.script-output.visible { display: block; }
+.script-card { background: #1a1a2e; border-radius: 16px; padding: 24px; color: white; }
+.script-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+.script-header .stats { display: flex; gap: 12px; font-size: 13px; }
+.script-header .stats span { background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 8px; }
+.script-header .actions { display: flex; gap: 8px; }
+.script-header .actions button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: background 0.15s; }
+.script-header .actions button:hover { background: rgba(255,255,255,0.2); }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 36px; }
+.timeline::before { content: ''; position: absolute; left: 14px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.12); }
+.timeline-item { position: relative; margin-bottom: 20px; }
+.timeline-item:last-child { margin-bottom: 0; }
+.timeline-item .dot { position: absolute; left: -22px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #fe2c55; border: 2px solid #1a1a2e; }
+.timeline-item .time { display: inline-block; font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+.timeline-item .time strong { color: #fe2c55; }
+.timeline-item .label { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #fe2c55; }
+.timeline-item .content { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.85); }
+.timeline-item .visual-note { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; font-style: italic; }
+
+/* Full script text */
+.full-script { margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.06); border-radius: 12px; }
+.full-script .title { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+.full-script .text { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.85); white-space: pre-wrap; }
+
+/* Hashtags */
+.hashtags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.hashtags span { background: rgba(254,44,85,0.15); color: #fe2c55; padding: 3px 10px; border-radius: 6px; font-size: 12px; }
+
+/* Toast */
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+.toast.show { opacity: 1; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: #999; }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state .text { font-size: 14px; }
+
+/* Length indicator */
+.char-count { text-align: right; font-size: 12px; color: #999; margin-top: 2px; }
+
+/* Title Generator */
+.title-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 24px; color: white; margin-top: 0; }
+.title-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.title-card .header h3 { font-size: 16px; font-weight: 600; }
+.title-card .header .count { font-size: 12px; color: rgba(255,255,255,0.5); }
+.title-grid { display: flex; flex-direction: column; gap: 8px; }
+.title-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,0.06); border-radius: 10px; cursor: pointer; transition: background 0.15s; }
+.title-item:hover { background: rgba(255,255,255,0.12); }
+.title-item .num { font-size: 11px; color: #fe2c55; font-weight: 700; min-width: 18px; padding-top: 2px; }
+.title-item .text { flex: 1; font-size: 13px; line-height: 1.5; }
+.title-item .tag { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: rgba(254,44,85,0.15); color: #fe2c55; white-space: nowrap; }
+.title-item .copy-btn { background: rgba(255,255,255,0.08); border: none; color: rgba(255,255,255,0.6); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.title-item .copy-btn:hover { background: #fe2c55; color: white; }
+.title-angles { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.title-angles label { font-size: 11px; padding: 4px 10px; background: rgba(255,255,255,0.06); border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+.title-angles label:hover { background: rgba(255,255,255,0.12); }
+.title-angles input[type=checkbox] { display: none; }
+.title-angles label:has(input:checked) { background: #fe2c55; color: white; }
+.title-empty { text-align: center; padding: 30px; color: rgba(255,255,255,0.4); font-size: 13px; }
+.title-empty .icon { font-size: 28px; margin-bottom: 8px; }
+.title-header-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+.title-header-actions button { padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; border: none; }
+.title-gen-btn { background: #fe2c55; color: white; }
+.title-gen-btn:hover { background: #e6244a; }
+.title-gen-all-btn { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+.title-gen-all-btn:hover { background: rgba(255,255,255,0.2); }
+.tab-bar { display: flex; gap: 4px; margin-bottom: 16px; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 4px; }
+.tab-bar button { flex: 1; padding: 8px; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; background: transparent; color: rgba(255,255,255,0.5); transition: all 0.15s; }
+.tab-bar button.active { background: #fe2c55; color: white; }
+.tab-bar button:hover:not(.active) { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+.title-badge { display: inline-block; font-size: 10px; background: rgba(254,44,85,0.15); color: #fe2c55; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
+.title-tab-content { display: none; }
+.title-tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>TK <span>Script</span> Lab</h1>
+  <p>上传商品图片，AI 自动生成 TikTok 带货脚本</p>
+</div>
+
+<div class="container">
+  <div class="two-col">
+
+    <!-- Left: Input -->
+    <div>
+      <!-- Image Upload -->
+      <div class="card">
+        <h2>📷 商品图片 <span class="badge">必填</span></h2>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="fileInput" accept="image/*" multiple>
+          <div class="icon">🖼️</div>
+          <div class="text">点击上传或多张图片拖入此区域</div>
+          <div class="hint">支持 JPG / PNG / WebP，建议 3-8 张不同角度的产品图</div>
+        </div>
+        <div class="preview-grid" id="previewGrid"></div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="card">
+        <h2>📦 商品信息</h2>
+        <div class="form-group">
+          <label>商品名称</label>
+          <input type="text" id="prodName" placeholder="如：Duryarhall 多功能斜挎腰包">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>品类</label>
+            <select id="prodCategory">
+              <option value="服饰箱包">服饰箱包</option>
+              <option value="美妆个护">美妆个护</option>
+              <option value="数码3C">数码3C</option>
+              <option value="家居日用">家居日用</option>
+              <option value="食品饮料">食品饮料</option>
+              <option value="母婴玩具">母婴玩具</option>
+              <option value="运动户外">运动户外</option>
+              <option value="珠宝配饰">珠宝配饰</option>
+              <option value="宠物用品">宠物用品</option>
+              <option value="汽车用品">汽车用品</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>目标受众</label>
+            <select id="targetAudience">
+              <option value="所有人">所有人</option>
+              <option value="女性 18-30">女性 18-30</option>
+              <option value="男性 18-30">男性 18-30</option>
+              <option value="女性 25-45">女性 25-45</option>
+              <option value="男性 25-45">男性 25-45</option>
+              <option value="上班族">上班族</option>
+              <option value="学生党">学生党</option>
+              <option value="宝妈">宝妈</option>
+              <option value="户外爱好者">户外爱好者</option>
+              <option value="宠物主">宠物主</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>核心卖点 <span class="optional">(每行一个，如：防水、大容量、轻便)</span></label>
+          <textarea id="sellingPoints" placeholder="防水耐磨
+仅重220g
+可调节肩带
+多隔层收纳
+男女通用">防水耐磨
+仅重220g
+可调节肩带
+多隔层收纳
+男女通用</textarea>
+        </div>
+        <div class="form-group">
+          <label>使用场景 <span class="optional">(选填，逗号分隔)</span></label>
+          <input type="text" id="scenes" placeholder="如：通勤、旅行、运动、日常出街">
+        </div>
+      </div>
+
+      <!-- Script Settings -->
+      <div class="card">
+        <h2>⚙️ 脚本设置</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>视频时长</label>
+            <select id="videoLength">
+              <option value="15">15 秒（快速展示）</option>
+              <option value="30" selected>30 秒（标准带货）</option>
+              <option value="60">60 秒（深度测评）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>口播音色</label>
+            <select id="voiceTone">
+              <option value="亲切日常" selected>🗣️ 亲切日常</option>
+              <option value="专业测评">🎙️ 专业测评</option>
+              <option value="激情种草">🔥 激情种草</option>
+              <option value="ASMR轻语">🤫 ASMR 轻语</option>
+              <option value="搞笑吐槽">😂 搞笑吐槽</option>
+              <option value="故事叙事">📖 故事叙事</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>视频风格</label>
+          <div class="tag-group" id="styleGroup">
+            <label><input type="radio" name="style" value="种草测评" checked><span>🌟 种草测评</span></label>
+            <label><input type="radio" name="style" value="开箱体验"><span>📦 开箱体验</span></label>
+            <label><input type="radio" name="style" value="场景剧情"><span>🎬 场景剧情</span></label>
+            <label><input type="radio" name="style" value="痛点解决"><span>💡 痛点解决</span></label>
+            <label><input type="radio" name="style" value="对比测评"><span>⚖️ 对比测评</span></label>
+            <label><input type="radio" name="style" value="ASMR展示"><span>✨ ASMR 展示</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generate Button -->
+      <button class="btn btn-primary" id="generateBtn" onclick="generateScript()">
+        🚀 生成带货脚本
+      </button>
+    </div>
+
+    <!-- Right: Output -->
+    <div>
+      <div class="card">
+        <h2>📋 生成脚本</h2>
+        <div class="empty-state" id="emptyState">
+          <div class="icon">🎬</div>
+          <div class="text">上传商品图片并填写信息<br>点击"生成带货脚本"开始</div>
+        </div>
+        <div class="script-output" id="scriptOutput">
+          <div class="script-card" id="scriptCard">
+            <div class="script-header">
+              <div class="stats">
+                <span id="statDuration">⏱️ 30s</span>
+                <span id="statWords">📝 220字</span>
+                <span id="statStyle">🌟 种草测评</span>
+              </div>
+              <div class="actions">
+                <button onclick="copyScript()">📋 复制</button>
+                <button onclick="exportText()">📥 下载</button>
+                <button onclick="regenerate()">🔄 重新生成</button>
+              </div>
+            </div>
+
+            <!-- Script Title -->
+            <div style="font-size:15px;font-weight:600;margin-bottom:16px;color:#fe2c55;" id="scriptTitle"></div>
+
+            <!-- Timeline -->
+            <div class="timeline" id="timeline"></div>
+
+            <!-- Full Script -->
+            <div class="full-script">
+              <div class="title">📄 完整口播文案</div>
+              <div class="text" id="fullScriptText"></div>
+            </div>
+
+            <!-- Hashtags -->
+            <div class="hashtags" id="hashtags"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Title Generator -->
+      <div class="card" style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);padding:0;border-radius:16px;overflow:hidden;">
+        <div class="title-card">
+          <div class="header">
+            <h3>🎬 视频标题生成器</h3>
+            <span class="count" id="titleCount">点击生成</span>
+          </div>
+
+          <div class="tab-bar">
+            <button class="active" data-tab="all" onclick="switchTitleTab('all')">全部</button>
+            <button data-tab="hook" onclick="switchTitleTab('hook')">钩子型</button>
+            <button data-tab="benefit" onclick="switchTitleTab('benefit')">利益型</button>
+            <button data-tab="question" onclick="switchTitleTab('question')">提问型</button>
+          </div>
+
+          <div class="title-header-actions">
+            <button class="title-gen-btn" onclick="generateTitles()">✨ 生成标题</button>
+            <button class="title-gen-all-btn" onclick="generateAllTitles()">🎲 全部生成</button>
+          </div>
+
+          <div class="title-tab-content active" id="tab-all">
+            <div class="title-empty" id="titleEmpty">
+              <div class="icon">🏷️</div>
+              <div>上传商品并填写信息后点击"生成标题"</div>
+            </div>
+            <div class="title-grid" id="titleGrid" style="display:none;"></div>
+          </div>
+          <div class="title-tab-content" id="tab-hook"><div class="title-grid" id="titleGridHook" style="display:none;"></div></div>
+          <div class="title-tab-content" id="tab-benefit"><div class="title-grid" id="titleGridBenefit" style="display:none;"></div></div>
+          <div class="title-tab-content" id="tab-question"><div class="title-grid" id="titleGridQuestion" style="display:none;"></div></div>
+        </div>
+      </div>
+      <!-- Quick Tips -->
+      <div class="card" style="background:#fff5f7;">
+        <h2>💡 拍摄小贴士</h2>
+        <div style="font-size:13px;line-height:1.7;color:#555;">
+          <div>• 封面用产品平铺或上身图，加粗体大字标题</div>
+          <div>• 前 3 秒必须抓住注意力（用痛点或视觉冲击）</div>
+          <div>• 多机位切换：近景展示细节 + 远景展示上身效果</div>
+          <div>• 适当用贴纸文字强调价格/折扣/卖点</div>
+          <div>• 背景音乐选热门带货 BGM，节奏与剪辑点对齐</div>
+          <div>• 时长不够？脚本生成后可自由增减分段</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== Image Upload ==========
+const fileInput = document.getElementById('fileInput');
+const uploadArea = document.getElementById('uploadArea');
+const previewGrid = document.getElementById('previewGrid');
+let uploadedImages = [];
+
+fileInput.addEventListener('change', (e) => { addFiles(e.target.files); });
+uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); addFiles(e.dataTransfer.files); });
+
+function addFiles(files) {
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) continue;
+    uploadedImages.push(f);
+  }
+  renderPreviews();
+}
+
+function removeImage(idx) {
+  uploadedImages.splice(idx, 1);
+  renderPreviews();
+}
+
+function renderPreviews() {
+  previewGrid.innerHTML = '';
+  if (uploadedImages.length > 0) {
+    uploadArea.classList.add('has-images');
+  } else {
+    uploadArea.classList.remove('has-images');
+  }
+  uploadedImages.forEach((f, i) => {
+    const div = document.createElement('div');
+    div.className = 'preview-item';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(f);
+    const btn = document.createElement('button');
+    btn.className = 'remove-btn';
+    btn.textContent = '×';
+    btn.onclick = (e) => { e.stopPropagation(); removeImage(i); };
+    const idx = document.createElement('span');
+    idx.className = 'index';
+    idx.textContent = i + 1;
+    div.appendChild(img);
+    div.appendChild(btn);
+    div.appendChild(idx);
+    previewGrid.appendChild(div);
+  });
+}
+
+// ========== Script Templates ==========
+function getTimeSlots(seconds) {
+  if (seconds === 15) return [
+    { label: '⏰ 黄金前3秒', time: '0-3s', desc: 'hook 抓注意力' },
+    { label: '🔥 卖点展示', time: '3-10s', desc: '核心卖点 x 2-3个' },
+    { label: '💥 促单转化', time: '10-15s', desc: '价格/优惠 + CTA' }
+  ];
+  if (seconds === 30) return [
+    { label: '⏰ 黄金钩子', time: '0-3s', desc: 'hook 抓注意力' },
+    { label: '📌 痛点引入', time: '3-8s', desc: '代入场景/痛点' },
+    { label: '✨ 产品亮点', time: '8-20s', desc: '3-4个卖点展示' },
+    { label: '💎 信任背书', time: '20-25s', desc: '销量/口碑/对比' },
+    { label: '🔥 临门一脚', time: '25-30s', desc: '价格刺激 + CTA' }
+  ];
+  return [
+    { label: '⏰ 强力钩子', time: '0-4s', desc: 'hook 抓注意力' },
+    { label: '😣 痛点深挖', time: '4-12s', desc: '深入场景代入' },
+    { label: '✨ 产品揭秘', time: '12-30s', desc: '卖点逐个展示' },
+    { label: '🔍 细节放大', time: '30-40s', desc: '材质/做工/对比' },
+    { label: '👥 口碑见证', time: '40-50s', desc: '用户评价/销量' },
+    { label: '🔥 限时促单', time: '50-60s', desc: '紧迫感 + CTA' }
+  ];
+}
+
+function generateHook(style, product, points) {
+  const hooks = {
+    '种草测评': [
+      `姐妹们，这个${product}我真的忍不住要分享！`,
+      `天呐！挖到宝了！这个${product}绝绝子！`,
+      `我不允许还有人不知道这款${product}！`,
+      `用了它之后，我真的后悔没早点买！`
+    ],
+    '开箱体验': [
+      `好激动！期待了好久的${product}终于到了！`,
+      `来给大家开箱这个最近超火的${product}！`,
+      `第一眼就被包装惊艳到了，快来看看这个${product}！`
+    ],
+    '场景剧情': [
+      `每次出门都要纠结带什么包？这个${product}拯救了你！`,
+      `作为一个爱出门的人，我找到了我的本命${product}！`,
+      `朋友都问我最近怎么这么会穿，秘密就是它！`
+    ],
+    '痛点解决': [
+      `你是不是也这样？出门东西太多包太小？`,
+      `还在为出门带不了东西发愁吗？这个必须看！`,
+      `以前的包太小装不下？这个${product}让你告别烦恼！`
+    ],
+    '对比测评': [
+      `市面上那么多${product.split(' ').slice(-2).join(' ')}，到底该怎么选？`,
+      `买之前纠结了好几款，最后选了它，理由太多！`,
+      `同价位里我对比了七八款，这款${product}完胜！`
+    ],
+    'ASMR展示': [
+      `` // will be handled separately
+    ]
+  };
+  const list = hooks[style] || hooks['种草测评'];
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function generateScriptContent(config) {
+  const { product, category, audience, points, scenes, style, seconds, tone } = config;
+  const slots = getTimeSlots(seconds);
+  const hook = generateHook(style, product, points);
+  const pointList = points.split('\n').filter(Boolean);
+  const sceneList = scenes ? scenes.split(/[,，、\s]+/).filter(Boolean) : [];
+
+  let segments = [];
+  let visualNotes = [];
+
+  // Segment 1: Hook
+  segments.push({
+    label: slots[0].label,
+    time: slots[0].time,
+    lines: [hook],
+    visual: `产品特写 / 痛点场景画面 / 对比画面开篇`
+  });
+
+  // Segment 2: Pain/Context (only for longer videos)
+  if (seconds >= 30) {
+    let painText = '';
+    if (sceneList.length > 0) {
+      painText = `不管是${sceneList.slice(0,3).join('、')}，带着它都超方便。`;
+    } else {
+      painText = '以前出门总觉得少了个包，手机钥匙卡包每次都要翻半天。';
+    }
+    segments.push({
+      label: slots[1].label,
+      time: slots[1].time,
+      lines: [painText],
+      visual: `场景代入：${sceneList.length > 0 ? sceneList.slice(0,2).join('、') : '日常通勤/出行'} / 真人使用画面`
+    });
+  }
+
+  // Segments: Product highlights
+  const highlightStart = seconds >= 30 ? 2 : 1;
+  const highlightSlots = seconds === 15 ? [slots[1]] : (seconds === 30 ? slots.slice(2, 4) : slots.slice(2, 5));
+
+  if (pointList.length > 0) {
+    highlightSlots.forEach((slot, i) => {
+      if (i >= pointList.length) return;
+      const pt = pointList[i];
+      let lines = [];
+      if (pt.includes('防水') || pt.includes('耐磨')) {
+        lines.push(`采用高品质${pt}材质，户外运动完全不用担心。`);
+      } else if (pt.includes('轻') || pt.includes('g')) {
+        lines.push(`仅${pt}，轻到几乎感觉不到它的存在。`);
+      } else if (pt.includes('容量') || pt.includes('隔层') || pt.includes('收纳')) {
+        lines.push(`${pt}，手机钥匙钱包统统装得下。`);
+      } else if (pt.includes('调节') || pt.includes('肩带')) {
+        lines.push(`${pt}，不同身高都能轻松驾驭。`);
+      } else if (pt.includes('通用') || pt.includes('男女')) {
+        lines.push(`${pt}，怎么搭都好看，买一个全家都能用。`);
+      } else {
+        lines.push(`${pt}，这也是我选它的重要原因。`);
+      }
+      segments.push({
+        label: slot.label,
+        time: slot.time,
+        lines,
+        visual: `细节特写：${pt} / 产品局部特写 / 功能演示`
+      });
+    });
+  }
+
+  // Remaining highlights
+  const extraPoints = pointList.slice(highlightSlots.length).slice(0, 2);
+  extraPoints.forEach((pt, i) => {
+    const slot = highlightSlots[Math.min(i + Math.min(1, seconds === 30 ? 2 : 3), highlightSlots.length - 1)];
+    if (slot) {
+      segments.push({
+        label: `✨ 亮点 ${i + 1}`,
+        time: '亮点展示',
+        lines: [`还有${pt}，这些小细节真的做得太到位了。`],
+        visual: `角度展示：${pt}`
+      });
+    }
+  });
+
+  // Bridge to price
+  if (seconds > 15) {
+    segments.push({
+      label: slots[slots.length - 2]?.label || '💎 信任',
+      time: slots[slots.length - 2]?.time || '15-20s',
+      lines: ['很多姐妹用完之后都说好，品质真的没话说，性价比超高。'],
+      visual: '多图轮播展示 / 好评截图（可选）'
+    });
+  }
+
+  // CTA
+  const cta = slots[slots.length - 1];
+  const ends = [
+    `价格也很香，现在下单还有优惠，赶紧冲！`,
+    `这个价格能买到这样的${product}，真的超值，链接放下面了！`,
+    `趁还没断货赶紧安排上，早买早享受！`
+  ];
+  segments.push({
+    label: cta.label,
+    time: cta.time,
+    lines: [ends[Math.floor(Math.random() * ends.length)]],
+    visual: '价格展示 / 购物车画面 / 购买引导叠加文字'
+  });
+
+  // ========== Build timeline HTML ==========
+  let timelineHtml = '';
+  let fullScript = '';
+
+  segments.forEach((seg, i) => {
+    timelineHtml += `
+      <div class="timeline-item">
+        <div class="dot"></div>
+        <div class="time"><strong>${seg.time}</strong></div>
+        <div class="label">${seg.label}</div>
+        <div class="content">${seg.lines.join('<br>')}</div>
+        <div class="visual-note">🎬 ${seg.visual}</div>
+      </div>`;
+    fullScript += seg.lines.join('。') + '。\n';
+  });
+
+  // Title
+  const titles = [
+    `${product}｜挖到宝了！这个太好用了！`,
+    `${product}｜我不允许还有人不知道它！`,
+    `${product}｜2024必入款，后悔没早买！`,
+    `${product}｜懒人必备，出门有它就够了！`,
+    `${product}｜对比了好几家，这家的细节绝了！`
+  ];
+
+  // Hashtags
+  const hashtagPool = [
+    '#好物推荐', '#好物分享', '#开箱', '#测评', '#购物分享',
+    '#我的私藏好物', '#实用好物', '#种草', '#年度好物',
+    '#居家好物', '#出行好物', '#平替', '#性价比好物',
+    '#TikTok带货', '#这一单超值',
+    `#${product.replace(/[^\w\u4e00-\u9fa5]/g, '').substring(0,10)}`
+  ];
+  const selectedTags = [...hashtagPool].sort(() => Math.random() - 0.5).slice(0, 10);
+  const categoryTag = `#${category}`;
+  if (!selectedTags.includes(categoryTag)) selectedTags.push(categoryTag);
+
+  // Word count
+  const wordCount = fullScript.replace(/\n/g, '').replace(/\s/g, '').length;
+
+  return {
+    title: titles[Math.floor(Math.random() * titles.length)],
+    timelineHtml,
+    fullScript: fullScript.trim(),
+    wordCount,
+    hashtags: selectedTags,
+    duration: `${seconds}s`,
+    style: style
+  };
+}
+
+// ========== Main Generate ==========
+function generateScript() {
+  const prodName = document.getElementById('prodName').value.trim();
+  const points = document.getElementById('sellingPoints').value.trim();
+
+  if (uploadedImages.length === 0) {
+    showToast('请先上传商品图片');
+    return;
+  }
+  if (!prodName) {
+    showToast('请填写商品名称');
+    return;
+  }
+  if (!points) {
+    showToast('请填写至少一个核心卖点');
+    return;
+  }
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 生成中...';
+
+  setTimeout(() => {
+    try {
+      const config = {
+        product: prodName,
+        category: document.getElementById('prodCategory').value,
+        audience: document.getElementById('targetAudience').value,
+        points: points,
+        scenes: document.getElementById('scenes').value.trim(),
+        style: document.querySelector('input[name="style"]:checked')?.value || '种草测评',
+        seconds: parseInt(document.getElementById('videoLength').value),
+        tone: document.getElementById('voiceTone').value
+      };
+
+      const result = generateScriptContent(config);
+
+      document.getElementById('emptyState').style.display = 'none';
+      const output = document.getElementById('scriptOutput');
+      output.classList.add('visible');
+
+      document.getElementById('statDuration').textContent = `⏱️ ${result.duration}`;
+      document.getElementById('statWords').textContent = `📝 ${result.wordCount}字`;
+      document.getElementById('statStyle').textContent = `🌟 ${result.style}`;
+      document.getElementById('scriptTitle').textContent = result.title;
+      document.getElementById('timeline').innerHTML = result.timelineHtml;
+      document.getElementById('fullScriptText').textContent = result.fullScript;
+
+      const ht = document.getElementById('hashtags');
+      ht.innerHTML = result.hashtags.map(h => `<span>${h}</span>`).join('');
+
+      // Scroll to output
+      output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch(e) {
+      showToast('生成出错，请重试');
+      console.error(e);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🚀 生成带货脚本';
+  }, 600);
+}
+
+// ========== Actions ==========
+function copyScript() {
+  const text = document.getElementById('fullScriptText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('已复制脚本到剪贴板');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showToast('已复制脚本到剪贴板');
+  });
+}
+
+function exportText() {
+  const title = document.getElementById('scriptTitle').textContent;
+  const timeline = document.getElementById('timeline').querySelectorAll('.timeline-item');
+  let text = `📱 TikTok带货脚本\n━━━━━━━━━━━━━━\n标题：${title}\n━━━━━━━━━━━━━━\n\n`;
+  timeline.forEach(item => {
+    const time = item.querySelector('.time')?.textContent || '';
+    const label = item.querySelector('.label')?.textContent || '';
+    const content = item.querySelector('.content')?.textContent || '';
+    const visual = item.querySelector('.visual-note')?.textContent || '';
+    text += `【${time}】${label}\n${content}\n${visual}\n\n`;
+  });
+  text += '━━━━━━━━━━━━━━\n完整口播文案：\n' + document.getElementById('fullScriptText').textContent + '\n\n';
+  const tags = [...document.querySelectorAll('#hashtags span')].map(s => s.textContent).join(' ');
+  text += tags;
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `TikTok脚本_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('脚本已下载');
+}
+
+function regenerate() {
+  generateScript();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ========== Keyboard shortcut ==========
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    generateScript();
+  }
+});
+
+function generateTitles() {
+  const prodName = document.getElementById('prodName').value.trim();
+  const points = document.getElementById('sellingPoints').value.trim();
+  const category = document.getElementById('prodCategory').value;
+  const audience = document.getElementById('targetAudience').value;
+  const style = document.querySelector('input[name="style"]:checked')?.value || '种草测评';
+  const scenes = document.getElementById('scenes').value.trim();
+  const sceneList = scenes ? scenes.split(/[,，、\s]+/).filter(Boolean) : [];
+  const pointList = points.split('\n').filter(Boolean);
+
+  if (!prodName || !points) {
+    showToast('请先填写商品名称和卖点');
+    return;
+  }
+
+  const allTitles = generateAllTitleVariants(prodName, category, audience, style, pointList, sceneList);
+  renderTitles(allTitles);
+}
+
+function generateAllTitleVariants(prod, cat, aud, style, points, scenes) {
+  const hs = ['🔥', '💥', '✨', '🌟', '😱', '💰', '🎯', '⚡', '💯', '🚀', '👀', '😍', '🤯', '💪', '🆘'];
+
+  // Helper: random emoji
+  const re = () => hs[Math.floor(Math.random() * hs.length)];
+  // Helper: random from array
+  const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  // Helper: pick random 1-2 points comma joined
+  const pt = (n) => points.slice(0, Math.min(n || 2, points.length)).join('、');
+  const onePt = () => points[0] || '';
+  const scene = () => scenes.length > 0 ? scenes[Math.floor(Math.random() * scenes.length)] : '出门';
+
+  // ========== HOOK / Clickbait ==========
+  const hooks = [
+    ${re()} 这个也太好用了吧！我不允许还有人不知道！,
+    ${re()} 天呐！挖到宝了！这个我真的会谢！,
+    ${re()} 姐妹们冲！这个我真的按头安利！,
+    ${re()} 被问爆了！你们要的链接来了！,
+    ${re()} 救命！这个让我花小钱办大事！,
+    ${re()} 不允许还有人没看过这个！,
+    ${re()} 别划走！这个真的有被惊艳到！,
+    ${re()} 后悔没早买！这个让我幸福感爆棚！,
+    ${re()} 闺蜜问我最近怎么状态这么好，全靠这个！,
+    ${re()} 手慢无！这个真的绝了！
+  ];
+
+  // ========== BENEFIT / Value-driven ==========
+  const benefits = [
+    ${re()} 不到一顿饭钱就能拥有的，真香！,
+    ${re()} 一个=三个！这个的多功能简直了！,
+    ${re()} 真的太重要了！这个做到了！,
+    ${re()} 从早用到晚，这个每天都在帮我省时间,
+    ${re()} 性价比天花板！这个只要XX钱！,
+    ${re()} 为了入的，没想到这么实用！,
+    ${re()} 用过就回不去了！的真的绝,
+    ${re()} ｜，懒人福音没错了！,
+    ${re()} 每天都在用！这的我吹爆！,
+    ${re()} 终于找到了！中的性价比之王！
+  ];
+
+  // ========== QUESTION / Curiosity ==========
+  const questions = [
+    ${re()} 到底值不值得买？看完你就知道了！,
+    ${re()} 的时候你们都在用什么？我选这个！,
+    ${re()} 为什么我建议都备一个？,
+    ${re()} 还在纠结怎么选？看完这个不纠结！,
+    ${re()} 买便宜的还是买贵的？我帮你试了！,
+    ${re()} 你们要的测评来了！到底好不好用？,
+    ${re()} 是谁还没拥有这个？快来看看！,
+    ${re()} 的是智商税吗？实测告诉你！,
+    ${re()} 想知道我必带什么吗？就是这个！,
+    ${re()} 听说这个很火？我买来试了试...
+  ];
+
+  // ========== STYLE variants ==========
+  function styleVariant(base, idx) {
+    if (style === '对比测评') {
+      const c = ['跟同价位比', '跟大牌比', '跟旧款比', '跟我之前用的比'];
+      return ${re()} ，这个赢了！;
+    }
+    if (style === '痛点解决') {
+      return ${re()} 有这个再也不用担心的问题了！;
+    }
+    if (style === '开箱体验') {
+      const o = ['刚到货就忍不住拍了', '拆箱那一刻我惊呆了', '包装比想象中好太多了'];
+      return ${re()} 开箱｜！;
+    }
+    if (style === 'ASMR展示') {
+      return ${re()} 沉浸式体验｜每一个细节都让人舒适;
+    }
+    if (style === '场景剧情') {
+      return ${re()} 带上它，体验感直接拉满！;
+    }
+    return base;
+  }
+
+  // Mix up and add style-specific titles
+  let all = [
+    ...hooks.map(h => ({ text: h, type: 'hook' })),
+    ...benefits.map(b => ({ text: b, type: 'benefit' })),
+    ...questions.map(q => ({ text: q, type: 'question' }))
+  ];
+
+  // Add 5 style-specific
+  for (let i = 0; i < 5; i++) {
+    const base = rand(all).text;
+    all.push({ text: styleVariant(base, i), type: ${style} });
+  }
+
+  // Also add plain (no emoji) good titles
+  const plainer = [
+    ${prod}｜,
+    ${prod}｜必看｜,
+    ${prod}｜适合的推荐,
+    ${prod}｜我的私藏好物分享,
+    ${prod}用了三个月，说说真实感受
+  ];
+  plainer.forEach(p => all.push({ text: p, type: 'plain' }));
+
+  // Remove duplicates
+  const seen = new Set();
+  return all.filter(t => {
+    const key = t.text.replace(/[🔥💥✨🌟😱💰🎯⚡💯🚀👀😍🤯💪🆘]/g, '').trim();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function renderTitles(titles) {
+  document.getElementById('titleEmpty').style.display = 'none';
+  document.getElementById('titleCount').textContent = ${titles.length} 个标题;
+
+  // Group by type
+  const groups = { hook: [], benefit: [], question: [], plain: [], 种草测评: [], 开箱体验: [], 场景剧情: [], 痛点解决: [], 对比测评: [], ASMR展示: [] };
+  titles.forEach(t => {
+    if (groups[t.type]) groups[t.type].push(t.text);
+    else groups.hook.push(t.text); // fallback
+  });
+
+  // Render all
+  renderTitleGroup('titleGrid', titles.map(t => t.text));
+  renderTitleGroup('titleGridHook', groups.hook);
+  renderTitleGroup('titleGridBenefit', groups.benefit);
+  renderTitleGroup('titleGridQuestion', groups.question);
+
+  // Show the grids
+  document.getElementById('titleGrid').style.display = '';
+  document.getElementById('titleGridHook').style.display = groups.hook.length ? '' : 'none';
+  document.getElementById('titleGridBenefit').style.display = groups.benefit.length ? '' : 'none';
+  document.getElementById('titleGridQuestion').style.display = groups.question.length ? '' : 'none';
+}
+
+function renderTitleGroup(gridId, titles) {
+  const grid = document.getElementById(gridId);
+  if (!titles || titles.length === 0) {
+    grid.innerHTML = '<div class="title-empty" style="padding:20px;"><div class="icon">🏷️</div><div>暂无该类型的标题</div></div>';
+    grid.style.display = '';
+    return;
+  }
+  grid.innerHTML = titles.map((t, i) => {
+    const emoji = t.match(/^[🔥💥✨🌟😱💰🎯⚡💯🚀👀😍🤯💪🆘]/)?.[0] || '';
+    const tag = emoji ? '热门' : '推荐';
+    return <div class="title-item">
+      <span class="num">#</span>
+      <span class="text"></span>
+      <span class="tag"></span>
+      <button class="copy-btn" onclick="copySingleTitle(this, '')">复制</button>
+    </div>;
+  }).join('');
+  grid.style.display = '';
+}
+
+function copySingleTitle(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已复制';
+    setTimeout(() => { btn.textContent = '复制'; }, 1200);
+    showToast('已复制标题');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    btn.textContent = '已复制';
+    setTimeout(() => { btn.textContent = '复制'; }, 1200);
+  });
+}
+
+function generateAllTitles() {
+  const btn = document.querySelector('.title-gen-all-btn');
+  btn.textContent = '🔄 生成中...';
+  setTimeout(() => {
+    generateTitles();
+    btn.textContent = '🎲 全部生成';
+  }, 200);
+}
+
+function switchTitleTab(tab) {
+  document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.title-tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(.tab-bar button[data-tab=""]).classList.add('active');
+  document.getElementById(	ab-).classList.add('active');
+}
+
+// Auto-generate titles when generating script
+const origGenerate = generateScript;
+generateScript = function() {
+  origGenerate();
+  // Also generate titles if product info is filled
+  const prodName = document.getElementById('prodName').value.trim();
+  const points = document.getElementById('sellingPoints').value.trim();
+  if (prodName && points) {
+    setTimeout(() => generateTitles(), 300);
+  }
+};
+
+
+// ========== Title Generation ==========
+</script>
+</body>
+</html>
