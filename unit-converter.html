@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>单位换算工具</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f7fa;
+    color: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .container {
+    max-width: 800px;
+    width: 100%;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    padding: 32px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h1 span { color: #6b7280; font-weight: 400; font-size: 14px; }
+  .categories {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .cat-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cat-btn.active {
+    background: #fff;
+    color: #1a1a2e;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .cat-btn:hover:not(.active) { color: #374151; }
+  .converter-panel { display: none; }
+  .converter-panel.active { display: block; }
+  .converter-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .converter-row label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    min-width: 60px;
+  }
+  .input-group {
+    flex: 1;
+    position: relative;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fff;
+    color: #1a1a2e;
+  }
+  .input-group input:focus { border-color: #3b82f6; }
+  .input-group .unit {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    font-weight: 500;
+    color: #9ca3af;
+    pointer-events: none;
+  }
+  .swap-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 18px;
+    color: #6b7280;
+  }
+  .swap-btn:hover { border-color: #3b82f6; color: #3b82f6; }
+  .rate-info {
+    text-align: right;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+    margin-left: 76px;
+    padding-right: 8px;
+  }
+  .category-icon { font-size: 18px; }
+  @media (max-width: 560px) {
+    .container { padding: 20px 16px; }
+    .converter-row { flex-wrap: wrap; gap: 8px; }
+    .converter-row label { min-width: auto; width: 100%; }
+    .swap-btn { width: 100%; height: 36px; }
+    .rate-info { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>换算工具 <span>一键转换</span></h1>
+
+  <div class="categories" id="categoryTabs">
+    <button class="cat-btn active" data-cat="weight"><span class="category-icon">⚖️</span> 重量</button>
+    <button class="cat-btn" data-cat="length"><span class="category-icon">📏</span> 长度</button>
+    <button class="cat-btn" data-cat="currency"><span class="category-icon">💱</span> 货币</button>
+  </div>
+
+  <div class="converter-panel active" id="panel-weight">
+    <div class="converter-row">
+      <label>输入</label>
+      <div class="input-group">
+        <input type="number" id="weightInput" step="any" value="1" placeholder="0">
+        <span class="unit" id="weightFromUnit">KG</span>
+      </div>
+    </div>
+    <div style="text-align:center;"><button class="swap-btn" id="swapWeight">⇄</button></div>
+    <div class="converter-row">
+      <label>结果</label>
+      <div class="input-group">
+        <input type="text" id="weightOutput" readonly value="2.2046">
+        <span class="unit" id="weightToUnit">LBS</span>
+      </div>
+    </div>
+    <div class="rate-info" id="weightRate">1 KG = 2.2046 LBS</div>
+  </div>
+
+  <div class="converter-panel" id="panel-length">
+    <div class="converter-row">
+      <label>输入</label>
+      <div class="input-group">
+        <input type="number" id="lengthInput" step="any" value="1" placeholder="0">
+        <span class="unit" id="lengthFromUnit">CM</span>
+      </div>
+    </div>
+    <div style="text-align:center;"><button class="swap-btn" id="swapLength">⇄</button></div>
+    <div class="converter-row">
+      <label>结果</label>
+      <div class="input-group">
+        <input type="text" id="lengthOutput" readonly value="0.3937">
+        <span class="unit" id="lengthToUnit">INCH</span>
+      </div>
+    </div>
+    <div class="rate-info" id="lengthRate">1 CM = 0.3937 INCH</div>
+  </div>
+
+  <div class="converter-panel" id="panel-currency">
+    <div class="converter-row">
+      <label>输入</label>
+      <div class="input-group">
+        <input type="number" id="currencyInput" step="any" value="1" placeholder="0">
+        <span class="unit">RMB</span>
+      </div>
+    </div>
+    <div style="margin:12px 0;">
+      <label style="font-size:13px;font-weight:500;color:#6b7280;display:block;margin-bottom:6px;">目标货币</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="cat-btn active" data-target="usd" style="flex:1;min-width:70px;">USD</button>
+        <button class="cat-btn" data-target="rub" style="flex:1;min-width:70px;">RUB</button>
+        <button class="cat-btn" data-target="jpy" style="flex:1;min-width:70px;">JPY</button>
+      </div>
+    </div>
+    <div class="converter-row">
+      <label>结果</label>
+      <div class="input-group">
+        <input type="text" id="currencyOutput" readonly value="0.14">
+        <span class="unit" id="currencyToUnit">USD</span>
+      </div>
+    </div>
+    <div class="rate-info" id="currencyRate">1 RMB ≈ 0.14 USD</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const KG_TO_LBS = 2.20462;
+  const CM_TO_INCH = 0.393701;
+  const RMB_RATES = { usd: 0.14, rub: 12.5, jpy: 21.0 };
+
+  const el = {
+    wIn: document.getElementById('weightInput'),
+    wOut: document.getElementById('weightOutput'),
+    wFu: document.getElementById('weightFromUnit'),
+    wTu: document.getElementById('weightToUnit'),
+    wRt: document.getElementById('weightRate'),
+    lIn: document.getElementById('lengthInput'),
+    lOut: document.getElementById('lengthOutput'),
+    lFu: document.getElementById('lengthFromUnit'),
+    lTu: document.getElementById('lengthToUnit'),
+    lRt: document.getElementById('lengthRate'),
+    cIn: document.getElementById('currencyInput'),
+    cOut: document.getElementById('currencyOutput'),
+    cTu: document.getElementById('currencyToUnit'),
+    cRt: document.getElementById('currencyRate'),
+  };
+
+  let wSwap = false, lSwap = false, curTarget = 'usd';
+
+  function calcW() {
+    var v = parseFloat(el.wIn.value);
+    if (isNaN(v) || v < 0) { el.wOut.value = ''; el.wRt.textContent = ''; return; }
+    var r, f, t;
+    if (wSwap) { r = v / KG_TO_LBS; f = 'LBS'; t = 'KG'; el.wRt.textContent = '1 LBS = ' + (1/KG_TO_LBS).toFixed(6) + ' KG'; }
+    else { r = v * KG_TO_LBS; f = 'KG'; t = 'LBS'; el.wRt.textContent = '1 KG = ' + KG_TO_LBS.toFixed(4) + ' LBS'; }
+    el.wOut.value = parseFloat(r.toFixed(4)).toString();
+    el.wFu.textContent = f; el.wTu.textContent = t;
+  }
+
+  function calcL() {
+    var v = parseFloat(el.lIn.value);
+    if (isNaN(v) || v < 0) { el.lOut.value = ''; el.lRt.textContent = ''; return; }
+    var r, f, t;
+    if (lSwap) { r = v / CM_TO_INCH; f = 'INCH'; t = 'CM'; el.lRt.textContent = '1 INCH = ' + (1/CM_TO_INCH).toFixed(4) + ' CM'; }
+    else { r = v * CM_TO_INCH; f = 'CM'; t = 'INCH'; el.lRt.textContent = '1 CM = ' + CM_TO_INCH.toFixed(4) + ' INCH'; }
+    el.lOut.value = parseFloat(r.toFixed(4)).toString();
+    el.lFu.textContent = f; el.lTu.textContent = t;
+  }
+
+  function calcC() {
+    var v = parseFloat(el.cIn.value);
+    if (isNaN(v) || v < 0) { el.cOut.value = ''; el.cRt.textContent = ''; return; }
+    var rate = RMB_RATES[curTarget];
+    var sym = { usd: 'USD', rub: 'RUB', jpy: 'JPY' }[curTarget];
+    el.cOut.value = (v * rate).toFixed(2);
+    el.cTu.textContent = sym;
+    el.cRt.textContent = '1 RMB \u2248 ' + rate + ' ' + sym;
+  }
+
+  document.getElementById('swapWeight').onclick = function() { wSwap = !wSwap; calcW(); };
+  document.getElementById('swapLength').onclick = function() { lSwap = !lSwap; calcL(); };
+  el.wIn.addEventListener('input', calcW);
+  el.lIn.addEventListener('input', calcL);
+  el.cIn.addEventListener('input', calcC);
+
+  document.querySelectorAll('#categoryTabs .cat-btn').forEach(function(b) {
+    b.addEventListener('click', function() {
+      document.querySelectorAll('#categoryTabs .cat-btn').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      ['weight','length','currency'].forEach(function(k) {
+        document.getElementById('panel-' + k).classList.toggle('active', k === b.dataset.cat);
+      });
+    });
+  });
+
+  document.querySelectorAll('[data-target]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      document.querySelectorAll('[data-target]').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      curTarget = b.dataset.target;
+      calcC();
+    });
+  });
+
+  calcW(); calcL(); calcC();
+})();
+</script>
+</body>
+</html>
