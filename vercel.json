@@ -1,0 +1,10 @@
+{
+  "name": "my-tools",
+  "version": 2,
+  "public": true,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/", "destination": "/index.html" }
+  ]
+}
