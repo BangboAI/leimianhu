@@ -11,10 +11,20 @@
     background: #f5f7fa;
     color: #1a1a2e;
     min-height: 100vh;
+  }
+  .nav{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+  .nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+  .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+  .nav-brand span{color:#60a5fa}
+  .nav-links{display:flex;gap:4px}
+  .nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all 0.2s}
+  .nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+  .page-content{
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 40px 20px;
+    min-height: calc(100vh - 56px);
   }
   .container {
     max-width: 800px;
@@ -135,6 +145,19 @@
 </style>
 </head>
 <body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">🛒 <span>HuaAngel</span> Tools</a>
+    <div class="nav-links">
+      <a href="/">首页</a>
+      <a href="/ozon-content-generator">OZON 生成器</a>
+      <a href="/ozon-price-calculator">价格计算器</a>
+      <a href="/tiktok-script-generator">TK 脚本</a>
+      <a href="/unit-converter" class="active">单位换算</a>
+    </div>
+  </div>
+</nav>
+<div class="page-content">
 <div class="container">
   <h1>换算工具 <span>一键转换</span></h1>
 
@@ -292,5 +315,6 @@
   calcW(); calcL(); calcC();
 })();
 </script>
+</div>
 </body>
 </html>

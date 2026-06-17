@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OZON 内容生成器 - HuaAngel Tools</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f0f2f5;
+  --card-bg: #fff;
+  --text: #1a1a2e;
+  --text-secondary: #666;
+  --primary: #005bff;
+  --primary-hover: #0047cc;
+  --primary-light: #e8f0fe;
+  --accent-green: #00a854;
+  --accent-orange: #f59e0b;
+  --accent-red: #e53935;
+  --bg-dark: #1a1a2e;
+  --header-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-hover: 0 6px 20px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-lg: 16px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ===== Navigation ===== */
+.nav {
+  background: var(--header-gradient);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+.nav-brand span { color: #60a5fa; }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+}
+
+/* ===== Header ===== */
+.header {
+  background: var(--header-gradient);
+  padding: 40px 24px 48px;
+  text-align: center;
+  color: #fff;
+  border-radius: 0 0 24px 24px;
+}
+.header h1 { font-size: 28px; margin-bottom: 8px; }
+.header h1 span { color: #60a5fa; }
+.header p { color: rgba(255,255,255,0.65); font-size: 15px; }
+
+/* ===== Container ===== */
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+/* ===== Section Title ===== */
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+/* ===== Cards ===== */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+/* ===== Form ===== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-group input, .form-group select, .form-group textarea {
+  padding: 10px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+  background: #fafafa;
+  color: var(--text);
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0,91,255,0.08);
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-group.full { grid-column: 1 / -1; }
+
+/* ===== Tags ===== */
+.tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tag-group input { display: none; }
+.tag-group label {
+  padding: 7px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  background: #fafafa;
+}
+.tag-group label:hover { border-color: var(--primary); background: var(--primary-light); }
+.tag-group input:checked + label {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ===== Buttons ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(0,91,255,0.3);
+}
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-lg { padding: 14px 36px; font-size: 16px; }
+.btn-block { width: 100%; justify-content: center; }
+.btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 6px; }
+.btn-outline {
+  background: #fff;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+.btn-outline:hover { background: var(--primary-light); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 6px 10px;
+}
+.btn-ghost:hover { background: #f5f5f5; }
+
+/* ===== Output Panels ===== */
+.output-section { margin-top: 24px; }
+.output-card {
+  background: var(--bg-dark);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  color: #e0e0e0;
+  position: relative;
+}
+.output-card h3 {
+  font-size: 16px;
+  color: #60a5fa;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.output-box {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  position: relative;
+  white-space: pre-wrap;
+  color: #d4d4d8;
+}
+.output-box .variant-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #60a5fa;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.output-box .copy-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #aaa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.output-box .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+.output-box .copy-btn.copied { background: var(--accent-green); color: #fff; }
+
+.keyword-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.keyword-tag {
+  background: rgba(96,165,250,0.15);
+  color: #93c5fd;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+.empty-state p { color: var(--text-secondary); font-size: 14px; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-dark);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ===== Categories ===== */
+.cat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.cat-card {
+  border: 2px solid #e5e7eb;
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  background: #fafafa;
+}
+.cat-card:hover { border-color: var(--primary); background: var(--primary-light); }
+.cat-card.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(0,91,255,0.1);
+}
+.cat-card .cat-emoji { font-size: 28px; margin-bottom: 8px; }
+.cat-card .cat-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.cat-card .cat-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+/* ===== Preview Bar ===== */
+.preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--primary-light);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding: 32px 24px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .form-grid, .form-grid.triple { grid-template-columns: 1fr; }
+  .container { padding: 16px; }
+  .cat-cards { grid-template-columns: 1fr 1fr; }
+  .header h1 { font-size: 22px; }
+  .nav-links a { font-size: 13px; padding: 4px 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">🛒 <span>HuaAngel</span> Tools</a>
+    <div class="nav-links">
+      <a href="/">首页</a>
+      <a href="/ozon-content-generator" class="active">OZON 生成器</a>
+      <a href="/ozon-price-calculator">价格计算器</a>
+      <a href="/tiktok-script-generator">TK 脚本</a>
+      <a href="/unit-converter">单位换算</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Header -->
+<header class="header">
+  <h1>✨ OZON <span>Content</span> Lab</h1>
+  <p>输入产品信息，一键生成俄语标题、描述和关键词标签</p>
+</header>
+
+<div class="container">
+
+  <!-- Step 1: Category -->
+  <div class="card">
+    <div class="section-title">📦 第一步：选择产品品类</div>
+    <div class="cat-cards" id="catCards">
+      <div class="cat-card selected" data-cat="dog_toy">
+        <div class="cat-emoji">🐶</div>
+        <div class="cat-name">狗玩具 / Игрушки для собак</div>
+        <div class="cat-desc">互动益智、慢食、训练</div>
+      </div>
+      <div class="cat-card" data-cat="cat_toy">
+        <div class="cat-emoji">🐱</div>
+        <div class="cat-name">猫玩具 / Игрушки для кошек</div>
+        <div class="cat-desc">逗猫棒、滚球、益智</div>
+      </div>
+      <div class="cat-card" data-cat="bags">
+        <div class="cat-emoji">🎒</div>
+        <div class="cat-name">箱包 / Сумки</div>
+        <div class="cat-desc">背包、腰包、斜挎包</div>
+      </div>
+      <div class="cat-card" data-cat="accessories">
+        <div class="cat-emoji">⌚</div>
+        <div class="cat-name">配饰 / Аксессуары</div>
+        <div class="cat-desc">帽子、围巾、手套</div>
+      </div>
+      <div class="cat-card" data-cat="other">
+        <div class="cat-emoji">📦</div>
+        <div class="cat-name">其他 / Другое</div>
+        <div class="cat-desc">自定义品类</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Product Info -->
+  <div class="card">
+    <div class="section-title">📝 第二步：填写产品信息</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>产品名称（中文）*</label>
+        <input type="text" id="prodName" placeholder="例如：不倒翁漏食球">
+      </div>
+      <div class="form-group">
+        <label>品牌（选填）</label>
+        <input type="text" id="prodBrand" placeholder="例如：PetFun">
+      </div>
+      <div class="form-group">
+        <label>颜色</label>
+        <select id="prodColor">
+          <option value="">未指定</option>
+          <option value="синий">蓝色 / Синий</option>
+          <option value="зеленый">绿色 / Зеленый</option>
+          <option value="красный">红色 / Красный</option>
+          <option value="розовый">粉色 / Розовый</option>
+          <option value="черный">黑色 / Черный</option>
+          <option value="белый">白色 / Белый</option>
+          <option value="серый">灰色 / Серый</option>
+          <option value="оранжевый">橙色 / Оранжевый</option>
+          <option value="фиолетовый">紫色 / Фиолетовый</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>材质</label>
+        <select id="prodMaterial">
+          <option value="">未指定</option>
+          <option value="ABS пластик">ABS塑料</option>
+          <option value="силикон">硅胶</option>
+          <option value="нейлон">尼龙</option>
+          <option value="резина">橡胶</option>
+          <option value="полиэстер">聚酯纤维</option>
+          <option value="хлопок">棉</option>
+          <option value="натуральная кожа">真皮</option>
+          <option value="экокожа">PU皮</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Product Features -->
+  <div class="card">
+    <div class="section-title">🏷 第三步：选择产品特性</div>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px">选择适用于你产品的标签（可多选）</p>
+    <div class="tag-group" id="featureTags">
+      <input type="checkbox" id="f_interactive" value="интерактивная игрушка"><label for="f_interactive">互动玩具</label>
+      <input type="checkbox" id="f_puzzle" value="головоломка"><label for="f_puzzle">益智/解谜</label>
+      <input type="checkbox" id="f_slowfeeder" value="slow feeder"><label for="f_slowfeeder">慢食器</label>
+      <input type="checkbox" id="f_dispenser" value="раздача корма"><label for="f_dispenser">漏食/出粮</label>
+      <input type="checkbox" id="f_tumbler" value="неваляшка"><label for="f_tumbler">不倒翁</label>
+      <input type="checkbox" id="f_rolling" value="катящийся шар"><label for="f_rolling">滚动球</label>
+      <input type="checkbox" id="f_antistress" value="антистресс"><label for="f_antistress">减压/抗焦虑</label>
+      <input type="checkbox" id="f_boredom" value="от скуки"><label for="f_boredom">防无聊</label>
+      <input type="checkbox" id="f_mental" value="умственная стимуляция"><label for="f_mental">智力开发</label>
+      <input type="checkbox" id="f_developing" value="развивающая игрушка"><label for="f_developing">教育发展</label>
+      <input type="checkbox" id="f_waterproof" value="водоотталкивающий"><label for="f_waterproof">防水</label>
+      <input type="checkbox" id="f_durable" value="прочный"><label for="f_durable">耐用</label>
+      <input type="checkbox" id="f_lightweight" value="легкий"><label for="f_lightweight">轻便</label>
+      <input type="checkbox" id="f_washable" value="легко мыть"><label for="f_washable">可水洗</label>
+      <input type="checkbox" id="f_silent" value="бесшумный"><label for="f_silent">静音</label>
+      <input type="checkbox" id="f_safe" value="безопасный"><label for="f_safe">安全无毒</label>
+      <input type="checkbox" id="f_training" value="для дрессировки"><label for="f_training">训练用</label>
+      <input type="checkbox" id="f_indoor" value="для дома"><label for="f_indoor">家用/室内</label>
+      <input type="checkbox" id="f_outdoor" value="для улицы"><label for="f_outdoor">户外用</label>
+      <input type="checkbox" id="f_travel" value="для путешествий"><label for="f_travel">旅行用</label>
+    </div>
+  </div>
+
+  <!-- Step 4: Target Audience -->
+  <div class="card">
+    <div class="section-title">🐾 第四步：适用对象</div>
+    <div class="tag-group" id="audienceTags">
+      <input type="checkbox" id="a_puppy" value="для щенков"><label for="a_puppy">幼犬</label>
+      <input type="checkbox" id="a_adult" value="для взрослых собак"><label for="a_adult">成年犬</label>
+      <input type="checkbox" id="a_small" value="для мелких пород"><label for="a_small">小型犬</label>
+      <input type="checkbox" id="a_medium" value="для средних пород"><label for="a_medium">中型犬</label>
+      <input type="checkbox" id="a_large" value="для крупных пород"><label for="a_large">大型犬</label>
+      <input type="checkbox" id="a_cat" value="для кошек"><label for="a_cat">猫咪</label>
+      <input type="checkbox" id="a_unisex" value="унисекс"><label for="a_unisex">男女通用</input>
+      <input type="checkbox" id="a_men" value="мужской"><label for="a_men">男士</label>
+      <input type="checkbox" id="a_women" value="женский"><label for="a_women">女士</label>
+      <input type="checkbox" id="a_allpets" value="для всех питомцев"><label for="a_allpets">所有宠物</label>
+    </div>
+  </div>
+
+  <!-- Step 5: Extra Info -->
+  <div class="card">
+    <div class="section-title">💡 第五步：补充描述（选填）</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>自定义卖点 / 特色（每行一条，将自动翻译为俄语）</label>
+        <textarea id="customFeatures" placeholder="例如：&#10;透明上盖可以看到食物余量&#10;可调节出食口大小&#10;适合3个月以上幼犬&#10;底部防滑设计"></textarea>
+      </div>
+      <div class="form-group">
+        <label>产品尺寸（选填）</label>
+        <input type="text" id="prodSize" placeholder="例如：直径 10 см">
+      </div>
+      <div class="form-group">
+        <label>包装内容（选填）</label>
+        <input type="text" id="prodPackage" placeholder="例如：1 шт">
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate Button -->
+  <div style="text-align:center; padding: 8px 0 24px;">
+    <button class="btn btn-primary btn-lg btn-block" onclick="generate()" style="max-width:500px">
+      🚀 一键生成 OZON 上架内容
+    </button>
+  </div>
+
+  <!-- Output Section -->
+  <div id="outputSection" class="output-section" style="display:none">
+    
+    <!-- Product Preview -->
+    <div class="preview-bar" id="previewBar"></div>
+
+    <!-- Titles -->
+    <div class="card">
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>📌 商品标题（Название товара）</span>
+        <button class="btn btn-sm btn-outline" onclick="copyAll('titles')">📋 复制全部标题</button>
+      </div>
+      <div id="titlesOutput"></div>
+    </div>
+
+    <!-- Description -->
+    <div class="card">
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>📄 商品描述（Описание товара）</span>
+        <button class="btn btn-sm btn-outline" onclick="copyAll('desc')">📋 复制描述</button>
+      </div>
+      <div id="descOutput" class="output-card"></div>
+    </div>
+
+    <!-- Keywords -->
+    <div class="card">
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>#️⃣ 关键词标签（Хештеги для OZON）</span>
+        <button class="btn btn-sm btn-outline" onclick="copyAll('keywords')">📋 复制关键词</button>
+      </div>
+      <div id="keywordsOutput" style="line-height: 2.2;"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p>🛒 HuaAngel Tools · OZON 上架内容一键生成 · www.huaangel.com</p>
+</footer>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ===== Category Selection =====
+document.getElementById('catCards').addEventListener('click', function(e) {
+  const card = e.target.closest('.cat-card');
+  if (!card) return;
+  this.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  updateFeatureTags(card.dataset.cat);
+});
+
+function updateFeatureTags(cat) {
+  // Show/hide features based on category
+  const petFeatures = ['f_interactive','f_puzzle','f_slowfeeder','f_dispenser','f_tumbler','f_rolling','f_antistress','f_boredom','f_mental','f_developing','f_washable','f_silent','f_safe','f_indoor','f_training'];
+  const bagFeatures = ['f_waterproof','f_durable','f_lightweight','f_safe','f_travel','f_outdoor'];
+  const allTags = document.querySelectorAll('#featureTags > input');
+  
+  allTags.forEach(tag => {
+    tag.parentElement.style.display = '';
+  });
+  
+  if (cat === 'bags' || cat === 'accessories') {
+    allTags.forEach(tag => {
+      if (!bagFeatures.includes(tag.id) && tag.id !== 'f_indoor' && tag.id !== 'f_training') {
+        tag.parentElement.style.display = tag.checked ? '' : 'none';
+        tag.checked = false;
+      }
+    });
+  }
+  
+  // Update audience tags
+  const audiencePet = ['a_puppy','a_adult','a_small','a_medium','a_large','a_cat','a_allpets'];
+  const audienceHuman = ['a_unisex','a_men','a_women'];
+  document.querySelectorAll('#audienceTags label').forEach(label => {
+    const input = label.parentElement.querySelector('input');
+    if (cat === 'bags' || cat === 'accessories') {
+      if (audienceHuman.includes(input.id)) label.style.display = '';
+      else label.style.display = 'none';
+    } else {
+      if (audiencePet.includes(input.id)) label.style.display = '';
+      else label.style.display = 'none';
+    }
+  });
+}
+
+// ===== Generation Logic =====
+function getSelectedTags(containerId) {
+  const tags = [];
+  document.querySelectorAll(`#${containerId} input:checked`).forEach(input => {
+    tags.push(input.value);
+  });
+  return tags;
+}
+
+function getCategoryName(cat) {
+  const map = {
+    'dog_toy': 'игрушка для собак',
+    'cat_toy': 'игрушка для кошек',
+    'bags': 'сумка',
+    'accessories': 'аксессуар',
+    'other': 'товар'
+  };
+  return map[cat] || 'товар';
+}
+
+function getCategoryNameRu(cat) {
+  const map = {
+    'dog_toy': 'Игрушки для собак',
+    'cat_toy': 'Игрушки для кошек', 
+    'bags': 'Сумки',
+    'accessories': 'Аксессуары',
+    'other': 'Товары'
+  };
+  return map[cat] || 'Товары';
+}
+
+function generate() {
+  const cat = document.querySelector('.cat-card.selected')?.dataset.cat || 'other';
+  const name = document.getElementById('prodName').value.trim();
+  const brand = document.getElementById('prodBrand').value.trim();
+  const color = document.getElementById('prodColor').value;
+  const material = document.getElementById('prodMaterial').value;
+  const features = getSelectedTags('featureTags');
+  const audience = getSelectedTags('audienceTags');
+  const customFeatures = document.getElementById('customFeatures').value.trim();
+  const size = document.getElementById('prodSize').value.trim();
+  const pkg = document.getElementById('prodPackage').value.trim();
+
+  if (!name) {
+    showToast('⚠️ 请至少填写产品名称');
+    return;
+  }
+
+  // Build title parts
+  const titleBase = buildTitleBase(cat, name, brand, color, material, features, audience);
+  const titles = [
+    buildTitleShort(titleBase, cat),
+    buildTitleSEO(titleBase, cat), 
+    buildTitleLong(titleBase, cat)
+  ];
+
+  // Build description
+  const desc = buildDescription(cat, name, brand, color, material, features, audience, customFeatures, size, pkg);
+
+  // Build keywords
+  const keywords = buildKeywords(cat, color, material, features, audience);
+
+  // Render
+  renderOutput(titles, desc, keywords, cat);
+  
+  document.getElementById('outputSection').style.display = 'block';
+  document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+  
+  showToast('✅ 内容已生成！');
+}
+
+function buildTitleBase(cat, name, brand, color, material, features, audience) {
+  const parts = [];
+  
+  // Core product type
+  if (features.includes('неваляшка')) {
+    parts.push(`Интерактивная игрушка-неваляшка`);
+  } else if (features.includes('головоломка')) {
+    parts.push('Интерактивная игрушка-головоломка');
+  } else if (features.includes('интерактивная игрушка')) {
+    parts.push('Интерактивная игрушка');
+  } else {
+    parts.push(getCategoryName(cat));
+  }
+  
+  // For whom
+  const petAudience = audience.filter(a => 
+    a.includes('собак') || a.includes('щенк') || a.includes('кошек') || a.includes('питомц')
+  );
+  
+  if (petAudience.length > 0) {
+    parts.push(petAudience.join(' и '));
+  } else if (cat === 'dog_toy') {
+    parts.push('для собак');
+  } else if (cat === 'cat_toy') {
+    parts.push('для кошек');
+  } else if ((cat === 'bags' || cat === 'accessories') && audience.length > 0) {
+    parts.push(audience.join(' и '));
+  }
+  
+  // Features
+  const keyFeatures = features.filter(f => 
+    !['интерактивная игрушка', 'головоломка', 'неваляшка', 'развивающая игрушка'].includes(f)
+  );
+  if (keyFeatures.length > 0) {
+    parts.push('с ' + keyFeatures.slice(0, 2).join(' и '));
+  }
+  
+  // Key benefits
+  const benefits = [];
+  if (features.includes('умственная стимуляция')) benefits.push('для умственной стимуляции');
+  if (features.includes('от скуки')) benefits.push('от скуки');
+  if (features.includes('антистресс')) benefits.push('антистресс');
+  if (features.includes('для дрессировки')) benefits.push('для дрессировки');
+  if (features.includes('slow feeder')) benefits.push('для медленного кормления');
+  if (benefits.length > 0) parts.push(benefits.slice(0, 2).join(' и '));
+  
+  // Material
+  if (material) parts.push(material);
+  
+  // Brand
+  if (brand) parts.push(brand);
+  
+  // Color
+  if (color) parts.push(color);
+  
+  return parts;
+}
+
+function buildTitleShort(base, cat) {
+  // Short version: core + key features, mobile-optimized
+  const short = [base[0]];
+  if (base.length > 1) short.push(base[1]); // audience
+  const remaining = base.slice(2).filter(p => !p.includes('ABS') && !p.includes('нейлон') && !p.includes('силикон') && !p.includes('резина'));
+  if (remaining.length > 0) short.push(remaining[0]);
+  if (remaining.length > 1 && remaining[1].includes('цвет')) short.push(remaining[remaining.length - 1]);
+  return short.join(', ');
+}
+
+function buildTitleSEO(base, cat) {
+  // SEO version: all important parts
+  const seo = base.filter(p => p !== base[base.length - 1] || !p.includes('ABS') || base.length <= 4);
+  return seo.join(', ');
+}
+
+function buildTitleLong(base, cat) {
+  // Extended version with all descriptive elements
+  const long = [...base];
+  return long.join(', ');
+}
+
+function buildDescription(cat, name, brand, color, material, features, audience, customFeatures, size, pkg) {
+  const petCat = ['dog_toy', 'cat_toy'].includes(cat);
+  const petName = cat === 'dog_toy' ? 'собака' : cat === 'cat_toy' ? 'кошка' : 'питомец';
+  
+  let desc = '';
+  
+  // Intro
+  if (features.includes('неваляшка')) {
+    desc += `Интерактивная игрушка-неваляшка — это не просто развлечение, а умный способ кормления вашего питомца. ${petName === 'собака' ? 'Собака толкает шар, он катится и вращается, а через специальное отверстие постепенно высыпаются лакомства или сухой корм.' : 'Питомец играет с игрушкой и самостоятельно добывает лакомства.'} Питомец играет, двигается и учится добывать еду самостоятельно.\n\n`;
+  } else if (features.includes('головоломка')) {
+    desc += `Интерактивная игрушка-головоломка — отличный способ занять вашего питомца и развить его умственные способности. ${petName === 'собака' ? 'Собака учится решать задачи, чтобы получить лакомство.' : 'Питомец разгадывает головоломку ради вкусного вознаграждения.'} Идеально подходит для активных и любознательных питомцев.\n\n`;
+  } else if (features.includes('интерактивная игрушка')) {
+    desc += `Интерактивная игрушка для вашего питомца — сочетание игры и развития. Помогает занять питомца, развивает интеллект и моторику. Подходит для ежедневного использования.\n\n`;
+  } else {
+    desc += `${name ? name + ' — ' : ''}качественный товар, созданный с заботой о вашем комфорте и удобстве. Подходит для ежедневного использования.\n\n`;
+  }
+
+  // Audience
+  const audienceText = audience.filter(a => 
+    a.includes('собак') || a.includes('щенк') || a.includes('кошек') || a.includes('питомц') || a.includes('унисекс') || a.includes('муж') || a.includes('жен')
+  );
+  if (audienceText.length > 0) {
+    desc += `Идеально подходит: ${audienceText.join(', ')}.\n\n`;
+  }
+  
+  // Characteristics
+  desc += `ХАРАКТЕРИСТИКИ:\n\n`;
+  if (cat === 'dog_toy' || cat === 'cat_toy') {
+    if (features.includes('неваляшка')) {
+      desc += `• Тип: игрушка-неваляшка, интерактивная головоломка\n`;
+      desc += `• Функция: медленное кормление (slow feeder), раздача лакомств\n`;
+      desc += `• Механизм: катящийся шар — питомец толкает, игрушка вращается, корм высыпается\n`;
+    } else if (features.includes('головоломка')) {
+      desc += `• Тип: интерактивная головоломка\n`;
+      desc += `• Функция: развитие интеллекта и моторики\n`;
+    }
+    if (features.includes('slow feeder')) {
+      desc += `• Режим кормления: медленное кормление, предотвращает переедание\n`;
+    }
+    if (features.includes('легко мыть')) {
+      desc += `• Уход: легко моется под водой\n`;
+    }
+    if (features.includes('бесшумный')) {
+      desc += `• Уровень шума: бесшумная, не раздражает слух\n`;
+    }
+    if (features.includes('безопасный')) {
+      desc += `• Безопасность: нетоксичные материалы, безопасна для питомца\n`;
+    }
+  } else if (cat === 'bags') {
+    desc += `• Тип: сумка\n`;
+    if (features.includes('водоотталкивающий')) desc += `• Защита: водоотталкивающая ткань\n`;
+    if (features.includes('прочный')) desc += `• Прочность: усиленные швы и качественная фурнитура\n`;
+  }
+  
+  if (material) desc += `• Материал: ${material}\n`;
+  if (color) desc += `• Цвет: ${color}\n`;
+  if (features.includes('прочный')) desc += `• Прочность: высокая износостойкость, долгий срок службы\n`;
+  if (features.includes('легкий')) desc += `• Вес: легкий, не создает нагрузки\n`;
+  if (brand) desc += `• Бренд: ${brand}\n`;
+  if (size) desc += `• Размер: ${size}\n`;
+  if (pkg) desc += `• Комплектация: ${pkg}\n`;
+  
+  // Custom features
+  if (customFeatures) {
+    desc += '\n';
+    const lines = customFeatures.split('\n').filter(l => l.trim());
+    lines.forEach(line => {
+      desc += `• ${line.trim()}\n`;
+    });
+  }
+  
+  // Advantages
+  desc += `\nПРЕИМУЩЕСТВА:\n\n`;
+  if (features.includes('slow feeder')) {
+    desc += `⏱ Медленное кормление — предотвращает переедание, улучшает пищеварение\n`;
+  }
+  if (features.includes('умственная стимуляция') || features.includes('развивающая игрушка')) {
+    desc += `🧠 Умственная стимуляция — ${petName} думает и учится, развивает интеллект\n`;
+  }
+  if (features.includes('неваляшка') || features.includes('катящийся шар') || features.includes('интерактивная игрушка')) {
+    desc += `🐾 Физическая активность — побуждает питомца двигаться, играть и исследовать\n`;
+  }
+  if (features.includes('антистресс') || features.includes('от скуки')) {
+    desc += `😌 Антистресс — занимает питомца надолго, спасает от скуки и разрушительного поведения\n`;
+  }
+  if (features.includes('для дома')) {
+    desc += `🏠 Для дома — идеально для самостоятельной игры\n`;
+  }
+  if (features.includes('для путешествий') || features.includes('для улицы')) {
+    desc += `✈️ Компактный — удобно брать с собой в поездки\n`;
+  }
+  if (features.includes('бесшумный')) {
+    desc += `🔊 Бесшумный — не гремит, не раздражает\n`;
+  }
+  if (features.includes('легко мыть')) {
+    desc += `🧼 Легко мыть — разбирается и моется за секунды\n`;
+  }
+  if (features.includes('водоотталкивающий')) {
+    desc += `💧 Водоотталкивающий — защищает содержимое от влаги\n`;
+  }
+  if (features.includes('прочный')) {
+    desc += `🛡 Прочный — долгий срок службы, устойчив к износу\n`;
+  }
+  if (features.includes('безопасный')) {
+    desc += `✅ Безопасный — изготовлен из нетоксичных материалов\n`;
+  }
+  
+  // Care
+  desc += `\nЗАБОТА О КЛИЕНТАХ:\n`;
+  desc += `Мы уверены в качестве нашей продукции. Если у вас возникли вопросы или претензии — свяжитесь с нами, мы оперативно решим любую проблему. Ваш питомец заслуживает лучшего!\n`;
+  
+  return desc;
+}
+
+function buildKeywords(cat, color, material, features, audience) {
+  const keywords = new Set();
+  
+  // Category-specific base keywords
+  if (cat === 'dog_toy') {
+    keywords.add('интерактивная игрушка для собак');
+    keywords.add('игрушка для собак');
+    keywords.add('игрушка головоломка для собак');
+    keywords.add('развивающая игрушка для собак');
+  } else if (cat === 'cat_toy') {
+    keywords.add('интерактивная игрушка для кошек');
+    keywords.add('игрушка для кошек');
+    keywords.add('игрушка головоломка для кошек');
+    keywords.add('развивающая игрушка для кошек');
+  } else if (cat === 'bags') {
+    keywords.add('сумка');
+    keywords.add('сумка через плечо');
+    keywords.add('поясная сумка');
+    keywords.add('сумка для путешествий');
+    keywords.add('сумка для спорта');
+  } else if (cat === 'accessories') {
+    keywords.add('аксессуар');
+    keywords.add('подарок');
+  }
+  
+  // Feature keywords
+  if (features.includes('неваляшка')) {
+    keywords.add('игрушка неваляшка для собак');
+    keywords.add('неваляшка с кормом');
+  }
+  if (features.includes('катящийся шар')) {
+    keywords.add('шар с лакомством для собак');
+    keywords.add('игрушка катящаяся для собак');
+    keywords.add('вращающаяся игрушка для собак');
+  }
+  if (features.includes('slow feeder')) {
+    keywords.add('slow feeder для собак');
+    keywords.add('игрушка для медленного кормления');
+    keywords.add('кормушка головоломка для собак');
+  }
+  if (features.includes('раздача корма')) {
+    keywords.add('игрушка с раздачей корма');
+    keywords.add('игрушка с раздачей лакомств');
+  }
+  if (features.includes('умственная стимуляция')) {
+    keywords.add('умственная стимуляция собаки');
+    keywords.add('интеллектуальная игрушка для собак');
+    keywords.add('тренировка мозга собаки');
+  }
+  if (features.includes('от скуки')) {
+    keywords.add('игрушка от скуки для собак');
+    keywords.add('собака скучает чем занять');
+  }
+  if (features.includes('антистресс')) {
+    keywords.add('игрушка антистресс для собак');
+  }
+  if (features.includes('для дрессировки')) {
+    keywords.add('игрушка для дрессировки');
+  }
+  if (features.includes('для дома')) {
+    keywords.add('активные игры для собак дома');
+    keywords.add('игрушка для самостоятельной игры');
+  }
+  if (features.includes('для улицы')) {
+    keywords.add('игрушка для прогулок');
+  }
+  if (features.includes('легко мыть')) {
+    keywords.add('игрушка легко моется');
+  }
+  if (features.includes('бесшумный')) {
+    keywords.add('бесшумная игрушка для собак');
+  }
+  if (features.includes('безопасный')) {
+    keywords.add('безопасная игрушка для собак');
+  }
+  
+  // Material keywords
+  if (material === 'ABS пластик') {
+    keywords.add('пластиковая игрушка для собак');
+  } else if (material === 'силикон') {
+    keywords.add('силиконовая игрушка для собак');
+  } else if (material === 'нейлон') {
+    keywords.add('нейлоновая сумка');
+  }
+  
+  // Color keywords
+  if (color) {
+    const colorAdj = {
+      'синий': 'синяя', 'зеленый': 'зеленая', 'красный': 'красная',
+      'розовый': 'розовая', 'черный': 'черная', 'белый': 'белая',
+      'серый': 'серая', 'оранжевый': 'оранжевая', 'фиолетовый': 'фиолетовая'
+    };
+    const adj = colorAdj[color] || color;
+    keywords.add(adj + ' игрушка для собак');
+  }
+  
+  // Audience keywords
+  audience.forEach(a => {
+    if (a.includes('щенк')) keywords.add('игрушка для щенков');
+    if (a.includes('мелких')) keywords.add('игрушка для мелких пород');
+    if (a.includes('средних')) keywords.add('игрушка для средних собак');
+    if (a.includes('крупных')) keywords.add('игрушка для крупных собак');
+    if (a.includes('кошек')) {
+      keywords.add('игрушка для кошек и собак');
+      keywords.add('игрушка для кошек');
+    }
+    if (a.includes('всех питомц')) keywords.add('игрушка для всех питомцев');
+    if (a.includes('унисекс')) keywords.add('унисекс');
+    if (a.includes('муж')) keywords.add('мужской');
+    if (a.includes('жен')) keywords.add('женский');
+  });
+  
+  // General
+  keywords.add('зоотовары для собак игрушки');
+  keywords.add('развивающие игры для питомцев');
+  keywords.add('подарок собаке');
+  
+  // Limit to 28
+  const arr = [...keywords];
+  return arr.slice(0, 28);
+}
+
+// ===== Rendering =====
+function renderOutput(titles, desc, keywords, cat) {
+  // Preview bar
+  document.getElementById('previewBar').innerHTML = 
+    `📦 品类: ${getCategoryNameRu(cat)} | 🏷 标题: ${titles.length} 版本 | 📝 描述: 已生成 | #️⃣ 关键词: ${keywords.length} 个`;
+  
+  // Titles
+  const titleNames = ['📱 移动端精简版（推荐）', '🔍 SEO 优化版', '📋 完整扩展版'];
+  document.getElementById('titlesOutput').innerHTML = titles.map((t, i) => `
+    <div class="output-box">
+      <div class="variant-label">${titleNames[i]}</div>
+      <div>${t}</div>
+      <button class="copy-btn" onclick="copyText(this, '${escapeHtml(t)}')">📋 复制</button>
+    </div>
+  `).join('');
+  
+  // Description
+  document.getElementById('descOutput').innerHTML = `
+    <div style="position:relative">
+      <button class="copy-btn" onclick="copyText(this, '${escapeHtml(desc)}')" style="top:0;right:0">📋 复制</button>
+      <pre style="font-family:inherit;white-space:pre-wrap;line-height:1.7;font-size:14px">${desc}</pre>
+    </div>
+  `;
+  
+  // Keywords
+  document.getElementById('keywordsOutput').innerHTML = `
+    <div style="margin-bottom:12px">
+      <strong style="color:var(--text-secondary);font-size:13px">哈希标签格式（直接粘贴到 OZON）：</strong>
+    </div>
+    <div class="output-box">
+      <button class="copy-btn" onclick="copyText(this, '${escapeHtml(keywords.map(k => '#' + k).join(' '))}')">📋 复制</button>
+      <div class="keyword-tags">
+        ${keywords.map(k => `<span class="keyword-tag">#${k}</span>`).join('\n        ')}
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <strong style="color:var(--text-secondary);font-size:13px">逗号格式（粘贴到 OZON 关键词字段）：</strong>
+    </div>
+    <div class="output-box" style="margin-top:8px">
+      <button class="copy-btn" onclick="copyText(this, '${escapeHtml(keywords.join(', '))}')">📋 复制</button>
+      <div style="font-size:13px;color:#93c5fd">${keywords.join(', ')}</div>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/\n/g, '\\n');
+}
+
+// ===== Copy Functions =====
+function copyText(btn, text) {
+  const unescaped = text.replace(/\\n/g, '\n').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  navigator.clipboard.writeText(unescaped).then(() => {
+    btn.textContent = '✅ 已复制';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 复制'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    showToast('⚠️ 复制失败，请手动选择文本');
+  });
+}
+
+function copyAll(type) {
+  if (type === 'titles') {
+    const titles = document.querySelectorAll('#titlesOutput .output-box');
+    let all = '';
+    titles.forEach(box => {
+      const label = box.querySelector('.variant-label').textContent;
+      const text = box.querySelector('div:not(.variant-label)').textContent;
+      all += `${label}\n${text}\n\n`;
+    });
+    navigator.clipboard.writeText(all).then(() => showToast('✅ 全部标题已复制'));
+  } else if (type === 'desc') {
+    const desc = document.querySelector('#descOutput pre').textContent;
+    navigator.clipboard.writeText(desc).then(() => showToast('✅ 描述已复制'));
+  } else if (type === 'keywords') {
+    const tags = document.querySelectorAll('#keywordsOutput .keyword-tag');
+    const keywordStr = Array.from(tags).map(t => t.textContent).join(' ');
+    navigator.clipboard.writeText(keywordStr).then(() => showToast('✅ 关键词已复制'));
+  }
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+
+</body>
+</html>

@@ -6,7 +6,15 @@
 <title>OZON 箱包售价计算器</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#222;padding:20px}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#222;padding:0}
+.nav{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all 0.2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.page-content{padding:20px}
 .container{max-width:1000px;margin:0 auto}
 h1{font-size:22px;margin-bottom:4px}
 .subtitle{color:#666;font-size:13px;margin-bottom:24px}
@@ -45,6 +53,19 @@ input:focus,select:focus{outline:none;border-color:#005bff;box-shadow:0 0 0 2px 
 </style>
 </head>
 <body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">🛒 <span>HuaAngel</span> Tools</a>
+    <div class="nav-links">
+      <a href="/">首页</a>
+      <a href="/ozon-content-generator">OZON 生成器</a>
+      <a href="/ozon-price-calculator" class="active">价格计算器</a>
+      <a href="/tiktok-script-generator">TK 脚本</a>
+      <a href="/unit-converter">单位换算</a>
+    </div>
+  </div>
+</nav>
+<div class="page-content">
 <div class="container">
 <h1>OZON 箱包 FBO 售价计算器</h1>
 <p class="subtitle">输入成本和重量，自动计算建议售价、利润分析和竞品区间对比</p>
@@ -226,5 +247,6 @@ document.querySelectorAll('input,select').forEach(function(el){el.addEventListen
 c();
 });
 </script>
+</div>
 </body>
 </html>
