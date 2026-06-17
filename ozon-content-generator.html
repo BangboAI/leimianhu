@@ -334,6 +334,164 @@ body {
   font-weight: 500;
 }
 
+/* ===== Tab Navigation ===== */
+.tab-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  background: var(--header-gradient);
+  padding: 0 24px 0;
+  border-radius: 0 0 24px 24px;
+}
+.tab-btn {
+  padding: 14px 32px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  border-bottom: 3px solid transparent;
+  transition: all 0.25s;
+  position: relative;
+  top: 1px;
+}
+.tab-btn:hover { color: rgba(255,255,255,0.85); }
+.tab-btn.active {
+  color: #fff;
+  border-bottom-color: #60a5fa;
+  background: rgba(96,165,250,0.1);
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ===== Upload Zone ===== */
+.upload-zone {
+  border: 2px dashed #d1d5db;
+  border-radius: var(--radius-lg);
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: #fafbfc;
+  margin-bottom: 16px;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+.upload-zone .upload-icon { font-size: 42px; margin-bottom: 10px; }
+.upload-zone .upload-text { font-size: 14px; color: var(--text-secondary); }
+.upload-zone .upload-hint { font-size: 12px; color: #aaa; margin-top: 6px; }
+.upload-zone input[type="file"] { display: none; }
+
+/* ===== Image Preview Grid ===== */
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  min-height: 40px;
+}
+.image-preview-item {
+  position: relative;
+  aspect-ratio: 3/4;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  background: #f5f5f5;
+  cursor: grab;
+  transition: all 0.2s;
+}
+.image-preview-item:active { cursor: grabbing; }
+.image-preview-item:hover { border-color: var(--primary); box-shadow: var(--shadow-hover); }
+.image-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #f0f0f0;
+}
+.image-preview-item .img-index {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: var(--primary);
+  color: #fff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+.image-preview-item .img-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(229,57,53,0.9);
+  color: #fff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.image-preview-item:hover .img-remove { opacity: 1; }
+
+/* ===== Video Settings ===== */
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.setting-row label { font-size: 14px; font-weight: 600; min-width: 90px; color: var(--text); }
+.setting-row input[type="range"] { flex: 1; min-width: 120px; accent-color: var(--primary); }
+.setting-row .range-val { font-size: 14px; font-weight: 700; color: var(--primary); min-width: 50px; }
+
+/* ===== Video Progress ===== */
+.video-progress {
+  margin: 20px 0;
+  text-align: center;
+}
+.video-progress .progress-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.video-progress .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #60a5fa);
+  border-radius: 4px;
+  transition: width 0.3s;
+  width: 0%;
+}
+.video-progress .progress-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ===== Video Preview ===== */
+.video-preview-card video {
+  width: 100%;
+  max-width: 360px;
+  border-radius: var(--radius);
+  background: #000;
+  display: block;
+  margin: 0 auto;
+}
+
 /* ===== Footer ===== */
 .footer {
   text-align: center;
@@ -374,6 +532,14 @@ body {
   <p>输入产品信息，一键生成俄语标题、描述和关键词标签</p>
 </header>
 
+<!-- Tab Navigation -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('content', event)">📝 内容生成</button>
+  <button class="tab-btn" onclick="switchTab('video', event)">🎬 封面视频</button>
+</div>
+
+<!-- Tab: Content Generator -->
+<div id="tab-content" class="tab-panel active">
 <div class="container">
 
   <!-- Step 1: Category -->
@@ -558,6 +724,102 @@ body {
 
   </div>
 
+</div>
+</div>
+
+<!-- Tab: Cover Video Generator -->
+<div id="tab-video" class="tab-panel">
+<div class="container">
+
+  <!-- Step 1: Upload Images -->
+  <div class="card">
+    <div class="section-title">🖼 第一步：上传产品图片（5-8 张）</div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('imageInput').click()">
+      <div class="upload-icon">📁</div>
+      <div class="upload-text">点击上传 或 拖拽图片到这里</div>
+      <div class="upload-hint">支持 JPG / PNG / WebP，建议尺寸 ≥ 800×1067（3:4），最少 5 张</div>
+    </div>
+    <input type="file" id="imageInput" accept="image/*" multiple hidden onchange="handleImageSelect(this)">
+    <div class="image-preview-grid" id="imagePreviewGrid"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-sm btn-outline" onclick="document.getElementById('imageInput').click()">+ 添加图片</button>
+      <button class="btn btn-sm btn-ghost" onclick="clearAllImages()">🗑 清空全部</button>
+      <span id="imgCount" style="font-size:13px;color:var(--text-secondary);line-height:2">已上传：0 张</span>
+    </div>
+  </div>
+
+  <!-- Step 2: Video Settings -->
+  <div class="card">
+    <div class="section-title">⚙ 第二步：视频设置</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>每张图片展示时长</label>
+        <div class="setting-row" style="gap:8px">
+          <input type="range" id="durationPerImage" min="1.5" max="4" step="0.5" value="2.5" oninput="document.getElementById('durationVal').textContent=this.value+'秒'">
+          <span class="range-val" id="durationVal">2.5秒</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>转场效果</label>
+        <select id="transitionEffect">
+          <option value="fade">淡入淡出 Fade</option>
+          <option value="kenburns">电影运镜 Ken Burns</option>
+          <option value="slide">滑动切换 Slide</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>产品名称（水印文字）</label>
+        <input type="text" id="videoOverlayText" placeholder="例如：Интерактивная игрушка для собак">
+      </div>
+      <div class="form-group">
+        <label>背景颜色</label>
+        <select id="bgColor">
+          <option value="#1a1a2e">深蓝（推荐）</option>
+          <option value="#ffffff">白色</option>
+          <option value="#f5f5f5">浅灰</option>
+          <option value="#000000">黑色</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Output Format Info -->
+  <div class="card" style="background:var(--primary-light);border:1px solid rgba(0,91,255,0.15)">
+    <div class="section-title" style="margin-bottom:8px">📐 OZON 视频规格说明</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--text-secondary)">
+      <div>✅ 画面比例：<strong>3:4</strong>（720×960）</div>
+      <div>✅ 输出格式：<strong>WebM</strong>（可转 MP4）</div>
+      <div>✅ 转场效果：3 种可选</div>
+      <div>✅ 推荐浏览器：Chrome / Edge</div>
+    </div>
+  </div>
+
+  <!-- Generate Button -->
+  <div style="text-align:center; padding: 8px 0 24px;">
+    <button class="btn btn-primary btn-lg btn-block" id="generateVideoBtn" onclick="generateVideo()" style="max-width:500px">
+      🎬 生成封面视频
+    </button>
+  </div>
+
+  <!-- Progress -->
+  <div id="videoProgress" class="video-progress" style="display:none">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">正在合成视频...</div>
+  </div>
+
+  <!-- Preview -->
+  <div id="videoPreviewCard" class="card video-preview-card" style="display:none">
+    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span>🎥 视频预览（3:4）</span>
+      <button class="btn btn-sm btn-outline" onclick="downloadVideo()">⬇ 下载视频</button>
+    </div>
+    <video id="videoPreview" controls playsinline style="width:100%;max-width:360px;border-radius:10px;background:#000;display:block;margin:0 auto"></video>
+    <p style="text-align:center;font-size:12px;color:var(--text-secondary);margin-top:8px">
+      💡 如果 OZON 需要 MP4 格式，可使用<a href="https://cloudconvert.com/webm-to-mp4" target="_blank" style="color:var(--primary)">在线转换工具</a>
+    </p>
+  </div>
+
+</div>
 </div>
 
 <footer class="footer">
@@ -1079,11 +1341,369 @@ function copyAll(type) {
 }
 
 // ===== Toast =====
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+// ===== Tab Switching =====
+function switchTab(tab, e) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  e.target.classList.add('active');
+}
+
+// ===== Video Generator =====
+let videoImages = [];
+let videoBlob = null;
+let dragIndex = null;
+
+// Upload handling
+document.getElementById('uploadZone').addEventListener('dragover', function(e) {
+  e.preventDefault();
+  this.classList.add('drag-over');
+});
+document.getElementById('uploadZone').addEventListener('dragleave', function(e) {
+  this.classList.remove('drag-over');
+});
+document.getElementById('uploadZone').addEventListener('drop', function(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  handleImageFiles(e.dataTransfer.files);
+});
+
+function handleImageSelect(input) {
+  handleImageFiles(input.files);
+  input.value = '';
+}
+
+function handleImageFiles(files) {
+  const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (validFiles.length === 0) return;
+  
+  const remaining = 8 - videoImages.length;
+  if (remaining <= 0) {
+    showToast('⚠️ 最多 8 张图片');
+    return;
+  }
+  
+  const toAdd = validFiles.slice(0, remaining);
+  let loaded = 0;
+  
+  toAdd.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      videoImages.push({ dataUrl: e.target.result, file: file, name: file.name });
+      loaded++;
+      if (loaded === toAdd.length) renderImageGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderImageGrid() {
+  const grid = document.getElementById('imagePreviewGrid');
+  grid.innerHTML = videoImages.map((img, i) => `
+    <div class="image-preview-item" draggable="true" data-index="${i}"
+         ondragstart="dragStart(event, ${i})" ondragover="dragOver(event)" ondrop="dragDrop(event, ${i})">
+      <img src="${img.dataUrl}" alt="Image ${i+1}">
+      <div class="img-index">${i+1}</div>
+      <button class="img-remove" onclick="event.stopPropagation();removeImage(${i})">×</button>
+    </div>
+  `).join('');
+  document.getElementById('imgCount').textContent = `已上传：${videoImages.length} 张`;
+  
+  if (videoImages.length >= 5) {
+    document.getElementById('generateVideoBtn').disabled = false;
+  }
+}
+
+function removeImage(index) {
+  videoImages.splice(index, 1);
+  renderImageGrid();
+}
+
+function clearAllImages() {
+  videoImages = [];
+  renderImageGrid();
+  document.getElementById('videoPreviewCard').style.display = 'none';
+  document.getElementById('videoProgress').style.display = 'none';
+  videoBlob = null;
+}
+
+function dragStart(e, index) {
+  dragIndex = index;
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function dragDrop(e, targetIndex) {
+  e.preventDefault();
+  if (dragIndex === null || dragIndex === targetIndex) return;
+  const [item] = videoImages.splice(dragIndex, 1);
+  videoImages.splice(targetIndex, 0, item);
+  dragIndex = null;
+  renderImageGrid();
+}
+
+// ===== Video Generation =====
+async function generateVideo() {
+  if (videoImages.length < 5) {
+    showToast('⚠️ 请至少上传 5 张图片');
+    return;
+  }
+  
+  // Check browser support
+  if (!window.MediaRecorder) {
+    showToast('⚠️ 当前浏览器不支持视频录制，请使用 Chrome 或 Edge');
+    return;
+  }
+  
+  // Show progress
+  const progDiv = document.getElementById('videoProgress');
+  const progFill = document.getElementById('progressFill');
+  const progText = document.getElementById('progressText');
+  const previewCard = document.getElementById('videoPreviewCard');
+  progDiv.style.display = 'block';
+  progFill.style.width = '0%';
+  progText.textContent = '正在加载图片...';
+  previewCard.style.display = 'none';
+  
+  const generateBtn = document.getElementById('generateVideoBtn');
+  generateBtn.disabled = true;
+  generateBtn.textContent = '⏳ 生成中...';
+  
+  // Settings
+  const W = 720, H = 960; // 3:4 aspect ratio
+  const fps = 30;
+  const durationPerImage = parseFloat(document.getElementById('durationPerImage').value);
+  const transitionDuration = 0.8; // seconds
+  const effect = document.getElementById('transitionEffect').value;
+  const overlayText = document.getElementById('videoOverlayText').value.trim();
+  const bgColor = document.getElementById('bgColor').value;
+  
+  const totalDuration = videoImages.length * durationPerImage + (videoImages.length - 1) * transitionDuration;
+  const totalFrames = Math.ceil(totalDuration * fps);
+  
+  // Create canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  
+  // Load all images
+  progText.textContent = '正在加载图片...';
+  const loadedImages = [];
+  for (let i = 0; i < videoImages.length; i++) {
+    const img = new Image();
+    img.src = videoImages[i].dataUrl;
+    await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+    loadedImages.push(img);
+    progFill.style.width = Math.round((i + 1) / videoImages.length * 15) + '%';
+  }
+  
+  // Setup MediaRecorder
+  let mimeType = '';
+  for (const m of ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']) {
+    if (MediaRecorder.isTypeSupported(m)) { mimeType = m; break; }
+  }
+  if (!mimeType) {
+    showToast('⚠️ 浏览器不支持 WebM 编码');
+    generateBtn.disabled = false;
+    generateBtn.textContent = '🎬 生成封面视频';
+    progDiv.style.display = 'none';
+    return;
+  }
+  
+  const stream = canvas.captureStream(fps);
+  const chunks = [];
+  const recorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: 4000000 });
+  
+  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  
+  recorder.onstop = () => {
+    videoBlob = new Blob(chunks, { type: mimeType });
+    const url = URL.createObjectURL(videoBlob);
+    const videoEl = document.getElementById('videoPreview');
+    videoEl.src = url;
+    previewCard.style.display = 'block';
+    progDiv.style.display = 'none';
+    generateBtn.disabled = false;
+    generateBtn.textContent = '🎬 重新生成';
+    showToast('✅ 视频生成完成！');
+    previewCard.scrollIntoView({ behavior: 'smooth' });
+  };
+  
+  // Start recording
+  recorder.start();
+  
+  // Render loop
+  let startTime = null;
+  let frameCount = 0;
+  
+  function drawImageCover(img, alpha = 1) {
+    const imgW = img.naturalWidth || img.width;
+    const imgH = img.naturalHeight || img.height;
+    const imgRatio = imgW / imgH;
+    const canvasRatio = W / H;
+    
+    let dw, dh, dx, dy;
+    if (imgRatio > canvasRatio) {
+      dh = H;
+      dw = H * imgRatio;
+      dx = (W - dw) / 2;
+      dy = 0;
+    } else {
+      dw = W;
+      dh = W / imgRatio;
+      dx = 0;
+      dy = (H - dh) / 2;
+    }
+    
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(img, dx, dy, dw, dh);
+    ctx.globalAlpha = 1;
+  }
+  
+  function drawFrame(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const elapsed = (timestamp - startTime) / 1000; // seconds
+    
+    if (elapsed >= totalDuration) {
+      recorder.stop();
+      return;
+    }
+    
+    // Clear with background
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, W, H);
+    
+    // Determine current image and transition state
+    const segmentDuration = durationPerImage + transitionDuration;
+    const segmentIndex = Math.floor(elapsed / segmentDuration);
+    const segmentTime = elapsed - segmentIndex * segmentDuration;
+    
+    if (segmentIndex >= videoImages.length - 1) {
+      // Last image
+      const lastImg = loadedImages[videoImages.length - 1];
+      const timeInLast = elapsed - (videoImages.length - 1) * segmentDuration;
+      
+      if (effect === 'kenburns' && lastImg) {
+        const progress = Math.min(timeInLast / durationPerImage, 1);
+        const scale = 1 + progress * 0.08;
+        ctx.save();
+        ctx.translate(W/2, H/2);
+        ctx.scale(scale, scale);
+        ctx.translate(-W/2, -H/2);
+        drawImageCover(lastImg);
+        ctx.restore();
+      } else {
+        drawImageCover(lastImg);
+      }
+    } else if (segmentTime < durationPerImage) {
+      // Displaying current image
+      const img = loadedImages[segmentIndex];
+      if (effect === 'kenburns' && img) {
+        const progress = segmentTime / durationPerImage;
+        const scale = 1 + progress * 0.08;
+        ctx.save();
+        ctx.translate(W/2, H/2);
+        ctx.scale(scale, scale);
+        ctx.translate(-W/2, -H/2);
+        drawImageCover(img);
+        ctx.restore();
+      } else {
+        drawImageCover(img);
+      }
+    } else {
+      // In transition
+      const transProgress = (segmentTime - durationPerImage) / transitionDuration;
+      const img1 = loadedImages[segmentIndex];
+      const img2 = loadedImages[segmentIndex + 1];
+      
+      if (effect === 'fade') {
+        drawImageCover(img1, 1 - transProgress);
+        drawImageCover(img2, transProgress);
+      } else if (effect === 'slide') {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, W * (1 - transProgress), H);
+        ctx.clip();
+        drawImageCover(img1);
+        ctx.restore();
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(W * (1 - transProgress), 0, W * transProgress, H);
+        ctx.clip();
+        drawImageCover(img2);
+        ctx.restore();
+      } else {
+        // kenburns: crossfade
+        drawImageCover(img1, 1 - transProgress);
+        drawImageCover(img2, transProgress);
+      }
+    }
+    
+    // Watermark overlay
+    if (overlayText) {
+      const fontSize = 22;
+      ctx.font = `600 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+      const textW = ctx.measureText(overlayText).width;
+      const padding = 20;
+      
+      // Background
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      const rx = W - textW - padding * 2 - 16;
+      const ry = H - fontSize - padding * 2 - 16;
+      roundRect(ctx, rx, ry, textW + padding * 2, fontSize + padding * 2, 10);
+      ctx.fill();
+      
+      // Text
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(overlayText, rx + padding, ry + fontSize + padding * 0.3);
+    }
+    
+    frameCount++;
+    const pct = Math.min(Math.round(elapsed / totalDuration * 85) + 15, 100);
+    progFill.style.width = pct + '%';
+    progText.textContent = `合成中... ${Math.round(elapsed)}s / ${Math.round(totalDuration)}s`;
+    
+    requestAnimationFrame(drawFrame);
+  }
+  
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+  
+  progText.textContent = '正在合成视频...';
+  requestAnimationFrame(drawFrame);
+}
+
+function downloadVideo() {
+  if (!videoBlob) {
+    showToast('⚠️ 请先生成视频');
+    return;
+  }
+  const url = URL.createObjectURL(videoBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ozon_cover_video_' + Date.now() + '.webm';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('⬇ 下载中...');
 }
 </script>
 
