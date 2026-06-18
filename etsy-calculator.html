@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etsy Fee & Profit Calculator - HuaAngel Tools</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f0f2f5;
+  --card-bg: #fff;
+  --text: #1a1a2e;
+  --text-secondary: #666;
+  --header-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --orange: #F1641E;
+  --green: #1e8c5e;
+  --red: #d14343;
+  --border: #e4e2df;
+  --radius: 8px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+<style>
+:root {
+  --orange: #F1641E;
+  --orange-light: #fef3ed;
+  --orange-hover: #d95518;
+  --green: #1e8c5e;
+  --green-light: #edf7f3;
+  --red: #d14343;
+  --red-light: #fdf1f1;
+  --bg: #f5f4f2;
+  --card: #ffffff;
+  --border: #e4e2df;
+  --text: #222222;
+  --text-secondary: #5f5b57;
+  --text-muted: #8a8682;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --radius: 8px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;line-height:1.5}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;padding:24px 16px}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+
+.container{max-width:800px;margin:0 auto}
+
+.header{margin-bottom:24px}
+.header h1{font-size:1.5rem;font-weight:650;letter-spacing:-0.02em;color:var(--text)}
+.header p{font-size:0.85rem;color:var(--text-secondary);margin-top:4px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px}
+.card-title{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:16px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.full{grid-column:1/-1}
+.field label{font-size:0.81rem;font-weight:500;color:var(--text-secondary)}
+.field .hint{font-size:0.73rem;color:var(--text-muted);margin-top:1px}
+.input-wrap{position:relative}
+.input-wrap .prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;pointer-events:none}
+.input-wrap input,.input-wrap select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:var(--font);color:var(--text);background:var(--card);transition:border-color 0.15s;outline:none}
+.input-wrap input:focus,.input-wrap select:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(241,100,30,0.12)}
+.input-wrap .prefix ~ input{padding-left:24px}
+
+.toggle-row{display:flex;align-items:center;gap:10px;padding:10px 0 4px}
+.toggle{position:relative;width:38px;height:22px;flex-shrink:0;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:#d0ccc8;border-radius:11px;transition:background 0.2s}
+.toggle .slider::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform 0.2s}
+.toggle input:checked+.slider{background:var(--orange)}
+.toggle input:checked+.slider::after{transform:translateX(16px)}
+.toggle-label{font-size:0.85rem;color:var(--text-secondary)}
+
+.summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.stat{text-align:center;padding:14px 8px;border-radius:6px;background:var(--bg)}
+.stat .value{font-size:1.35rem;font-weight:650;letter-spacing:-0.01em;line-height:1.2}
+.stat .value.positive{color:var(--green)}
+.stat .value.negative{color:var(--red)}
+.stat .label{font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:4px}
+
+.breakdown{margin-top:16px}
+.breakdown-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.88rem}
+.breakdown-item:last-child{border-bottom:none}
+.breakdown-item .label{color:var(--text-secondary);display:flex;align-items:center;gap:5px}
+.breakdown-item .label .dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.breakdown-item .value{font-weight:500;font-variant-numeric:tabular-nums}
+.breakdown-item.total{font-weight:600;border-bottom:2px solid var(--text);padding-top:10px;padding-bottom:8px}
+.breakdown-item.total .label{color:var(--text);font-weight:600}
+.breakdown-item.final{font-weight:700;border-top:2px solid var(--text);border-bottom:none;padding-top:10px;margin-top:4px}
+.breakdown-item.final .label{color:var(--text)}
+.breakdown-item.final .value{font-size:1rem}
+.breakdown-item.sub{padding-left:16px;font-size:0.84rem}
+.breakdown-item.sub .label{color:var(--text-muted)}
+
+.margin-bar-wrap{margin-top:16px}
+.margin-bar-wrap .mar-label{font-size:0.78rem;color:var(--text-secondary);margin-bottom:4px}
+.margin-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;position:relative}
+.margin-bar .fill{height:100%;border-radius:4px;transition:width 0.3s,background 0.3s}
+.margin-bar .fill.positive{background:var(--green)}
+.margin-bar .fill.negative{background:var(--red)}
+.margin-bar .fill.zero{background:var(--text-muted)}
+
+.suggest-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.suggest-item{background:var(--bg);border-radius:6px;padding:12px 14px;text-align:center}
+.suggest-item .value{font-size:1.15rem;font-weight:650;color:var(--orange)}
+.suggest-item .label{font-size:0.72rem;color:var(--text-muted);margin-top:4px}
+.suggest-item .sub{font-size:0.72rem;color:var(--text-secondary);margin-top:2px}
+
+.footer{text-align:center;margin-top:24px;padding-bottom:8px;font-size:0.75rem;color:var(--text-muted)}
+.footer a{color:var(--text-muted);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.footer a:hover{color:var(--orange)}
+
+.section-divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+
+@media(max-width:600px){
+  body{padding:16px 12px}
+  .card{padding:16px}
+  .form-grid{grid-template-columns:1fr}
+  .summary{grid-template-columns:1fr}
+  .suggest-grid{grid-template-columns:1fr}
+  div[style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr!important}
+  .header h1{font-size:1.25rem}
+}
+
+.nav {
+  background: var(--header-gradient);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+.nav-brand span { color: #60a5fa; }
+.nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav-links a {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+}
+.container { max-width: 800px; margin: 24px auto 40px; padding: 0 16px; }
+.back-link { margin-bottom: 16px; }
+.back-link a { color: var(--text-secondary); text-decoration: none; font-size: 14px; }
+.back-link a:hover { color: var(--orange); }
+.footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  border-top: 1px solid #e5e7eb;
+}
+.footer a { color: #005bff; text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">🛒 <span>HuaAngel</span> Tools</a>
+    <div class="nav-links">
+      <a href="/">首页</a>
+      <a href="/ozon-content-generator">OZON 生成器</a>
+      <a href="/ozon-price-calculator">价格计算器</a>
+      <a href="/etsy-calculator" class="active">Etsy 计算器</a>
+      <a href="/tiktok-script-generator">TK 脚本</a>
+      <a href="/unit-converter">单位换算</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="back-link"><a href="/">← 返回首页</a></div>
+  <div class="container">
+
+  <div class="header">
+    <h1>Etsy Fee &amp; Profit Calculator</h1>
+    <p>Item-level profit calculator for Etsy sellers — US fees applied</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Item &amp; Costs</div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="price">Selling Price</label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="price" min="0" step="0.01" value="25.00"></div>
+      </div>
+      <div class="field">
+        <label for="qty">Quantity</label>
+        <div class="input-wrap"><input type="number" id="qty" min="1" step="1" value="1"></div>
+      </div>
+      <div class="field">
+        <label for="shipping-charged">Shipping Charged to Buyer</label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="shipping-charged" min="0" step="0.01" value="5.00"></div>
+      </div>
+      <div class="field">
+        <label for="shipping-cost">Your Shipping Cost</label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="shipping-cost" min="0" step="0.01" value="4.00"></div>
+      </div>
+      <div class="field">
+        <label for="material-cost">Material Cost per Item</label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="material-cost" min="0" step="0.01" value="5.00"></div>
+      </div>
+      <div class="field">
+        <label for="labor-cost">Labor &amp; Overhead per Item</label>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="labor-cost" min="0" step="0.01" value="3.00"></div>
+      </div>
+      <div class="field">
+        <label for="other-cost">Other Costs per Item</label>
+        <div class="hint">packaging, misc fees, etc.</div>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="other-cost" min="0" step="0.01" value="0.00"></div>
+      </div>
+      <div class="field">
+        <label for="desired-profit">Desired Profit per Item</label>
+        <div class="hint">used to calculate target price</div>
+        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="desired-profit" min="0" step="0.01" value="10.00"></div>
+      </div>
+      <div class="field full toggle-row">
+        <label class="toggle">
+          <input type="checkbox" id="offsite-ads">
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label"><strong>Offsite Ads</strong> — include 12% ad fee on this order</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="results">
+    <div class="card-title">Results</div>
+
+    <div class="summary">
+      <div class="stat">
+        <div class="value" id="total-revenue">$30.00</div>
+        <div class="label">Total Revenue</div>
+      </div>
+      <div class="stat">
+        <div class="value" id="total-fees">$3.45</div>
+        <div class="label">Etsy Fees</div>
+      </div>
+      <div class="stat">
+        <div class="value positive" id="net-profit">$14.55</div>
+        <div class="label">Net Profit</div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 36px">
+
+      <div>
+        <div class="breakdown">
+          <div class="breakdown-item"><span class="label">Revenue</span><span class="value" id="rev-total">$30.00</span></div>
+          <div class="breakdown-item sub"><span class="label">Item sale</span><span class="value" id="rev-item">$25.00 (×1)</span></div>
+          <div class="breakdown-item sub"><span class="label">Shipping charged</span><span class="value" id="rev-shipping">$5.00</span></div>
+        </div>
+
+        <div class="breakdown">
+          <div class="breakdown-item total"><span class="label">Fees</span><span class="value" id="fee-total">-$3.45</span></div>
+          <div class="breakdown-item sub"><span class="label"><span class="dot" style="background:#999"></span>Listing fee</span><span class="value" id="fee-listing">$0.20</span></div>
+          <div class="breakdown-item sub"><span class="label"><span class="dot" style="background:var(--orange)"></span>Transaction fee (6.5%)</span><span class="value" id="fee-transaction">$1.62</span></div>
+          <div class="breakdown-item sub"><span class="label"><span class="dot" style="background:#5b8def"></span>Payment processing (3% + $0.25)</span><span class="value" id="fee-processing">$1.15</span></div>
+          <div class="breakdown-item sub"><span class="label"><span class="dot" style="background:#9b8b7a"></span>Shipping transaction (6.5%)</span><span class="value" id="fee-shipping">$0.33</span></div>
+          <div class="breakdown-item sub" id="fee-offsite-row" style="display:none">
+            <span class="label"><span class="dot" style="background:#e8a838"></span>Offsite ads (12%)</span>
+            <span class="value" id="fee-offsite">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="breakdown">
+          <div class="breakdown-item total"><span class="label">Cost of Goods</span><span class="value" id="cogs-total">-$8.00</span></div>
+          <div class="breakdown-item sub"><span class="label">Materials</span><span class="value" id="cogs-materials">$5.00</span></div>
+          <div class="breakdown-item sub"><span class="label">Labor &amp; overhead</span><span class="value" id="cogs-labor">$3.00</span></div>
+          <div class="breakdown-item sub"><span class="label">Other costs</span><span class="value" id="cogs-other">$0.00</span></div>
+          <div class="breakdown-item sub"><span class="label">Shipping cost</span><span class="value" id="cogs-shipping">$4.00</span></div>
+        </div>
+
+        <div class="breakdown">
+          <div class="breakdown-item final" id="profit-row">
+            <span class="label">Net Profit</span>
+            <span class="value" id="profit-value">$14.55</span>
+          </div>
+          <div class="breakdown-item sub">
+            <span class="label">Profit margin</span>
+            <span class="value" id="profit-margin">48.5%</span>
+          </div>
+          <div class="breakdown-item sub">
+            <span class="label">Break-even price (per item)</span>
+            <span class="value" id="breakeven">$10.64</span>
+          </div>
+        </div>
+
+        <div class="margin-bar-wrap">
+          <div class="mar-label">Profit margin</div>
+          <div class="margin-bar">
+            <div class="fill positive" id="margin-fill" style="width:48.5%"></div>
+          </div>
+        </div>
+
+        <div class="suggest-grid">
+          <div class="suggest-item">
+            <div class="value" id="suggest-desired">$38.56</div>
+            <div class="label">Price for Desired Profit</div>
+            <div class="sub" id="suggest-desired-sub">Target: $10.00 / item</div>
+          </div>
+          <div class="suggest-item">
+            <div class="value" id="suggest-20pct">$21.60</div>
+            <div class="label">Price for 20% Margin</div>
+            <div class="sub">Recommended minimum</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    Etsy fee estimates based on US rates. Actual fees may vary. &mdash; <a onclick="resetDefaults()">Reset defaults</a>
+  </div>
+
+</div>
+
+
+</div>
+
+<footer class="footer">
+  <p>🛒 <strong>HuaAngel Tools</strong> · 跨境卖家的效率工作台</p>
+  <p style="margin-top:4px"><a href="https://www.huaangel.com">www.huaangel.com</a></p>
+</footer>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  const INPUT_IDS = [
+    'price','qty','shipping-charged','shipping-cost',
+    'material-cost','labor-cost','other-cost','desired-profit','offsite-ads'
+  ];
+
+  function fmt(v) {
+    return (v < 0 ? '-$' : '$') + Math.abs(v).toFixed(2);
+  }
+
+  function calc() {
+    const p  = parseFloat($('price').value) || 0;
+    const q  = parseInt($('qty').value) || 1;
+    const sc = parseFloat($('shipping-charged').value) || 0;
+    const scost = parseFloat($('shipping-cost').value) || 0;
+    const mc = parseFloat($('material-cost').value) || 0;
+    const lc = parseFloat($('labor-cost').value) || 0;
+    const oc = parseFloat($('other-cost').value) || 0;
+    const dp = parseFloat($('desired-profit').value) || 0;
+    const off = $('offsite-ads').checked;
+
+    const itemRev = p * q;
+    const totalRev = itemRev + sc;
+
+    const listingFee = 0.20;
+    const txFee = itemRev * 0.065;
+    const procFee = totalRev * 0.03 + 0.25;
+    const shipFee = sc * 0.065;
+    const offFee = off ? totalRev * 0.12 : 0;
+    const totalFees = listingFee + txFee + procFee + shipFee + offFee;
+
+    const prodCosts = (mc + lc + oc) * q;
+    const totalCosts = prodCosts + scost;
+
+    const netProfit = totalRev - totalFees - totalCosts;
+    const marginPct = totalRev > 0 ? (netProfit / totalRev) * 100 : 0;
+
+    const rateM = 0.905 - (off ? 0.12 : 0);
+
+    const beNum = 0.45 + prodCosts + scost - sc * rateM;
+    const beDen = q * rateM;
+    const bePrice = beDen > 0 ? Math.max(0, beNum / beDen) : 0;
+
+    const desiredTotal = dp * q;
+    const sugNum = desiredTotal + 0.45 + prodCosts + scost - sc * rateM;
+    const sugDen = q * rateM;
+    const sugPrice = sugDen > 0 ? Math.max(0, sugNum / sugDen) : 0;
+
+    const m20Rate = 0.705 - (off ? 0.12 : 0);
+    const price20Num = (totalCosts + 0.45) / m20Rate - sc;
+    const price20 = q > 0 && m20Rate > 0 ? Math.max(0, price20Num / q) : 0;
+
+    /* ── Update UI ── */
+
+    $('total-revenue').textContent = fmt(totalRev);
+    $('total-fees').textContent = fmt(totalFees);
+
+    const pe = $('net-profit');
+    pe.textContent = fmt(netProfit);
+    pe.className = 'value' + (netProfit > 0.005 ? ' positive' : netProfit < -0.005 ? ' negative' : '');
+
+    $('rev-total').textContent = fmt(totalRev);
+    $('rev-item').textContent = fmt(p * q) + ' (\u00d7' + q + ')';
+    $('rev-shipping').textContent = fmt(sc);
+
+    $('fee-total').textContent = '-' + fmt(totalFees).replace(/^-|\$/g,'');
+    $('fee-listing').textContent = fmt(listingFee);
+    $('fee-transaction').textContent = fmt(txFee);
+    $('fee-processing').textContent = fmt(procFee);
+    $('fee-shipping').textContent = fmt(shipFee);
+
+    const offRow = $('fee-offsite-row');
+    if (off) {
+      offRow.style.display = 'flex';
+      $('fee-offsite').textContent = fmt(offFee);
+    } else {
+      offRow.style.display = 'none';
+    }
+
+    $('cogs-total').textContent = '-' + fmt(totalCosts).replace(/^-|\$/g,'');
+    $('cogs-materials').textContent = fmt(mc * q);
+    $('cogs-labor').textContent = fmt(lc * q);
+    $('cogs-other').textContent = fmt(oc * q);
+    $('cogs-shipping').textContent = fmt(scost);
+
+    const pv = $('profit-value');
+    pv.textContent = fmt(netProfit);
+    pv.style.color = netProfit >= 0 ? '' : 'var(--red)';
+
+    $('profit-margin').textContent = marginPct.toFixed(1) + '%';
+    $('breakeven').textContent = fmt(bePrice);
+
+    const mf = $('margin-fill');
+    mf.style.width = Math.min(Math.max(marginPct, 0), 100) + '%';
+    mf.className = 'fill' + (marginPct > 5 ? ' positive' : marginPct < -1 ? ' negative' : ' zero');
+
+    $('suggest-desired').textContent = fmt(sugPrice);
+    $('suggest-desired-sub').textContent = 'Target: ' + fmt(dp) + ' / item';
+    $('suggest-20pct').textContent = fmt(price20);
+  }
+
+  window.resetDefaults = function() {
+    const defs = {
+      'price': '25.00',
+      'qty': '1',
+      'shipping-charged': '5.00',
+      'shipping-cost': '4.00',
+      'material-cost': '5.00',
+      'labor-cost': '3.00',
+      'other-cost': '0.00',
+      'desired-profit': '10.00',
+      'offsite-ads': false
+    };
+    for (const [id, val] of Object.entries(defs)) {
+      const el = $(id);
+      if (!el) continue;
+      if (el.type === 'checkbox') el.checked = val;
+      else el.value = val;
+    }
+    calc();
+  };
+
+  for (const id of INPUT_IDS) {
+    const el = $(id);
+    if (!el) continue;
+    el.addEventListener('input', calc);
+    el.addEventListener('change', calc);
+  }
+
+  calc();
+})();
+</script>
+</body>
+</html>
