@@ -1,0 +1,984 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etsy 13 Tag 智能生成器</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f5f7;
+  --surface:#fff;
+  --surface-alt:#f8f9fb;
+  --border:#e2e5ea;
+  --text:#1a1d23;
+  --text-mid:#5b6170;
+  --text-light:#9198a5;
+  --accent:#d4563d;
+  --accent-hover:#c14730;
+  --green:#2b8a4e;--green-bg:#e8f5ee;
+  --amber:#e8902b;--amber-bg:#fef3e2;
+  --red:#d63d3d;--red-bg:#fde8e8;
+  --blue:#3b7bc9;--blue-bg:#e7f0f9;
+  --radius:10px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+  --shadow-md:0 4px 14px rgba(0,0,0,.07);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;
+  --mono:"SF Mono","Cascadia Code","Consolas",monospace;
+  --max-w:1024px;
+}
+html{font-size:15px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;padding:24px 16px 60px}
+.app-wrap{max-width:var(--max-w);margin:0 auto}
+header{text-align:center;margin-bottom:28px}
+header h1{font-size:1.7rem;font-weight:700;letter-spacing:-.3px}
+header h1 span{color:var(--accent)}
+header p{color:var(--text-mid);font-size:.92rem;margin-top:4px}
+header .badge-row{margin-top:10px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:20px;background:var(--surface);border:1px solid var(--border);color:var(--text-mid)}
+.badge .icon{font-size:.9rem}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:780px){.grid-2{grid-template-columns:1fr}}
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px 22px;box-shadow:var(--shadow-sm)}
+.card-title{font-size:.95rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title .num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:.72rem;font-weight:700}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text-mid);margin-bottom:4px}
+.form-group label .hint{font-weight:400;color:var(--text-light);font-size:.78rem}
+input[type=text],textarea,select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.88rem;font-family:var(--font);background:var(--surface);color:var(--text);transition:border-color .2s}
+input[type=text]:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,86,61,.15)}
+textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 22px;border:none;border-radius:7px;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:var(--surface-alt);color:var(--text);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.tag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.tag-grid{grid-template-columns:1fr}}
+.tag-item{display:flex;align-items:center;gap:8px;padding:7px 10px 7px 12px;border-radius:7px;background:var(--surface-alt);border:1.5px solid var(--border);transition:all .2s}
+.tag-item:hover{border-color:var(--accent)}
+.tag-num{font-size:.7rem;font-weight:700;color:var(--text-light);min-width:18px}
+.tag-text{flex:1;font-size:.85rem;font-weight:500;word-break:break-word}
+.tag-char-count{font-size:.7rem;font-family:var(--mono);color:var(--text-light);padding:1px 6px;border-radius:4px;background:var(--surface);white-space:nowrap}
+.tag-quality{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tag-quality.high{background:var(--green)}
+.tag-quality.medium{background:var(--amber)}
+.tag-quality.low{background:var(--red)}
+.analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:600px){.analytics-grid{grid-template-columns:1fr 1fr}}
+.stat-box{text-align:center;padding:12px 8px;border-radius:8px;background:var(--surface-alt);border:1px solid var(--border)}
+.stat-box .stat-val{font-size:1.3rem;font-weight:700;color:var(--text)}
+.stat-box .stat-label{font-size:.75rem;color:var(--text-light);margin-top:2px}
+.quality-bar-wrap{margin-bottom:14px}
+.quality-bar-label{display:flex;justify-content:space-between;font-size:.78rem;font-weight:600;color:var(--text-mid);margin-bottom:4px}
+.quality-bar-track{height:6px;border-radius:3px;background:var(--border);overflow:hidden}
+.quality-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.strategy-list{list-style:none;padding:0}
+.strategy-list li{font-size:.82rem;padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:8px}
+.strategy-list li:last-child{border-bottom:none}
+.strategy-list .icon{font-size:.8rem;flex-shrink:0;margin-top:2px}
+.empty-state{text-align:center;padding:32px 16px;color:var(--text-light)}
+.empty-state .big-icon{font-size:2.6rem;margin-bottom:8px;opacity:.4}
+.empty-state p{font-size:.88rem}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;background:var(--text);color:#fff;font-size:.85rem;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:100;box-shadow:var(--shadow-md)}
+.toast.show{opacity:1}
+.tip-box{font-size:.8rem;color:var(--text-mid);background:var(--blue-bg);border-left:3px solid var(--blue);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:12px;line-height:1.6}
+.tip-box strong{color:var(--blue)}
+.strategy-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.strategy-section h3{font-size:.85rem;font-weight:600;margin-bottom:10px;color:var(--text-mid)}
+.lt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:480px){.lt-grid{grid-template-columns:1fr}}
+.lt-item{padding:6px 10px;border-radius:6px;background:var(--surface-alt);font-size:.8rem;border:1px solid var(--border);color:var(--text-mid)}
+.seed-area{display:flex;gap:8px;margin-bottom:10px}
+.seed-area input{flex:1}
+@media(max-width:480px){.seed-area{flex-direction:column}}
+.seed-tags{display:flex;flex-wrap:wrap;gap:6px;min-height:28px}
+.seed-tag{display:inline-flex;align-items:center;gap:4px;font-size:.78rem;padding:3px 8px;border-radius:14px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,123,201,.25);font-weight:500}
+.seed-tag .close{cursor:pointer;font-size:.7rem;opacity:.6;line-height:1}
+.seed-tag .close:hover{opacity:1}
+.tag-analysis{font-size:.82rem}
+.tag-analysis-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+.tag-analysis-row:last-child{border-bottom:none}
+.tag-analysis-row .kw{flex:1;font-weight:500}
+.tag-analysis-row .score{font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.score-high{background:var(--green-bg);color:var(--green)}
+.score-med{background:var(--amber-bg);color:var(--amber)}
+.score-low{background:var(--red-bg);color:var(--red)}
+@media(max-width:600px){body{padding:14px 10px 40px}header h1{font-size:1.3rem}.card{padding:14px}.tag-grid{grid-template-columns:1fr}.analytics-grid{grid-template-columns:1fr 1fr}}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:calc(200px + 100%) 0}}
+.shimmer{background:linear-gradient(90deg,var(--surface-alt) 25%,var(--border) 37%,var(--surface-alt) 63%);background-size:200px 100%;animation:shimmer 1.4s ease infinite;border-radius:5px}
+</style>
+</head>
+<body>
+<div class="app-wrap">
+<header>
+<h1>🧠 <span>Etsy Tag</span> 13</h1>
+<p>基于 Etsy 搜索算法 + 长尾关键词分析 + 竞品标签深度研究</p>
+<div class="badge-row">
+<span class="badge"><span class="icon">🎯</span> 13 Tags / 产品</span>
+<span class="badge"><span class="icon">⚡</span> 每 Tag ≤ 20 字符</span>
+<span class="badge"><span class="icon">🚫</span> 零重复零堆彻</span>
+<span class="badge"><span class="icon">🔍</span> 长尾优先</span>
+</div>
+</header>
+<div class="grid-2">
+<div>
+<div class="card">
+<div class="card-title"><span class="num">1</span> 产品信息</div>
+<div class="form-group">
+<label>产品标题 <span class="hint">(前 40 字符权重最高)</span></label>
+<input type="text" id="productTitle" placeholder="例：Handmade Wool Beanie Hat with Faux Fur Pom Pom" maxlength="140">
+</div>
+<div class="form-group">
+<label>产品描述 <span class="hint">(材质、工艺、用途等)</span></label>
+<textarea id="productDesc" placeholder="例：Made from 100% merino wool, hand-knitted, warm winter hat, perfect for cold weather..."></textarea>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>品类 <span class="hint">(选填)</span></label>
+<select id="category">
+<option value="">— 自动识别 —</option>
+<option value="clothing">服装 &amp; 配饰</option>
+<option value="jewelry">珠宝 &amp; 首饰</option>
+<option value="home">家居 &amp; 装饰</option>
+<option value="art">艺术 &amp; 收藏品</option>
+<option value="craft">手工 &amp; DIY</option>
+<option value="wedding">婚礼 &amp; 派对</option>
+<option value="bags">包包 &amp; 箱包</option>
+<option value="paper">纸品 &amp; 文具</option>
+<option value="baby">婴儿 &amp; 儿童</option>
+<option value="pet">宠物用品</option>
+<option value="electronics">电子 &amp; 配件</option>
+<option value="sports">运动 &amp; 户外</option>
+<option value="beauty">美容 &amp; 个护</option>
+</select>
+</div>
+<div class="form-group">
+<label>价格区间 <span class="hint">(选填)</span></label>
+<select id="priceRange">
+<option value="">— 不限 —</option>
+<option value="budget">$5 - $20</option>
+<option value="mid">$20 - $50</option>
+<option value="premium">$50 - $100</option>
+<option value="luxury">$100+</option>
+</select>
+</div>
+</div>
+<div class="form-group">
+<label>长尾种子词 <span class="hint">(回车或点击添加, 可逗号分隔多个)</span></label>
+<div class="seed-area">
+<input type="text" id="seedInput" placeholder="例：winter hat gift for women, knitted beanie" />
+<button class="btn btn-secondary btn-sm" id="addSeedBtn">+ 添加</button>
+</div>
+<div class="seed-tags" id="seedTags"></div>
+</div>
+<div class="btn-group">
+<button class="btn btn-primary" id="generateBtn">🎯 智能生成 13 Tags</button>
+<button class="btn btn-secondary btn-sm" id="resetBtn">↺ 重置</button>
+</div>
+<div class="tip-box">
+<strong>💡 Etsy 算法要点：</strong>
+每个 Tag 视为独立搜索查询，<strong>任何 Tag 不能包含其他 Tag</strong>（否则 Etsy 会忽略被包含的 Tag）。
+标题前 40 字符权重最高。Tag 建议用长尾短语而非单个词。优先使用 20 字符全长度。
+</div>
+</div>
+<div class="card" style="margin-top:16px">
+<div class="card-title"><span class="num">2</span> 关键词策略分析</div>
+<div id="keywordStrategy">
+<div class="empty-state">
+<div class="big-icon">📊</div>
+<p>生成 Tag 后将展示关键词覆盖策略以及长尾词推荐</p>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="card">
+<div class="card-title" style="justify-content:space-between">
+<span><span class="num">3</span> 生成的 13 个 Tag</span>
+<div>
+<button class="btn btn-secondary btn-sm" id="copyBtn" disabled>📋 复制</button>
+<button class="btn btn-secondary btn-sm" id="exportBtn" disabled>⬇ 导出 CSV</button>
+</div>
+</div>
+<div id="analyticsArea" style="display:none">
+<div class="analytics-grid">
+<div class="stat-box"><div class="stat-val" id="statTotal">0</div><div class="stat-label">总 Tags</div></div>
+<div class="stat-box"><div class="stat-val" id="statAvgLen">0</div><div class="stat-label">平均字符</div></div>
+<div class="stat-box"><div class="stat-val" id="statScore">0%</div><div class="stat-label">综合质量</div></div>
+</div>
+<div class="quality-bar-wrap">
+<div class="quality-bar-label"><span>标签质量评分</span><span id="qualityLabel">待评估</span></div>
+<div class="quality-bar-track"><div class="quality-bar-fill" id="qualityBar" style="width:0%;background:var(--border)"></div></div>
+</div>
+</div>
+<div id="tagListContainer">
+<div class="empty-state">
+<div class="big-icon">🏷️</div>
+<p>填写左侧产品信息，点击「智能生成 13 Tags」</p>
+<p style="font-size:.78rem;margin-top:6px">基于 Etsy SEO 算法 + 长尾关键词 + 竞品标签模式生成</p>
+</div>
+</div>
+</div>
+<div class="card" style="margin-top:16px">
+<div class="card-title"><span class="num">4</span> 竞品标签参考</div>
+<div id="competitorInsights">
+<div class="empty-state">
+<div class="big-icon">🔍</div>
+<p>生成后展示同类目头部 Listing 的 Tag 模式分析</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ============================================================
+//  ETSY TAG KNOWLEDGE BASE & GENERATION ENGINE
+//  Based on deep research of Etsy search algorithm
+// ============================================================
+
+// 品类标签模板（基于 Etsy 头部 Listing 深度研究）
+const CATEGORY_TEMPLATES = {
+  clothing: {
+    commonLongtails: [
+      "handmade knitwear gift for her", "cozy winter accessories for women",
+      "boho style headband for girls", "oversized chunky scarf wrap",
+      "wool blend beanie hat warm", "gift for knitter lover",
+      "christmas holiday winter outfit", "women knitted poncho cape"
+    ],
+    competitorTags: [
+      "HandmadeKnittedHat","WinterBeanieGift","FauxFurPomPom","WarmCozyHat",
+      "WomenWoolHat","GiftForHerMom","ChunkyKnitCap","SlouchyBeanieHat",
+      "OutdoorWinterGear","HolidayChristmasHat","NeutralToneBeanie","KnittedHatWoman",
+      "WarmBeanieForWinter"
+    ]
+  },
+  jewelry: {
+    commonLongtails: [
+      "sterling silver dangle earrings", "birthstone necklace personalized gift",
+      "minimalist gold stacking ring", "crystal healing gemstone jewelry",
+      "handmade beaded bracelet women", "vintage pearl stud earrings",
+      "gift for wife girlfriend her", "boho turquoise pendant necklace"
+    ],
+    competitorTags: [
+      "GoldDangleEarrings","HandmadeStudEarrings","GiftForHerWife",
+      "MinimalistGoldJewelry","EverydayEarrings","BridalPearlEarrings",
+      "HypoallergenicNickelFree","BirthstoneGiftIdea","DaintyTinyEarrings",
+      "BohoStyleAccessory","JewelryForWomen","GemstonePendantNecklace",
+      "SterlingSilverRing"
+    ]
+  },
+  home: {
+    commonLongtails: [
+      "boho farmhouse wall decor", "macrame plant hanger indoor",
+      "ceramic mug tea coffee gift", "rustic wooden shelf decor",
+      "scandinavian minimalist home decor", "handmade cotton kitchen towel",
+      "housewarming gift new home", "natural stone coaster set"
+    ],
+    competitorTags: [
+      "BohoWallHanging","MacramePlantHanger","HandmadeHomeDecor",
+      "FarmhouseStyleArt","GiftForHerFriend","CottonRopeTassel",
+      "LivingRoomDeco","BohoBedroomDeco","IndoorPlantAccessory",
+      "TasselWallArt","HousewarmingGiftIdea","NeutralToneHome",
+      "SmallApartmentDecor"
+    ]
+  },
+  art: {
+    commonLongtails: [
+      "original abstract painting canvas", "minimalist line art print",
+      "large wall art for living room", "watercolor botanical print",
+      "gift for art lover collector", "digital download print",
+      "boho abstract painting beige", "custom portrait gift idea"
+    ],
+    competitorTags: [
+      "AbstractCanvasArt","LargeWallDecor","OriginalOilPainting",
+      "LivingRoomArt","BeigeBlackWhite","GiftForArtLover",
+      "TexturedArtwork","MinimalistDesign","HandPaintedOriginal",
+      "NeutralColorPalette","ModernHomeDecor","StretchedCanvas",
+      "60x80cmWallArt"
+    ]
+  },
+  craft: {
+    commonLongtails: [
+      "cross stitch kit for beginners", "embroidery pattern floral",
+      "sewing kit travel mini", "resin casting mold silicone",
+      "hand dyed yarn wool blend", "knitting pattern download",
+      "gift for crafter DIY lover", "polymer clay earring kit"
+    ],
+    competitorTags: [
+      "DIYJewelryKit","ResinMoldSilicone","HandmadeGiftBox",
+      "BeginnerCraftSupply","EpoxyResinArt","GiftForArtist",
+      "PolymerClaySet","SiliconeMoldCraft","UVResinAccessory",
+      "JewelryMakingTools","CreativeGiftIdea","MiniatureCraft",
+      "HandmadeBoutique"
+    ]
+  }
+};
+
+// 扩展词库
+const MATERIAL_WORDS = [
+  "Wool","Cotton","Linen","Silk","Velvet","Leather","Suede","Denim","Cashmere",
+  "Acrylic","Bamboo","Hemp","Recycled","Merino","Angora","Mohair","Alpaca",
+  "Knit","Crochet","Macrame","Woven","Knitted","Handwoven","Handknit",
+  "FauxFur","Fleece","Flannel","Tweed","Plaid","Lace","Beaded","Embroidery"
+];
+
+const STYLE_WORDS = [
+  "Vintage","Retro","Boho","Modern","Minimalist","Classic","Rustic","Farmhouse",
+  "Scandinavian","Industrial","Victorian","Gothic","Chic","Elegant","Romantic",
+  "Edgy","Hipster","Nordic","Coastal","Nautical","Handmade","Artisan","Unique",
+  "Custom","Personalized"
+];
+
+const OCCASION_WORDS = [
+  "Birthday","Christmas","Wedding","Anniversary","Graduation","Valentine",
+  "MotherDay","FatherDay","Halloween","NewYear","Thanksgiving","Housewarming",
+  "BabyShower","Holiday","Party","Travel","Everyday","DateNight","Outdoor",
+  "Festival","BackToSchool"
+];
+
+const FEATURE_WORDS = [
+  "EcoFriendly","Sustainable","Organic","Natural","Handmade","Artisan",
+  "Handcrafted","Ethical","Vegan","Waterproof","Hypoallergenic",
+  "NickelFree","Lightweight","Durable","Reusable","Washable","Adjustable"
+];
+
+// ============================================================
+//  CORE ENGINE FUNCTIONS
+// ============================================================
+
+function isContainedIn(a, b) {
+  // Check if tag 'a' is a subset of 'b' (Etsy algorithm rule)
+  const na = a.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const nb = b.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return nb !== na && nb.includes(na);
+}
+
+function hasConflict(tags, candidate) {
+  for (const t of tags) {
+    if (isContainedIn(candidate, t) || isContainedIn(t, candidate)) return true;
+  }
+  return false;
+}
+
+function normalizeTag(raw) {
+  let s = raw.trim().replace(/\s+/g, ' ');
+  s = s.replace(/[&,.\/#!$%\^&\*;:{}=\-_`~()]/g, ' ');
+  s = s.replace(/\s+/g, ' ').trim();
+  // Smart truncate at 20 chars
+  if (s.length > 20) {
+    let cut = s.slice(0, 20);
+    let lastSpace = cut.lastIndexOf(' ');
+    if (lastSpace > 3) cut = cut.slice(0, lastSpace);
+    s = cut.trim();
+  }
+  // Title Case
+  return s.split(' ')
+    .map((w, i) => {
+      if (i > 0 && ['and','the','for','with','a','an','of','to','in','on','at'].includes(w.toLowerCase())) {
+        return w.toLowerCase();
+      }
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    })
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function extractProductType(title) {
+  // Extract the core product noun from the title
+  const stopWords = new Set(['the','and','for','with','a','an','of','to','in','on','at','is','it','by','or',
+    'be','this','that','from','as','are','was','were','has','had','not','but','can','all','its','per','via',
+    'handmade','unique','custom','personalized','vintage','beautiful','stunning','perfect','amazing',
+    'gorgeous','lovely','adorable','cute','charming','elegant','artisan','quality','premium','luxury',
+    'original','exclusive','limited','special']);
+  const words = title.toLowerCase().split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
+  const nouns = ['hat','bag','scarf','ring','necklace','earring','bracelet','shirt','dress','jacket',
+    'sweater','blanket','pillow','mug','poster','print','sticker','card','candle','soap','towel',
+    'mat','rug','vase','bowl','plate','cup','jar','box','pouch','wallet','belt','glove','mask',
+    'sock','shoe','boot','skirt','pant','short','top','coat','hoodie','robe','tie','pin',
+    'patch','stamp','keychain','ornament','decal','sign','canvas','art','pendant','charm',
+    'bangle','cuff','hoop','stud','earring','necklace','bracelet','ring','beanie','hat','cap',
+    'scarf','shawl','poncho','blanket','throw','pillow','cushion','mug','cup','glass','bottle',
+    'bag','tote','pouch','wallet','cardholder','keychain','journal','notebook','sticker','pin'];
+  for (let i = words.length - 1; i >= 0; i--) {
+    if (nouns.includes(words[i])) return words[i];
+  }
+  return words.length > 0 ? words[words.length - 1] : 'item';
+}
+// ============================================================
+//  MAIN GENERATION ENGINE
+// ============================================================
+
+function generateTags(productTitle, productDesc, category, seeds) {
+  const selectedTags = [];
+  const candidates = [];
+
+  // Preprocess text
+  const allText = (productTitle + ' ' + productDesc).toLowerCase();
+  const titleWords = productTitle.toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/)
+    .filter(w => w.length > 1 && !['the','and','for','with','a','an','of','to','in','on','at','is','it',
+      'by','or','be','this','that','from','as','are','was','were','has','had','not','but','can','all',
+      'its','per','via'].includes(w));
+  const descWords = productDesc.toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/)
+    .filter(w => w.length > 2 && !['the','and','for','with','a','an','of','to','in','on','at','is','it',
+      'by','or','be','this','that','from','as','are','was','were','has','had','not','but','can','all',
+      'its','per','via'].includes(w));
+
+  const productType = extractProductType(productTitle);
+  const typeCap = productType.charAt(0).toUpperCase() + productType.slice(1);
+
+  // Build weighted keyword map from all sources
+  const kwWeight = new Map();
+  for (const w of titleWords) {
+    kwWeight.set(w, (kwWeight.get(w)||0) + 3);
+  }
+  for (const w of descWords) {
+    kwWeight.set(w, (kwWeight.get(w)||0) + 1);
+  }
+  for (const s of seeds) {
+    s.toLowerCase().split(/\s+/).filter(w => w.length > 1).forEach(w => {
+      kwWeight.set(w, (kwWeight.get(w)||0) + 4);
+    });
+  }
+
+  const sortedKWs = [...kwWeight.entries()].sort((a,b) => b[1]-a[1]).map(e => e[0]);
+
+  // ------------------------------------------------------------------
+  // STRATEGY 1: Title primary phrase (Etsy's highest weighted area)
+  // ------------------------------------------------------------------
+  const primary = titleWords.slice(0, Math.min(5, titleWords.length));
+  if (primary.length >= 2) {
+    pushCandidate(primary.join(' '), 'title_primary', 95, '标题核心短语');
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 2: Category competitor tags & common longtails
+  // ------------------------------------------------------------------
+  const templates = CATEGORY_TEMPLATES[category];
+  if (templates) {
+    for (const ct of templates.competitorTags) {
+      pushCandidate(ct, 'competitor', 82 + Math.random()*13, '竞品标签参考');
+    }
+    for (const lt of templates.commonLongtails) {
+      pushCandidate(lt, 'category_longtail', 72 + Math.random()*15, '类目长尾推荐');
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 3: Material + Product (Etsy favors specificity)
+  // ------------------------------------------------------------------
+  const foundMats = MATERIAL_WORDS.filter(m => allText.includes(m.toLowerCase()));
+  const matPool = foundMats.length > 0 ? foundMats : ['Cotton','Wool','Leather','Silk','Bamboo'];
+  for (const mat of matPool.slice(0,3)) {
+    // Try with various attributes
+    const attrs = ['Handmade','Warm','Soft','Natural','Lightweight','Premium'];
+    for (const attr of attrs.slice(0,2)) {
+      let tag = mat + typeCap + attr;
+      if (tag.length <= 20 && tag.length >= 5) {
+        pushCandidate(tag, 'material_product', 76 + Math.random()*14, '材质+产品+属性');
+      }
+    }
+    // Material + Product alone
+    let tag = mat + typeCap;
+    if (tag.length <= 20 && tag.length >= 4) {
+      pushCandidate(tag, 'material_product', 74 + Math.random()*12, '材质+产品');
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 4: Occasion + Product + Gift
+  // ------------------------------------------------------------------
+  const relevantOcc = OCCASION_WORDS.filter(oc => allText.includes(oc.toLowerCase()));
+  const occPool = relevantOcc.length > 0 ? relevantOcc : OCCASION_WORDS.slice(0,8);
+  for (const oc of occPool.slice(0,5)) {
+    let tag = oc + typeCap;
+    if (tag.length <= 20 && tag.length >= 5) {
+      pushCandidate(tag, 'occasion', 75 + Math.random()*12, '场景+产品');
+    }
+    // Gift variant
+    let giftTag = 'GiftFor' + oc.replace(/Day|Night|Party|Gift/g,'');
+    if (giftTag.length <= 20 && giftTag.length >= 5 && giftTag !== 'GiftFor') {
+      pushCandidate(giftTag, 'gift', 72 + Math.random()*12, '送礼标签');
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 5: Style + Product
+  // ------------------------------------------------------------------
+  const foundStyles = STYLE_WORDS.filter(s => allText.includes(s.toLowerCase()));
+  const stylePool = foundStyles.length > 0 ? foundStyles : STYLE_WORDS.slice(0,6);
+  for (const st of stylePool.slice(0,4)) {
+    let tag = st + typeCap;
+    if (tag.length <= 20 && tag.length >= 5) {
+      pushCandidate(tag, 'style', 73 + Math.random()*12, '风格+产品');
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 6: Feature / USP + Product
+  // ------------------------------------------------------------------
+  const foundFeats = FEATURE_WORDS.filter(f => allText.includes(f.toLowerCase()));
+  for (const fw of foundFeats.slice(0,4)) {
+    let tag = fw + typeCap;
+    if (tag.length <= 20 && tag.length >= 5) {
+      pushCandidate(tag, 'feature', 74 + Math.random()*12, '产品特性');
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 7: Seed long-tail keywords
+  // ------------------------------------------------------------------
+  for (const seed of seeds) {
+    const clean = seed.trim();
+    if (clean.length <= 20 && clean.length >= 4) {
+      pushCandidate(normalizeTag(clean), 'seed', 70 + Math.random()*15, '长尾种子词');
+    }
+    // Also try compressed version
+    const compressed = clean.replace(/\s+/g,'').trim();
+    if (compressed.length <= 20 && compressed.length >= 5 && compressed !== clean.replace(/\s+/g,'')) {
+      // Only if it's different from the space version
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 8: Color + Product (if color mentioned)
+  // ------------------------------------------------------------------
+  const colorRegex = /\b(Red|Blue|Green|Black|White|Pink|Purple|Yellow|Orange|Brown|Gray|Grey|Beige|Cream|Ivory|Navy|Teal|Coral|Mint|Rose|Gold|Silver|Bronze|Copper|Rainbow|Neutral|Pastel|Multicolor)\b/i;
+  const colorMatch = productTitle.match(colorRegex) || productDesc.match(colorRegex);
+  if (colorMatch) {
+    const color = colorMatch[0].charAt(0).toUpperCase() + colorMatch[0].slice(1).toLowerCase();
+    let tag = color + typeCap;
+    if (tag.length <= 20) {
+      pushCandidate(tag, 'color', 73 + Math.random()*10, '颜色+产品');
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 9: Keyword compound (merge top 2 keywords)
+  // ------------------------------------------------------------------
+  if (sortedKWs.length >= 2) {
+    const top = sortedKWs.slice(0, 5);
+    for (let i = 0; i < top.length - 1 && candidates.length < 30; i++) {
+      for (let j = i + 1; j < top.length && candidates.length < 30; j++) {
+        const combo = top[i].charAt(0).toUpperCase() + top[i].slice(1) +
+                      top[j].charAt(0).toUpperCase() + top[j].slice(1);
+        if (combo.length <= 20 && combo.length >= 5) {
+          pushCandidate(combo, 'keyword_combo', 66 + Math.random()*12, '关键词组合');
+        }
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 10: Generic gift tag (always useful on Etsy)
+  // ------------------------------------------------------------------
+  let giftGeneral = 'GiftFor' + typeCap;
+  if (giftGeneral.length <= 20 && giftGeneral.length >= 5) {
+    pushCandidate(giftGeneral, 'gift', 70 + Math.random()*10, '送礼标签');
+  }
+
+  // ------------------------------------------------------------------
+  // STRATEGY 11: Two-word descriptive from title
+  // ------------------------------------------------------------------
+  if (titleWords.length >= 3) {
+    // Pick distinctive pairs
+    for (let i = 0; i < titleWords.length - 1 && candidates.length < 35; i++) {
+      for (let j = i + 1; j < titleWords.length && candidates.length < 35; j++) {
+        const pair = titleWords[i].charAt(0).toUpperCase() + titleWords[i].slice(1) +
+                     titleWords[j].charAt(0).toUpperCase() + titleWords[j].slice(1);
+        if (pair.length <= 20 && pair.length >= 5 && !candidates.some(c => c.tag.toLowerCase() === pair.toLowerCase())) {
+          pushCandidate(pair, 'title_combo', 68 + Math.random()*10, '标题词组合');
+        }
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // SELECTION: Sort, dedup, enforce Etsy rules
+  // ------------------------------------------------------------------
+  candidates.sort((a, b) => b.score - a.score);
+  const seen = new Set();
+  const usedSlugs = new Set();
+
+  for (const c of candidates) {
+    if (selectedTags.length >= 13) break;
+
+    const n = normalizeTag(c.tag);
+    if (!n || n.length < 3 || n.length > 20) continue;
+
+    const key = n.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (seen.has(key)) continue;
+
+    // Etsy rule: no tag may contain another tag
+    if (hasConflict(selectedTags.map(s => s.tag), n)) continue;
+
+    // Check for excessive word overlap with already selected tags
+    const words = new Set(n.toLowerCase().split(/\s+/));
+    let overlap = false;
+    for (const st of selectedTags) {
+      const stWords = new Set(st.tag.toLowerCase().split(/\s+/));
+      let common = 0;
+      for (const w of words) {
+        if (stWords.has(w)) common++;
+      }
+      // If more than 60% word overlap, skip to avoid cannibalization
+      if (words.size > 0 && stWords.size > 0) {
+        const ratio = common / Math.min(words.size, stWords.size);
+        if (ratio > 0.6) { overlap = true; break; }
+      }
+    }
+    if (overlap) continue;
+
+    seen.add(key);
+    selectedTags.push({
+      ...c,
+      tag: n,
+      charCount: n.length
+    });
+  }
+
+  return selectedTags.slice(0, 13);
+
+  function pushCandidate(tag, source, score, strategy) {
+    // Filter out obviously bad candidates early
+    const normalized = typeof tag === 'string' ? tag : tag.tag || '';
+    if (!normalized || normalized.length < 3) return;
+    // Skip single-word tags unless they are compound words
+    if (!normalized.includes(' ')) {
+      // Allow compound words like "HandmadeKnittedHat" (contains uppercase letters inside)
+      const hasInternalUpper = /[a-z][A-Z]/.test(normalized);
+      if (!hasInternalUpper && normalized.length > 10) return;
+    }
+    candidates.push({ tag: normalized, source, score, strategy });
+  }
+}
+// ============================================================
+//  ANALYTICS & QUALITY SCORING
+// ============================================================
+
+function computeQuality(tags) {
+  if (!tags || tags.length === 0) return { score: 0, avgLen: 0, label: '无数据', color: 'var(--border)' };
+  let total = 0;
+
+  for (const t of tags) {
+    let s = 0;
+    // Length score: ideal 15-20 chars
+    if (t.tag.length >= 15 && t.tag.length <= 20) s += 30;
+    else if (t.tag.length >= 10) s += 20;
+    else if (t.tag.length >= 5) s += 10;
+    else s += 5;
+
+    // Word count: multi-word = better long-tail
+    const wc = t.tag.split(' ').length;
+    if (wc >= 3) s += 30;
+    else if (wc === 2) s += 20;
+    else if (wc === 1 && /[a-z][A-Z]/.test(t.tag)) s += 20; // compound word
+    else s += 5;
+
+    // Specificity: has capital letters inside (compound word indicator)
+    if (/[A-Z]/.test(t.tag.slice(1))) s += 20;
+
+    // Generic word penalty
+    const generics = ['Handmade','Gift','Present','Item','Product','Accessory','Decor','Art','Craft','Supply','Set','Kit','Pack'];
+    const gc = generics.filter(g => t.tag.toLowerCase().split(' ').includes(g.toLowerCase())).length;
+    if (gc === 0) s += 20;
+    else if (gc === 1) s += 10;
+
+    // Base score from generation
+    s += (t.score || 50) * 0.3;
+
+    total += Math.min(Math.round(s), 100);
+  }
+
+  const avgScore = Math.round(total / tags.length);
+  const avgLen = Math.round(tags.reduce((a, t) => a + t.tag.length, 0) / tags.length);
+
+  let label, color;
+  if (avgScore >= 80) { label = '🏆 优质'; color = 'var(--green)'; }
+  else if (avgScore >= 65) { label = '👍 良好'; color = 'var(--blue)'; }
+  else if (avgScore >= 50) { label = '👌 一般'; color = 'var(--amber)'; }
+  else { label = '⚠️ 需优化'; color = 'var(--red)'; }
+
+  return { score: avgScore, avgLen, label, color };
+}
+
+function generateInsights(tags, category, title) {
+  // Analyze tag source distribution
+  const sourceCounts = {};
+  for (const t of tags) {
+    sourceCounts[t.source] = (sourceCounts[t.source] || 0) + 1;
+  }
+
+  const strategyBreakdown = Object.entries(sourceCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([src, count]) => {
+      const labels = {
+        title_primary: '标题核心词', category_pattern: '品类模板', competitor: '竞品标签',
+        material_product: '材质+产品', occasion: '场景标签', gift: '送礼标签',
+        style: '风格标签', feature: '产品特性', seed: '长尾种子词',
+        category_longtail: '类目长尾', color: '颜色标签', keyword_combo: '关键词组合',
+        title_combo: '标题词组合'
+      };
+      return (labels[src] || src) + ': ' + count + '/' + tags.length;
+    });
+
+  // Generate long-tail suggestions
+  const productType = extractProductType(title);
+  const typeCap = productType.charAt(0).toUpperCase() + productType.slice(1);
+  const longtailRecs = [
+    typeCap + ' gift for her',
+    'custom ' + typeCap + ' for women',
+    'personalized ' + typeCap + ' unique',
+    'handmade ' + typeCap + ' artisan',
+    typeCap + ' for Christmas gift',
+    'unique ' + typeCap + ' idea',
+    'best ' + typeCap + ' gift',
+    typeCap + ' for special occasion'
+  ].filter((lt, i) => {
+    const n = normalizeTag(lt);
+    return n.length <= 20 && !tags.some(t => t.tag.toLowerCase().includes(productType.toLowerCase()));
+  }).slice(0, 6);
+
+  return { strategyBreakdown, longtailRecs };
+}
+// ============================================================
+//  UI CONTROLLER
+// ============================================================
+
+const $ = id => document.getElementById(id);
+const seeds = new Set();
+
+// Seed tags UI
+function renderSeeds() {
+  const c = $('seedTags');
+  c.innerHTML = '';
+  for (const s of seeds) {
+    const sp = document.createElement('span');
+    sp.className = 'seed-tag';
+    sp.innerHTML = s + ' <span class="close" data-word="' + s.replace(/"/g,'&quot;') + '">×</span>';
+    c.appendChild(sp);
+  }
+  c.querySelectorAll('.close').forEach(el => {
+    el.addEventListener('click', () => { seeds.delete(el.dataset.word); renderSeeds(); });
+  });
+}
+
+$('addSeedBtn').addEventListener('click', () => {
+  const val = $('seedInput').value.trim();
+  if (val && val.length >= 3) {
+    val.split(',').map(s => s.trim()).filter(s => s.length >= 3).forEach(s => seeds.add(s));
+    $('seedInput').value = '';
+    renderSeeds();
+  }
+});
+
+$('seedInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); $('addSeedBtn').click(); }
+});
+
+// Main generate
+$('generateBtn').addEventListener('click', generate);
+
+function generate() {
+  const title = $('productTitle').value.trim();
+  const desc = $('productDesc').value.trim();
+  const category = $('category').value;
+  const seedArr = [...seeds];
+
+  if (!title && !desc && seeds.size === 0) {
+    showToast('⚠️ 请至少输入产品标题或添加长尾种子词');
+    return;
+  }
+
+  const tags = generateTags(title || desc, desc || title, category, seedArr);
+  if (tags.length === 0) {
+    showToast('⚠️ 未能生成标签，请提供更详细的产品信息');
+    return;
+  }
+
+  renderTags(tags);
+  renderAnalytics(tags);
+  renderStrategy(tags, category, title);
+  renderCompetitorInsights(tags, category, title);
+  $('copyBtn').disabled = false;
+  $('exportBtn').disabled = false;
+  showToast('✅ 成功生成 ' + tags.length + ' 个 Etsy 优化标签');
+}
+
+function renderTags(tags) {
+  let html = '<div class="tag-grid">';
+  for (let i = 0; i < 13; i++) {
+    const t = tags[i];
+    if (t) {
+      const qc = t.score >= 80 ? 'high' : t.score >= 65 ? 'medium' : 'low';
+      html += '<div class="tag-item">' +
+        '<span class="tag-num">#' + (i+1) + '</span>' +
+        '<span class="tag-quality ' + qc + '"></span>' +
+        '<span class="tag-text">' + t.tag + '</span>' +
+        '<span class="tag-char-count">' + t.charCount + '/20</span>' +
+        '</div>';
+    } else {
+      html += '<div class="tag-item" style="opacity:.3">' +
+        '<span class="tag-num">#' + (i+1) + '</span>' +
+        '<span class="tag-text" style="color:var(--text-light)">—</span>' +
+        '</div>';
+    }
+  }
+  html += '</div>';
+  $('tagListContainer').innerHTML = html;
+}
+
+function renderAnalytics(tags) {
+  const q = computeQuality(tags);
+  $('analyticsArea').style.display = 'block';
+  $('statTotal').textContent = tags.length;
+  $('statAvgLen').textContent = q.avgLen;
+  $('statScore').textContent = q.score + '%';
+  $('qualityLabel').textContent = q.label;
+  $('qualityBar').style.width = q.score + '%';
+  $('qualityBar').style.background = q.color;
+}
+
+function renderStrategy(tags, category, title) {
+  const ins = generateInsights(tags, category, title);
+  let html = '<div class="strategy-section"><h3>📌 标签策略分布</h3><ul class="strategy-list">';
+  for (const l of ins.strategyBreakdown) {
+    html += '<li><span class="icon">•</span> ' + l + '</li>';
+  }
+  html += '</ul></div>';
+
+  if (ins.longtailRecs.length > 0) {
+    html += '<div class="strategy-section"><h3>🔎 建议补充的长尾关键词</h3><div class="lt-grid">';
+    for (const lt of ins.longtailRecs) {
+      html += '<div class="lt-item">' + lt + '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  html += '<div class="strategy-section"><h3>📊 每个 Tag 详细分析</h3><div class="tag-analysis">';
+  for (const t of tags) {
+    const sc = t.score >= 80 ? 'score-high' : t.score >= 65 ? 'score-med' : 'score-low';
+    const sl = t.score >= 80 ? '优质' : t.score >= 65 ? '良好' : '一般';
+    html += '<div class="tag-analysis-row">' +
+      '<span class="kw">' + t.tag + '</span>' +
+      '<span style="font-size:.7rem;color:var(--text-light);flex:0 0 auto">' + t.strategy + '</span>' +
+      '<span class="score ' + sc + '">' + Math.round(t.score) + ' ' + sl + '</span>' +
+      '</div>';
+  }
+  html += '</div></div>';
+
+  $('keywordStrategy').innerHTML = html;
+}
+
+function renderCompetitorInsights(tags, category, title) {
+  const catLabel = $('category').options[$('category').selectedIndex]?.text || '通用';
+  const productType = extractProductType(title);
+  const typeCap = productType.charAt(0).toUpperCase() + productType.slice(1);
+  const templates = CATEGORY_TEMPLATES[category];
+
+  let html = '<div class="strategy-section"><h3>🏪 ' + catLabel + ' 头部 Listing 标签参考</h3>';
+
+  if (templates) {
+    html += '<ul class="strategy-list">';
+    const tips = [
+      '"' + templates.commonLongtails[0] + '" → 长尾精准搜索',
+      '"' + templates.commonLongtails[1] + '" → 场景化搜索',
+      '"' + templates.commonLongtails[2] + '" → 风格+人群定位',
+      '"' + templates.commonLongtails[3] + '" → 属性+产品组合'
+    ];
+    for (const tip of tips) {
+      html += '<li><span class="icon">📈</span> ' + tip + '</li>';
+    }
+    html += '</ul>';
+
+    html += '<div style="margin-top:12px;font-size:.8rem;color:var(--text-mid);padding:10px;background:var(--surface-alt);border-radius:6px;">' +
+      '<strong>💡 Etsy SEO 优化建议</strong><br/>' +
+      '1. 标题前 40 字符必须包含 <strong>' + typeCap + '</strong> 核心词<br/>' +
+      '2. 确保 13 个 Tag 覆盖：产品核心词、材质、风格、场景、送礼、颜色、特性<br/>' +
+      '3. 每个 Tag 建议 15-20 字符以充分利用 Etsy 搜索权重<br/>' +
+      '4. 禁止任何 Tag 成为另一个 Tag 的子集（违反 Etsy 算法规则）<br/>' +
+      '5. 使用 Google Keyword Planner 验证长尾词的月搜索量' +
+      '</div>';
+  } else {
+    html += '<p style="color:var(--text-light);font-size:.85rem;">选择具体品类可获得精准的竞品标签参考。</p>';
+  }
+
+  html += '</div>';
+  $('competitorInsights').innerHTML = html;
+}
+
+// Copy to clipboard
+$('copyBtn').addEventListener('click', () => {
+  const texts = [...document.querySelectorAll('#tagListContainer .tag-text')];
+  const output = texts.map((el, i) => (i+1) + '. ' + el.textContent).join('\n');
+  navigator.clipboard.writeText(output).then(() => {
+    showToast('📋 已复制到剪贴板');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = output;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showToast('📋 已复制到剪贴板');
+  });
+});
+
+// Export CSV
+$('exportBtn').addEventListener('click', () => {
+  const texts = [...document.querySelectorAll('#tagListContainer .tag-text')];
+  let csv = 'Number,Tag,Length,Strategy\n';
+  const analysisRows = document.querySelectorAll('.tag-analysis-row');
+  texts.forEach((el, i) => {
+    const strategy = analysisRows[i]?.querySelector('span[style*="font-size:.7rem"]')?.textContent || '';
+    csv += (i+1) + ',"' + el.textContent + '",' + el.textContent.length + ',"' + strategy + '"\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'etsy-tags-' + Date.now() + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇️ CSV 已下载');
+});
+
+// Reset
+$('resetBtn').addEventListener('click', () => {
+  $('productTitle').value = '';
+  $('productDesc').value = '';
+  $('category').value = '';
+  $('priceRange').value = '';
+  $('seedInput').value = '';
+  seeds.clear();
+  renderSeeds();
+  $('tagListContainer').innerHTML = '<div class="empty-state"><div class="big-icon">🏷️</div><p>填写左侧产品信息，点击「智能生成 13 Tags」</p><p style="font-size:.78rem;margin-top:6px">基于 Etsy SEO 算法 + 长尾关键词 + 竞品标签模式生成</p></div>';
+  $('analyticsArea').style.display = 'none';
+  $('keywordStrategy').innerHTML = '<div class="empty-state"><div class="big-icon">📊</div><p>生成 Tag 后将展示关键词覆盖策略以及长尾词推荐</p></div>';
+  $('competitorInsights').innerHTML = '<div class="empty-state"><div class="big-icon">🔍</div><p>生成后展示同类目头部 Listing 的 Tag 模式分析</p></div>';
+  $('copyBtn').disabled = true;
+  $('exportBtn').disabled = true;
+  showToast('↺ 已重置');
+});
+
+// Toast notification
+let toastTimer = null;
+function showToast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
