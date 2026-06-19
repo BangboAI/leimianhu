@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>竞品监控 - HuaAngel Tools</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--t:#1a1a2e;--t2:#666;--p:#005bff;--ph:#0047cc;--a:#fe2c55;--g:#00a854;--o:#f59e0b;--purple:#7c3aed;--hdr:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--r:12px;--s:0 2px 8px rgba(0,0,0,0.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.nav{background:var(--hdr);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--hdr);padding:40px 24px 52px;text-align:center;color:#fff;border-radius:0 0 32px 32px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 50%, rgba(96,165,250,0.1) 0%, transparent 50%),radial-gradient(circle at 70% 30%, rgba(254,44,85,0.06) 0%, transparent 50%);pointer-events:none}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:5px 14px;font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:12px}
+.hero h1{font-size:28px;font-weight:800;margin-bottom:4px}
+.hero h1 span{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:14px;color:rgba(255,255,255,0.55);max-width:550px;margin:0 auto;line-height:1.6}
+.container{max-width:1100px;margin:-16px auto 40px;padding:0 20px;position:relative;z-index:1}
+.layout{display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--card);border-radius:var(--r);padding:20px 22px;box-shadow:var(--s)}
+.p-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#444}
+.fg input,.fg textarea,.fg select{width:100%;padding:8px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:13px;outline:none;transition:border-color .2s;font-family:inherit}
+.fg input:focus,.fg textarea:focus{border-color:var(--p)}
+.fg textarea{min-height:48px;resize:vertical;font-size:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--ph);box-shadow:0 4px 12px rgba(0,91,255,0.3)}
+.btn-g{background:var(--g);color:#fff}.btn-g:hover{opacity:.9}
+.btn-o{background:var(--o);color:#fff}
+.btn-s{background:#f0f0f0;color:#666;border:1px solid #ddd}
+.btn-s:hover{background:#e5e5e5}
+.btn-block{width:100%;justify-content:center}
+.btn-sm{padding:5px 12px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px;border-radius:5px}
+.btn-d{background:#fee;color:var(--a)}.btn-d:hover{background:#fdd}
+
+/* Table */
+.tt{width:100%;border-collapse:collapse}
+.tt th{text-align:left;font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;padding:8px 8px;border-bottom:2px solid #eee;font-weight:700;cursor:pointer;user-select:none;white-space:nowrap}
+.tt th:hover{color:var(--p)}
+.tt td{padding:10px 8px;font-size:13px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.tt tr:last-child td{border-bottom:none}
+.tt .title-cell{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--t2)}
+.price-up{color:var(--a);font-weight:600}
+.price-down{color:var(--g);font-weight:600}
+.price-same{color:var(--t2)}
+
+/* Tags */
+.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+.tag-amz{background:#fff3e0;color:#e65100}
+.tag-ebay{background:#ffeaea;color:#c62828}
+.tag-wmt{background:#e3f2fd;color:#1565c0}
+.tag-etsy{background:#fff3e0;color:#e65100}
+.tag-ali{background:#fce4ec;color:#b71c1c}
+.tag-tk{background:#f5f5f5;color:#333}
+.tag-oz{background:#e3f2fd;color:#0d47a1}
+.tag-ot{background:#f3e5f5;color:#6a1b9a}
+.tag-warn{background:#fff8e1;color:#f57f17}
+.tag-ok{background:#e8f5e9;color:#2e7d32}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:#bbb}
+.empty .icon{font-size:48px;margin-bottom:12px;opacity:.4}
+.empty h3{font-size:16px;color:#999;margin-bottom:4px}
+.empty p{font-size:13px}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:28px;max-width:520px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.modal h2{font-size:17px;margin-bottom:12px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+/* Analysis results */
+.analysis-section{margin-bottom:14px}
+.analysis-section h3{font-size:13px;font-weight:700;color:var(--p);margin-bottom:4px}
+.analysis-section p{font-size:12px;color:var(--t2);line-height:1.6}
+.analysis-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.analysis-tags span{padding:2px 8px;background:#e8f0fe;color:var(--p);border-radius:4px;font-size:11px}
+
+/* Stats row */
+.sr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.sc{text-align:center;padding:12px;background:#f9fafb;border-radius:10px}
+.sc .n{font-size:22px;font-weight:800;color:var(--p)}
+.sc .l{font-size:11px;color:var(--t2);margin-top:2px}
+
+/* History popup */
+.hist-list{max-height:300px;overflow-y:auto}
+.hist-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:12px}
+.hist-date{color:var(--t2);width:80px;flex-shrink:0;font-size:11px}
+
+.footer{text-align:center;padding:32px 24px;color:var(--t2);font-size:13px;border-top:1px solid #e5e7eb;margin-top:20px}
+.footer a{color:var(--p);text-decoration:none}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head><body>
+
+<nav class="nav"><div class="nav-inner">
+<a href="/" class="nav-brand">🔅 <span>HuaAngel</span> Tools</a>
+<div class="nav-links">
+<a href="/">首页</a><a href="/ai-title-generator">AI 标题</a>
+<a href="/dashboard">📊 看板</a><a href="/user">👤 用户</a>
+<a href="/competitor-monitor" class="active">🎯 竞品</a>
+</div></div></nav>
+
+<section class="hero">
+<div class="hero-badge">🎯 新工具 · AI 驱动</div>
+<h1>竞品 <span>监控</span></h1>
+<p>跟踪竞争对手的价格变化、标题策略、上新动态。AI 分析竞品标题，帮你找到差异化突破口。支持 Amazon · eBay · Walmart · Etsy · 速卖通 · TikTok · OZON · 美客多</p>
+</section>
+
+<div class="container">
+<div class="layout">
+
+<!-- Left: Add Competitor Form -->
+<div class="panel">
+<div class="p-title">➕ 添加竞品</div>
+
+<div class="fg">
+<label>竞品产品名 *</label>
+<input type="text" id="cpName" placeholder="如: Anker Soundcore P40i" autocomplete="off">
+</div>
+
+<div class="fg">
+<label>店铺/品牌名</label>
+<input type="text" id="cpStore" placeholder="如: AnkerDirect">
+</div>
+
+<div class="fg">
+<label>产品链接</label>
+<input type="url" id="cpUrl" placeholder="https://www.amazon.com/dp/...">
+</div>
+
+<div class="fg">
+<label>平台</label>
+<select id="cpPlatform">
+<option value="amazon">Amazon</option><option value="ebay">eBay</option>
+<option value="walmart">Walmart</option><option value="etsy">Etsy</option>
+<option value="aliexpress">速卖通</option><option value="tiktok">TikTok Shop</option>
+<option value="ozon">OZON</option><option value="other">其他</option>
+</select>
+</div>
+
+<div class="fg">
+<label>当前售价 ($)</label>
+<input type="number" id="cpPrice" placeholder="39.99" step="0.01">
+</div>
+
+<div class="fg">
+<label>当前标题</label>
+<textarea id="cpTitle" placeholder="粘贴竞品完整的商品标题" rows="2"></textarea>
+</div>
+
+<div class="fg">
+<label>备注 (选填)</label>
+<input type="text" id="cpNote" placeholder="如: 爆款、BSR排名前10">
+</div>
+
+<button class="btn btn-p btn-block" onclick="addCompetitor()">➕ 添加竞品</button>
+</div>
+
+<!-- Right: Competitor Dashboard -->
+<div class="panel">
+<div class="p-title">🎯 竞品列表 <span id="totalCount" style="font-size:12px;color:var(--t2);font-weight:400"></span>
+<span style="flex:1"></span>
+<button class="btn btn-sm btn-s" onclick="exportCompetitors()">📤 导出</button>
+<button class="btn btn-sm btn-d" onclick="clearAll()" style="margin-left:4px">🗑️</button>
+</div>
+
+<!-- Stats -->
+<div class="sr" id="statsRow">
+<div class="sc"><div class="n" id="statTotal">0</div><div class="l">监控中</div></div>
+<div class="sc"><div class="n" id="statAlerts">0</div><div class="l">变动提醒</div></div>
+<div class="sc"><div class="n" id="statAnalyzed">0</div><div class="l">已分析</div></div>
+</div>
+
+<!-- Table -->
+<div id="competitorList">
+<div class="empty">
+<div class="icon">🎯</div>
+<h3>还没有添加竞品</h3>
+<p>在左侧添加第一个竞品，AI 会帮你分析它们的标题策略</p>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- Analysis Modal -->
+<div class="modal-overlay" id="analysisModal">
+<div class="modal">
+<h2 id="analysisTitle">🔍 竞品标题分析</h2>
+<div id="analysisContent">
+<div style="text-align:center;padding:20px;color:#bbb">加载中...</div>
+</div>
+<div class="modal-actions">
+<button class="btn btn-s" onclick="closeModal('analysisModal')">关闭</button>
+<button class="btn btn-p" onclick="useInsights()">💡 应用到标题生成器</button>
+</div>
+</div>
+</div>
+
+<!-- Price History Modal -->
+<div class="modal-overlay" id="historyModal">
+<div class="modal">
+<h2>📈 价格历史</h2>
+<div class="hist-list" id="historyList"></div>
+<div class="modal-actions"><button class="btn btn-s" onclick="closeModal('historyModal')">关闭</button></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer"><p>🔅 <strong>HuaAngel Tools</strong> · 竞品监控 v1.0</p></footer>
+
+<script src="/track.js"></script>
+<script>
+var STORAGE_KEY = 'ha_competitors';
+var ANALYSIS_CACHE = 'ha_analysis_cache';
+
+function getCompetitors() { try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]}catch(e){return []} }
+function saveCompetitors(c) { localStorage.setItem(STORAGE_KEY, JSON.stringify(c)); }
+
+function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show')},2000); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function addCompetitor() {
+  var name = document.getElementById('cpName').value.trim();
+  if (!name) { showToast('请输入竞品产品名'); return; }
+  var cp = {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2,4),
+    name: name,
+    store: document.getElementById('cpStore').value.trim(),
+    url: document.getElementById('cpUrl').value.trim(),
+    platform: document.getElementById('cpPlatform').value,
+    price: parseFloat(document.getElementById('cpPrice').value) || 0,
+    title: document.getElementById('cpTitle').value.trim(),
+    note: document.getElementById('cpNote').value.trim(),
+    created: Date.now(),
+    updated: Date.now(),
+    history: [{ price: parseFloat(document.getElementById('cpPrice').value)||0, date: Date.now() }],
+    analyzed: false
+  };
+  var competitors = getCompetitors();
+  competitors.unshift(cp);
+  saveCompetitors(competitors);
+  document.getElementById('cpName').value = '';
+  document.getElementById('cpStore').value = '';
+  document.getElementById('cpUrl').value = '';
+  document.getElementById('cpPrice').value = '';
+  document.getElementById('cpTitle').value = '';
+  document.getElementById('cpNote').value = '';
+  renderCompetitors();
+  window.haTrack('competitor-monitor', 'add', { name: name, platform: cp.platform });
+  showToast('✅ 已添加 ' + name);
+}
+
+function deleteCompetitor(id) {
+  if (!confirm('确定删除该竞品？')) return;
+  var competitors = getCompetitors().filter(function(c) { return c.id !== id; });
+  saveCompetitors(competitors);
+  renderCompetitors();
+  window.haTrack('competitor-monitor', 'delete', {});
+  showToast('已删除');
+}
+
+function updatePrice(id) {
+  var newPrice = prompt('输入新的价格 ($):');
+  if (newPrice === null || newPrice === '') return;
+  newPrice = parseFloat(newPrice);
+  if (isNaN(newPrice) || newPrice <= 0) { showToast('请输入有效价格'); return; }
+  var competitors = getCompetitors();
+  for (var i = 0; i < competitors.length; i++) {
+    if (competitors[i].id === id) {
+      var oldPrice = competitors[i].price;
+      competitors[i].price = newPrice;
+      competitors[i].updated = Date.now();
+      competitors[i].history.push({ price: newPrice, date: Date.now() });
+      break;
+    }
+  }
+  saveCompetitors(competitors);
+  renderCompetitors();
+  window.haTrack('competitor-monitor', 'update_price', { newPrice: newPrice });
+  showToast('💰 价格已更新');
+}
+
+function showHistory(id) {
+  var competitors = getCompetitors();
+  var cp = competitors.find(function(c) { return c.id === id; });
+  if (!cp) return;
+  var list = document.getElementById('historyList');
+  list.innerHTML = (cp.history || []).slice().reverse().map(function(h) {
+    var d = new Date(h.date);
+    return '<div class="hist-item"><span class="hist-date">$' + h.price.toFixed(2) + '</span><span style="color:var(--t2)">' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString().slice(0,5) + '</span></div>';
+  }).join('') || '<div style="text-align:center;padding:20px;color:#bbb">暂无历史</div>';
+  document.getElementById('historyModal').classList.add('show');
+}
+
+function analyzeTitle(id) {
+  var competitors = getCompetitors();
+  var cp = competitors.find(function(c) { return c.id === id; });
+  if (!cp || !cp.title) { showToast('该竞品没有标题可分析'); return; }
+  
+  // Run analysis
+  var analysis = runTitleAnalysis(cp);
+  
+  // Show in modal
+  document.getElementById('analysisTitle').textContent = '🔍 ' + cp.name + ' — 标题分析';
+  document.getElementById('analysisContent').innerHTML = analysis.html;
+  document.getElementById('analysisModal').classList.add('show');
+  
+  // Mark as analyzed
+  for (var i = 0; i < competitors.length; i++) {
+    if (competitors[i].id === id) { competitors[i].analyzed = true; break; }
+  }
+  saveCompetitors(competitors);
+  renderCompetitors();
+  window.haTrack('competitor-monitor', 'analyze', { name: cp.name });
+  
+  // Store for use-insights
+  window.__lastAnalysis = { competitor: cp, analysis: analysis };
+}
+
+function runTitleAnalysis(cp) {
+  var title = cp.title;
+  var words = title.split(/[\s,|-]+/).filter(Boolean);
+  var charCount = title.length;
+  var wordCount = words.length;
+  
+  // Detect structure
+  var hasBrand = cp.store && title.toLowerCase().includes(cp.store.toLowerCase());
+  var hasNumbers = /\d/.test(title);
+  var hasParens = title.includes('(') || title.includes('[');
+  var hasPipe = title.includes('|');
+  var hasColon = title.includes(':');
+  
+  // Platform suggestion
+  var platformGuesses = [];
+  if (charCount > 150) platformGuesses.push('Amazon / Walmart（长标题适用）');
+  else if (charCount > 80) platformGuesses.push('Amazon');
+  else if (charCount > 60) platformGuesses.push('eBay / 速卖通');
+  else platformGuesses.push('Mercado Libre / TikTok');
+  if (hasPipe) platformGuesses.push('Amazon 风格（用|分隔）');
+  if (charCount <= 80 && !hasPipe) platformGuesses.push('eBay 风格（紧凑型）');
+  
+  // Keyword analysis
+  var stopWords = ['the','a','an','and','or','for','of','in','on','with','to','is','it','at','by','as','be','this','that'];
+  var keywords = words.filter(function(w) { return w.length > 3 && stopWords.indexOf(w.toLowerCase()) < 0; });
+  var keywordFreq = {};
+  keywords.forEach(function(k) { var kw = k.toLowerCase().replace(/[^a-z0-9]/g,''); if (kw) keywordFreq[kw] = (keywordFreq[kw]||0) + 1; });
+  var sortedKeywords = Object.keys(keywordFreq).sort(function(a,b){return keywordFreq[b]-keywordFreq[a]}).slice(0,10);
+  
+  // Structure type
+  var structureType = '未知';
+  if (hasBrand) structureType = '品牌驱动型（品牌名优先）';
+  else if (hasPipe) structureType = '分段型（用|分隔关键词）';
+  else if (hasColon) structureType = '主题+说明型';
+  else if (words[0] && words[0].length > 0 && words[0][0] === words[0][0].toUpperCase() && words.length > 5) structureType = '关键词驱动型（搜索匹配优先）';
+  else structureType = '自然语言型（可读性优先）';
+  
+  // Suggestions
+  var suggestions = [];
+  if (charCount > 180) suggestions.push('⚠️ 标题较长（' + charCount + '字符），手机端只显示前60字，核心词需要前置');
+  if (charCount < 50) suggestions.push('💡 标题较短，可以考虑增加更多关键词来提高搜索覆盖');
+  if (!hasBrand && cp.store) suggestions.push('💡 建议在标题前部加入品牌名「' + cp.store + '」增加品牌搜索匹配');
+  if (!hasNumbers) suggestions.push('💡 无数字信息（规格/数量），可考虑加入增强信任感');
+  if (sortedKeywords.length < 5) suggestions.push('💡 关键词密度较低，可考虑增加产品核心卖点关键词');
+  suggestions.push('🎯 差异化建议：注意竞品在标题中突出的卖点，如果你的产品有不同卖点，要在标题中强调差异化');
+  suggestions.push('📊 建议用AI标题生成器，基于这些分析生成一个更有竞争力的标题');
+  
+  var html = '<div class="analysis-section"><h3>📊 基本信息</h3><p>字符: ' + charCount + ' | 单词: ' + wordCount + ' | 结构: ' + structureType + '</p></div>';
+  html += '<div class="analysis-section"><h3>🔑 核心关键词（频次排序）</h3><div class="analysis-tags">' + sortedKeywords.slice(0,8).map(function(k) { return '<span>' + k + '</span>'; }).join('') + '</div></div>';
+  html += '<div class="analysis-section"><h3>🏷️ 可能适配平台</h3><p>' + platformGuesses.join(' · ') + '</p></div>';
+  html += '<div class="analysis-section"><h3>💡 优化建议</h3>' + suggestions.map(function(s) { return '<p>• ' + s + '</p>'; }).join('') + '</div>';
+  
+  return { html: html, keywords: sortedKeywords, structure: structureType, charCount: charCount };
+}
+
+function useInsights() {
+  if (!window.__lastAnalysis) { showToast('暂无分析数据'); return; }
+  window.open('/ai-title-generator', '_blank');
+  closeModal('analysisModal');
+  showToast('💡 已打开标题生成器，参考分析结果优化你的标题');
+}
+
+function exportCompetitors() {
+  var competitors = getCompetitors();
+  if (competitors.length === 0) { showToast('暂无数据可导出'); return; }
+  var rows = [['产品名','店铺','平台','价格','标题','备注','添加日期','状态']];
+  competitors.forEach(function(c) {
+    rows.push([c.name, c.store||'', c.platform||'', c.price, (c.title||'').replace(/"/g,'""'), c.note||'', new Date(c.created).toLocaleDateString(), c.analyzed?'已分析':'未分析']);
+  });
+  var csv = rows.map(function(r) { return r.join(','); }).join('\n');
+  var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'competitors-' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
+  window.haTrack('competitor-monitor', 'export', { count: competitors.length });
+}
+
+function clearAll() {
+  if (!confirm('确定清除所有竞品数据？')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  renderCompetitors();
+  showToast('已清除');
+}
+
+function priceDiff(cp) {
+  var h = cp.history || [];
+  if (h.length < 2) return { text: '—', cls: '' };
+  var last = h[h.length-1].price;
+  var prev = h[h.length-2].price;
+  var diff = last - prev;
+  if (diff > 0) return { text: '↑$' + diff.toFixed(2), cls: 'price-up' };
+  if (diff < 0) return { text: '↓$' + Math.abs(diff).toFixed(2), cls: 'price-down' };
+  return { text: '—', cls: 'price-same' };
+}
+
+function getPlatformTag(p) {
+  var map = { amazon:'tag-amz', ebay:'tag-ebay', walmart:'tag-wmt', etsy:'tag-etsy', aliexpress:'tag-ali', tiktok:'tag-tk', ozon:'tag-oz', other:'tag-ot' };
+  return '<span class="tag ' + (map[p]||'tag-ot') + '">' + (p.charAt(0).toUpperCase()+p.slice(1)) + '</span>';
+}
+
+function daysSince(t) {
+  var d = Math.floor((Date.now() - t) / 86400000);
+  return d === 0 ? '今天' : d === 1 ? '昨天' : d + '天前';
+}
+
+function renderCompetitors() {
+  var competitors = getCompetitors();
+  var container = document.getElementById('competitorList');
+  document.getElementById('statTotal').textContent = competitors.length;
+  document.getElementById('statAlerts').textContent = competitors.filter(function(c){return c.history&&c.history.length>1}).length;
+  document.getElementById('statAnalyzed').textContent = competitors.filter(function(c){return c.analyzed}).length;
+  document.getElementById('totalCount').textContent = '· 共 ' + competitors.length + ' 个';
+  
+  if (competitors.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="icon">🎯</div><h3>还没有添加竞品</h3><p>在左侧添加第一个竞品，AI 会帮你分析它们的标题策略</p></div>';
+    return;
+  }
+  
+  container.innerHTML = '<table class="tt"><thead><tr><th>产品</th><th>平台</th><th>价格</th><th>变动</th><th>标题</th><th>状态</th><th>操作</th></tr></thead><tbody>' +
+    competitors.map(function(c) {
+      var pd = priceDiff(c);
+      var titlePreview = c.title ? c.title.substring(0, 60) + (c.title.length > 60 ? '...' : '') : '<span style="color:#ccc">未记录</span>';
+      return '<tr><td><strong>' + c.name + '</strong>' + (c.store?'<br><span style="font-size:11px;color:var(--t2)">' + c.store + '</span>':'') + '</td>' +
+        '<td>' + getPlatformTag(c.platform) + '</td>' +
+        '<td style="font-weight:700">$' + c.price.toFixed(2) + '</td>' +
+        '<td class="' + pd.cls + '">' + pd.text + '</td>' +
+        '<td class="title-cell" title="' + (c.title||'') + '">' + titlePreview + '</td>' +
+        '<td>' + (c.analyzed ? '<span class="tag tag-ok">已分析</span>' : '<span class="tag tag-warn">待分析</span>') + '<br><span style="font-size:10px;color:var(--t2)">' + daysSince(c.updated) + '</span></td>' +
+        '<td>' +
+          '<button class="btn btn-xs btn-p" onclick="analyzeTitle('' + c.id + '')">🔍 分析</button> ' +
+          '<button class="btn btn-xs btn-s" onclick="updatePrice('' + c.id + '')">💰 改价</button> ' +
+          '<button class="btn btn-xs btn-s" onclick="showHistory('' + c.id + '')">📈 历史</button> ' +
+          '<button class="btn btn-xs btn-d" onclick="deleteCompetitor('' + c.id + '')">✕</button>' +
+        '</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+// Initial render
+document.addEventListener('DOMContentLoaded', renderCompetitors);
+</script>
+</body></html>
