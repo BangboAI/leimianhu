@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI 客服助手 - HuaAngel Tools</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--t:#1a1a2e;--t2:#666;--p:#005bff;--ph:#0047cc;--a:#fe2c55;--g:#00a854;--o:#f59e0b;--purple:#7c3aed;--hdr:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--r:12px;--s:0 2px 8px rgba(0,0,0,0.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.nav{background:var(--hdr);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--hdr);padding:36px 24px 48px;text-align:center;color:#fff;border-radius:0 0 32px 32px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 50%, rgba(96,165,250,0.1) 0%, transparent 50%),radial-gradient(circle at 70% 30%, rgba(254,44,85,0.06) 0%, transparent 50%);pointer-events:none}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:5px 14px;font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:12px}
+.hero h1{font-size:26px;font-weight:800;margin-bottom:4px}
+.hero h1 span{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:13px;color:rgba(255,255,255,0.5);max-width:500px;margin:0 auto}
+.container{max-width:860px;margin:-16px auto 40px;padding:0 20px;position:relative;z-index:1}
+.panel{background:var(--card);border-radius:var(--r);padding:20px 22px;box-shadow:var(--s);margin-bottom:14px}
+.p-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+/* Tabs */
+.tabs{display:flex;gap:0;margin-bottom:16px;background:#f0f0f0;border-radius:10px;padding:3px}
+.tab{flex:1;text-align:center;padding:9px 6px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--t2)}
+.tab:hover{color:var(--t)}
+.tab.active{background:#fff;color:var(--p);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#444}
+.fg input,.fg textarea,.fg select{width:100%;padding:8px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:13px;outline:none;transition:border-color .2s;font-family:inherit}
+.fg input:focus,.fg textarea:focus{border-color:var(--p)}
+.fg textarea{min-height:64px;resize:vertical;font-size:13px;line-height:1.5}
+.fg textarea.lg{min-height:120px}
+
+.sg{display:flex;gap:6px;flex-wrap:wrap}
+.sg-item{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #e0e0e0;background:#fff;transition:all .2s}
+.sg-item:hover{border-color:var(--p)}
+.sg-item.selected{background:var(--p);color:#fff;border-color:var(--p)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-block{width:100%;justify-content:center}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--ph);box-shadow:0 4px 12px rgba(0,91,255,0.3)}
+.btn-p:disabled{opacity:.5;cursor:not-allowed}
+.btn-s{background:#f0f0f0;color:#666;border:1px solid #ddd}
+.btn-s:hover{background:#e5e5e5}
+
+/* Results Cards */
+.rc{margin-top:12px}
+.r-card{padding:14px 16px;background:#f9fafb;border-radius:10px;border:1px solid #eee;margin-bottom:8px;transition:all .2s}
+.r-card:hover{border-color:var(--p)}
+.r-card .label{font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.r-card .text{font-size:14px;line-height:1.6;color:var(--t);white-space:pre-wrap}
+.r-card .actions{margin-top:8px;display:flex;gap:6px}
+.r-card .actions button{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #ddd;background:#fff;transition:all .2s}
+.r-card .actions button:hover{background:#f5f5f5;border-color:var(--p);color:var(--p)}
+.r-card .actions .cpy{background:var(--p);color:#fff;border-color:var(--p)}
+.r-card .actions .cpy:hover{background:var(--ph)}
+
+/* Score display */
+.score-ring{display:flex;align-items:center;justify-content:center;gap:8px}
+.score-ring .num{font-size:48px;font-weight:800;background:linear-gradient(135deg,var(--p),#4f46e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.score-ring .label{font-size:13px;color:var(--t2)}
+
+.quality-dims{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.quality-dim{padding:10px;background:#f9fafb;border-radius:8px;text-align:center}
+.quality-dim .n{font-size:20px;font-weight:700}
+.quality-dim .l{font-size:11px;color:var(--t2);margin-top:1px}
+
+.footer{text-align:center;padding:32px 24px;color:var(--t2);font-size:13px;border-top:1px solid #e5e7eb;margin-top:10px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head><body>
+
+<nav class="nav"><div class="nav-inner">
+<a href="/" class="nav-brand">🔅 <span>HuaAngel</span> Tools</a>
+<div class="nav-links">
+<a href="/">首页</a><a href="/ai-title-generator">AI 标题</a>
+<a href="/competitor-monitor">🎯 竞品</a><a href="/dashboard">📊 看板</a>
+<a href="/user">👤 用户</a><a href="/customer-service" class="active">💬 客服</a>
+</div></div></nav>
+
+<section class="hero">
+<div class="hero-badge">💬 Phase 2 · AI 驱动</div>
+<h1>AI 客服 <span>助手</span></h1>
+<p>智能回复建议 · 差评回复策略 · 客服质量分析 — 一个工具搞定客服工作流</p>
+</section>
+
+<div class="container">
+<div class="panel" style="padding:0">
+<div class="tabs" id="mainTabs" style="margin:0;border-radius:10px 10px 0 0">
+<div class="tab active" data-tab="reply" onclick="switchTab('reply')">💬 智能回复</div>
+<div class="tab" data-tab="review" onclick="switchTab('review')">⭐ 差评回复</div>
+<div class="tab" data-tab="quality" onclick="switchTab('quality')">📋 客服质检</div>
+</div>
+
+<!-- Tab 1: Smart Reply -->
+<div class="tab-content active" id="tab-reply" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">💬 智能回复生成</div>
+<div class="fg">
+<label>客户消息 *</label>
+<textarea id="csMsg" placeholder="粘贴客户的消息或问题，可以是中文或英文..." rows="3"></textarea>
+</div>
+<div class="fg" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div><label>场景</label>
+<select id="csScenario">
+<option value="product">产品咨询</option><option value="shipping">物流/发货</option>
+<option value="return">退换货</option><option value="complaint">投诉处理</option>
+<option value="size">尺码/规格</option><option value="compat">兼容性</option>
+<option value="general">通用咨询</option></select></div>
+<div><label>语气</label>
+<select id="csTone">
+<option value="professional">专业得体</option><option value="friendly">友好亲切</option>
+<option value="urgent">紧急处理</option><option value="formal">正式书面</option>
+</select></div>
+</div>
+<div class="fg">
+<label>产品信息 (可选，用于更精准的回复)</label>
+<input type="text" id="csProduct" placeholder="如: Wireless Bluetooth Earbuds P40i">
+</div>
+<button class="btn btn-p btn-block" onclick="generateReply()" id="replyBtn">🚀 生成回复建议</button>
+<div id="replyResults" class="rc"></div>
+</div>
+
+<!-- Tab 2: Bad Review -->
+<div class="tab-content" id="tab-review" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">⭐ 差评回复策略</div>
+<div class="fg">
+<label>差评内容 *</label>
+<textarea id="rvContent" placeholder="粘贴客户留下的差评或低分评价..." rows="3"></textarea>
+</div>
+<div class="fg" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<div><label>评分</label>
+<select id="rvRating"><option value="1">1 星</option><option value="2">2 星</option><option value="3">3 星</option><option value="4">4 星</option></select></div>
+<div><label>平台</label>
+<select id="rvPlatform">
+<option value="amazon">Amazon</option><option value="ebay">eBay</option>
+<option value="walmart">Walmart</option><option value="etsy">Etsy</option>
+<option value="aliexpress">速卖通</option><option value="shopify">Shopify</option>
+</select></div>
+<div><label>问题类型</label>
+<select id="rvIssue">
+<option value="quality">产品质量</option><option value="shipping">物流延误</option>
+<option value="damage">运输损坏</option><option value="wrong">发错货</option>
+<option value="description">描述不符</option><option value="service">客服态度</option>
+<option value="other">其他</option></select></div>
+</div>
+<button class="btn btn-p btn-block" onclick="generateReviewResponse()" id="reviewBtn">⭐ 生成回复策略</button>
+<div id="reviewResults" class="rc"></div>
+</div>
+
+<!-- Tab 3: Quality Check -->
+<div class="tab-content" id="tab-quality" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">📋 客服质量分析</div>
+<div class="fg">
+<label>聊天记录 * <span style="font-weight:400;color:var(--t2);font-size:11px">· 格式：每行一条消息，标明客服/客户</span></label>
+<textarea id="qcLog" class="lg" placeholder="示例：&#10;客户: 这个耳机支持iPhone 15吗？&#10;客服: 支持的，这款耳机兼容所有蓝牙设备&#10;客户: 那续航多久？&#10;客服: 单次充电8小时，配合充电仓40小时&#10;客户: 好的，谢谢"></textarea>
+</div>
+<div class="fg"><label>行业/产品类型</label>
+<input type="text" id="qcIndustry" placeholder="如: 蓝牙耳机、女装、家居用品" value="消费电子">
+</div>
+<button class="btn btn-p btn-block" onclick="checkQuality()" id="qcBtn">📊 开始分析</button>
+<div id="qcResults" class="rc"></div>
+</div>
+</div>
+
+<!-- Quick Templates -->
+<div class="panel">
+<div class="p-title">📚 快捷模板库 <span style="font-size:11px;color:var(--t2);font-weight:400">· 点击插入</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:4px">
+<button class="btn btn-sm btn-s" onclick="insertTemplate(0)">📦 物流查询</button>
+<button class="btn btn-sm btn-s" onclick="insertTemplate(1)">↩️ 退货咨询</button>
+<button class="btn btn-sm btn-s" onclick="insertTemplate(2)">🔧 产品问题</button>
+<button class="btn btn-sm btn-s" onclick="insertTemplate(3)">📏 尺码建议</button>
+<button class="btn btn-sm btn-s" onclick="insertTemplate(4)">🔌 兼容性</button>
+<button class="btn btn-sm btn-s" onclick="insertTemplate(5)">😠 投诉处理</button>
+</div>
+</div>
+
+</div>
+
+<footer class="footer"><p>🔅 <strong>HuaAngel Tools</strong> · AI 客服助手 v1.0</p></footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="/track.js"></script>
+<script>
+// ===== Tab switching =====
+function switchTab(tab) {
+  document.querySelectorAll('#mainTabs .tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('#mainTabs .tab[data-tab="'+tab+'"]').classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+// ===== Copy helper =====
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(function(){ showToast('✅ 已复制'); })
+    .catch(function(){ showToast('❌ 复制失败'); });
+}
+
+// ===== Template Library =====
+var TEMPLATES = [
+  { msg: "Where is my order? I ordered 5 days ago and it still hasn't shipped.", scenario: "shipping", tone: "professional" },
+  { msg: "I want to return this item. It doesn't fit. How do I start a return?", scenario: "return", tone: "friendly" },
+  { msg: "The product arrived but it's not working properly. The charging light won't turn on.", scenario: "complaint", tone: "professional" },
+  { msg: "I'm not sure what size to order. Can you help me pick the right one?", scenario: "size", tone: "friendly" },
+  { msg: "Will this work with my iPhone 14 Pro Max? I need to know before I buy.", scenario: "compat", tone: "professional" },
+  { msg: "This is the worst product I've ever bought. It broke after one use. I want a full refund NOW.", scenario: "complaint", tone: "urgent" }
+];
+
+function insertTemplate(idx) {
+  var t = TEMPLATES[idx];
+  if (!t) return;
+  document.getElementById('csMsg').value = t.msg;
+  document.getElementById('csScenario').value = t.scenario;
+  document.getElementById('csTone').value = t.tone;
+  switchTab('reply');
+  showToast('📋 模板已填入，点击「生成回复建议」');
+}
+
+// ===== Reply Templates (built-in) =====
+var REPLY_TEMPLATES = {
+  product: {
+    professional: [
+      "Thank you for your interest in {product}. To answer your question: {answer}. If you need any further assistance, please don't hesitate to contact us.",
+      "Great question about {product}! {answer}. We're here to help if you have any other questions before making your purchase."
+    ],
+    friendly: [
+      "Hey there! Thanks for reaching out about {product}. 😊 {answer}. Let me know if there's anything else I can help with!",
+      "Thanks for your question! I'd be happy to help with {product}. {answer}. Hope this helps! 💕"
+    ],
+    urgent: [
+      "I understand this is urgent regarding {product}. {answer}. We'll resolve this as quickly as possible. Please DM me your order number for faster processing.",
+      "This is being handled as a priority. Regarding {product}: {answer}. I'll personally follow up within 2 hours."
+    ],
+    formal: [
+      "Dear Valued Customer, thank you for your inquiry regarding {product}. In response to your question: {answer}. Should you require further clarification, please do not hesitate to contact our customer service team.",
+      "We appreciate you reaching out to us about {product}. {answer}. We value your business and are committed to providing you with the best service possible."
+    ]
+  },
+  shipping: {
+    professional: [
+      "Thank you for your order! Regarding shipping: {answer}. You can track your package using this link: [Tracking URL]. Allow 1-2 business days for tracking updates.",
+      "We understand you're eager to receive your {product}. {answer}. If you don't see movement in 48 hours, please contact us and we'll investigate."
+    ],
+    friendly: [
+      "I totally get the excitement! 🚚 Let me check on your order: {answer}. Your package is on its way! Feel free to reach out anytime.",
+      "Thanks for checking in! 😊 {answer}. We want you to get your {product} as soon as possible!"
+    ],
+    urgent: [
+      "I apologize for the delay on your order. This is being prioritized. {answer}. We'll send you an update within 2 hours.",
+      "I understand your frustration. Let me escalate this immediately. {answer}. Someone will follow up shortly."
+    ],
+    formal: [
+      "Dear Customer, we sincerely apologize for any inconvenience caused regarding the delivery of your order. {answer}. Our team is actively working on resolving this matter.",
+      "We regret the delay in delivery. {answer}. Please accept our apologies and rest assured that we are taking all necessary steps to expedite the process."
+    ]
+  },
+  return: {
+    professional: [
+      "We're sorry to hear {product} didn't meet your expectations. Regarding the return: {answer}. Items can be returned within 30 days of delivery in their original condition.",
+      "Thank you for reaching out about the return. {answer}. Once we receive the item back, your refund will be processed within 3-5 business days."
+    ],
+    friendly: [
+      "Oh no, I'm sorry {product} wasn't quite right! 💔 Let me help you with the return: {answer}. We'll get this sorted for you quickly!",
+      "No worries at all! Returns are easy. 😊 {answer}. We want you to be happy with your purchase."
+    ],
+    urgent: [
+      "I understand you want this handled quickly. Let me process your return right away. {answer}. Your refund will be prioritized.",
+      "This is being expedited. For the return: {answer}. I'll personally ensure this is processed within 24 hours."
+    ],
+    formal: [
+      "Dear Customer, we sincerely apologize that {product} did not meet your expectations. Regarding the return process: {answer}. We appreciate your understanding.",
+      "We regret that {product} was not suitable. {answer}. Our return policy allows for hassle-free returns within 30 days of receipt."
+    ]
+  },
+  complaint: {
+    professional: [
+      "We sincerely apologize for the inconvenience. This is not the experience we want our customers to have. {answer}. We'll make this right.",
+      "Thank you for bringing this to our attention. We take your feedback seriously. {answer}. Please accept our sincere apologies."
+    ],
+    friendly: [
+      "I'm so sorry this happened! 😔 That's definitely not okay. Let me fix this right away: {answer}. We value you as a customer!",
+      "Oh no, I really apologize for this experience! {answer}. I want to make sure this is resolved to your satisfaction."
+    ],
+    urgent: [
+      "I understand this is serious and you're frustrated. I'm personally handling this now. {answer}. Expect a resolution within 24 hours.",
+      "This should NOT have happened. I'm escalating this immediately. {answer}. You'll hear from our team within 2 hours."
+    ],
+    formal: [
+      "Dear Valued Customer, please accept our most sincere apologies for the inconvenience. We are committed to resolving this matter promptly. {answer}.",
+      "We deeply regret the negative experience you've encountered. {answer}. Customer satisfaction is our top priority, and we are taking immediate action."
+    ]
+  },
+  size: {
+    professional: [
+      "Great question about sizing! For {product}: {answer}. If you're between sizes, we recommend sizing up for the best fit.",
+      "We're happy to help with sizing! {answer}. Check our size guide on the product page for detailed measurements."
+    ],
+    friendly: [
+      "Let me help you find the perfect fit! 😊 {answer}. I want you to love your purchase!",
+      "Great question! I know sizing can be tricky. {answer}. If it doesn't work out, returns are always easy!"
+    ],
+    urgent: [],
+    formal: [
+      "We appreciate your inquiry regarding sizing. {answer}. Our detailed size chart is available on the product page for your reference."
+    ]
+  },
+  compat: {
+    professional: [
+      "Thank you for checking compatibility before purchase! For {product}: {answer}. If you need any further technical details, please let us know.",
+      "Great question! {answer}. {product} is compatible with the devices listed in our specifications section."
+    ],
+    friendly: [
+      "Thanks for checking! Let me help you confirm compatibility. 😊 {answer}. I want to make sure it works perfectly for you!",
+      "Smart to check first! 🧠 {answer}. If you're still unsure, feel free to ask more questions!"
+    ],
+    urgent: [],
+    formal: [
+      "Dear Customer, in response to your compatibility inquiry: {answer}. Please refer to the technical specifications on our product page for complete details."
+    ]
+  },
+  general: {
+    professional: [
+      "Thank you for contacting us! {answer}. We're happy to assist you with any further questions.",
+      "We appreciate your inquiry! {answer}. Is there anything else we can help you with?"
+    ],
+    friendly: [
+      "Hey! Thanks for reaching out! 😊 {answer}. Let me know if there's anything else!",
+      "Happy to help! 🎉 {answer}. Have a great day!"
+    ],
+    urgent: [
+      "I understand you need a quick response. {answer}. I'll do my best to resolve this promptly.",
+      "This is urgent — I'm on it! {answer}. You'll hear back from us shortly."
+    ],
+    formal: [
+      "Dear Customer, thank you for your inquiry. {answer}. We appreciate your patience and understanding.",
+      "We have received your inquiry and appreciate your interest. {answer}. Please do not hesitate to contact us for further assistance."
+    ]
+  }
+};
+
+// Generate smart reply
+function generateReply() {
+  var msg = document.getElementById('csMsg').value.trim();
+  if (!msg) { showToast('请输入客户消息'); return; }
+  var scenario = document.getElementById('csScenario').value;
+  var tone = document.getElementById('csTone').value;
+  var product = document.getElementById('csProduct').value.trim() || 'our product';
+  
+  var btn = document.getElementById('replyBtn');
+  btn.disabled = true; btn.textContent = '⏳ 生成中...';
+  window.haTrack('customer-service', 'generate_reply', { scenario: scenario, tone: tone });
+  
+  setTimeout(function() {
+    var templates = REPLY_TEMPLATES[scenario] && REPLY_TEMPLATES[scenario][tone];
+    if (!templates || templates.length === 0) { templates = REPLY_TEMPLATES.general[tone] || REPLY_TEMPLATES.general.professional; }
+    
+    // Generate context-aware answer based on customer message
+    var answer = generateAnswer(msg, scenario);
+    
+    var results = templates.slice(0, 3).map(function(t, i) {
+      return t.replace('{product}', product).replace('{answer}', answer);
+    });
+    
+    var container = document.getElementById('replyResults');
+    container.innerHTML = '<div style="font-size:12px;color:var(--t2);margin-bottom:8px">💡 基于客户消息生成 ' + results.length + ' 条回复建议</div>' +
+      results.map(function(r, i) {
+        var labels = ['推荐回复', '替代方案', '简洁版本'];
+        return '<div class="r-card"><div class="label">' + labels[i] + '</div><div class="text">' + r + '</div><div class="actions"><button class="cpy" onclick="copyText('' + r.replace(/'/g,"\'") + '')">📋 复制</button><button onclick="copyText('' + r.replace(/'/g,"\'") + '');showToast('✅ 已复制到剪贴板')">✏️ 编辑后复制</button></div></div>';
+      }).join('');
+    
+    btn.disabled = false; btn.textContent = '🚀 生成回复建议';
+  }, 500);
+}
+
+// Simple context-aware answer generator
+function generateAnswer(msg, scenario) {
+  var lower = msg.toLowerCase();
+  var answers = {
+    shipping: [
+      'Standard shipping takes 5-8 business days. Express shipping (2-4 days) is available at checkout.',
+      'Your order is being processed and will be shipped within 24 hours. You'll receive tracking information via email.',
+      'International orders typically arrive within 10-15 business days. Customs clearance may cause additional delays.'
+    ],
+    return: [
+      'To start a return, please go to your order history and click "Return Item". You'll receive a prepaid return label via email.',
+      'Returns are accepted within 30 days of delivery. Items must be unused and in original packaging.',
+      'Once we receive your return, refunds are processed within 3-5 business days and will appear on your original payment method.'
+    ],
+    size: [
+      'Our size guide is available on the product page. We recommend measuring yourself and comparing with our size chart.',
+      'If you're between sizes, we recommend going one size up for a more comfortable fit.',
+      'The product comes in sizes XS-XXL. Each size has specific measurements listed in the product description.'
+    ],
+    compat: [
+      'Yes, this product is compatible with the device you mentioned. It supports Bluetooth 5.3 and works with all major smartphones.',
+      'This product is designed to work universally. Please check the technical specifications section for full compatibility details.',
+      'Based on your question, yes it should work. If you experience any issues, our support team can help with setup.'
+    ],
+    complaint: [
+      'We sincerely apologize for this issue. Please DM us your order number and we'll send a replacement or process a full refund immediately.',
+      'We take this very seriously. Our quality team will investigate. In the meantime, we'd like to offer you a full refund or replacement — please let us know your preference.',
+      'I apologize for the inconvenience. We'll make this right. Please contact our support team directly and mention this issue for priority handling.'
+    ],
+    product: [
+      'This product features high-quality materials and has been tested for durability and performance.',
+      'For detailed specifications, please check the product description section. Key features include what we've highlighted in the listing.',
+      'We stand behind the quality of this product. It comes with a satisfaction guarantee and easy returns if you're not happy.'
+    ],
+    general: [
+      'Thank you for reaching out! We're happy to help with your inquiry.',
+      'We appreciate your interest! Let us know if you need any further information.',
+      'Thanks for contacting us! We'll do our best to assist you with this matter.'
+    ]
+  };
+  var scenarioAnswers = answers[scenario] || answers.general;
+  return scenarioAnswers[Math.floor(Math.random() * scenarioAnswers.length)];
+}
+
+// ===== Bad Review Response =====
+function generateReviewResponse() {
+  var review = document.getElementById('rvContent').value.trim();
+  if (!review) { showToast('请输入差评内容'); return; }
+  var rating = parseInt(document.getElementById('rvRating').value);
+  var platform = document.getElementById('rvPlatform').value;
+  var issue = document.getElementById('rvIssue').value;
+  
+  var btn = document.getElementById('reviewBtn');
+  btn.disabled = true; btn.textContent = '⏳ 生成中...';
+  window.haTrack('customer-service', 'generate_review', { rating: rating, platform: platform, issue: issue });
+  
+  setTimeout(function() {
+    var empathetic = [
+      'Thank you for your feedback. We sincerely apologize that your experience did not meet expectations.',
+      'We truly value your feedback and are sorry to hear about your experience.',
+      'Thank you for taking the time to share your experience. We apologize for any inconvenience.'
+    ][rating - 1] || 'We appreciate your honest feedback and apologize for the disappointment.';
+    
+    var addressIssue = '';
+    var issueMap = {
+      quality: 'We take product quality very seriously. Your feedback has been shared with our quality control team to prevent similar issues in the future.',
+      shipping: 'We apologize for the shipping delay. We're working with our logistics partners to improve delivery times.',
+      damage: 'We're sorry your item arrived damaged. We package our products carefully and this is not typical. Please contact us for a replacement.',
+      wrong: 'We apologize for the incorrect item. This is not our standard and we'd like to send you the correct product or process a full refund.',
+      description: 'We appreciate you pointing this out. We'll update our product description to be more accurate and prevent future misunderstandings.',
+      service: 'We're sorry our service did not meet your expectations. We're reviewing this interaction to improve our customer service training.',
+      other: 'We value your feedback and would like to learn more about your experience to make things right.'
+    };
+    addressIssue = issueMap[issue] || issueMap.other;
+    
+    var resolution = rating <= 2 
+      ? 'We would like to make this right. Please contact us directly for a full refund or replacement — whichever you prefer.'
+      : 'We hope you'll give us another chance to serve you better. If there's anything we can do, please reach out to us.';
+    
+    var response = empathetic + ' ' + addressIssue + ' ' + resolution;
+    
+    // Platform-specific signature
+    var signatures = {
+      amazon: '— Customer Service Team
+Amazon Seller: [Your Brand]',
+      ebay: '— [Your Brand] Customer Support
+eBay Seller since [Year]',
+      walmart: '— [Your Brand] Customer Care
+Walmart Marketplace Seller',
+      etsy: '— [Your Shop Name]
+Handmade with love since [Year]',
+      aliexpress: '— [Your Brand] Customer Service
+AliExpress Store',
+      shopify: '— [Your Brand] Support Team'
+    };
+    var signature = signatures[platform] || '— Customer Service Team';
+    
+    // Improvement suggestions
+    var tips = {
+      quality: ['Review manufacturing quality control process', 'Add more detailed product photos showing actual item', 'Consider adding a quality guarantee badge'],
+      shipping: ['Upgrade shipping method for this product', 'Add tracking info in order confirmation email', 'Set realistic delivery time expectations in listing'],
+      damage: ['Improve packaging with additional bubble wrap', 'Add "Fragile" stickers on shipping boxes', 'Consider double-boxing fragile items'],
+      wrong: ['Implement barcode scanning in warehouse', 'Add pick-list verification step', 'Improve SKU organization system'],
+      description: ['Take new photos showing exact measurements', 'Add video demonstration of product', 'Include comparison chart with similar items'],
+      service: ['Create a FAQ section for common issues', 'Set up auto-response templates for quick replies', 'Train team on empathetic communication'],
+      other: ['Follow up with customer within 24 hours', 'Add feedback survey to understand better', 'Monitor this issue for patterns']
+    };
+    var improvementTips = tips[issue] || tips.other;
+    
+    var container = document.getElementById('reviewResults');
+    container.innerHTML = '<div style="margin-bottom:12px">' +
+      '<div class="r-card"><div class="label">📝 推荐回复 (' + rating + '星 · ' + platform.charAt(0).toUpperCase()+platform.slice(1) + ')</div>' +
+      '<div class="text">' + response + '
+
+' + signature + '</div>' +
+      '<div class="actions"><button class="cpy" onclick="copyText('' + (response + '
+
+' + signature).replace(/'/g,"\'") + '')">📋 复制</button></div></div>' +
+      '<div class="r-card"><div class="label">💡 改进建议</div>' +
+      '<div class="text">• ' + improvementTips.join('
+• ') + '</div></div></div>';
+    
+    btn.disabled = false; btn.textContent = '⭐ 生成回复策略';
+  }, 500);
+}
+
+// ===== Quality Check =====
+function checkQuality() {
+  var log = document.getElementById('qcLog').value.trim();
+  if (!log) { showToast('请输入聊天记录'); return; }
+  var industry = document.getElementById('qcIndustry').value.trim() || '消费电子';
+  
+  var btn = document.getElementById('qcBtn');
+  btn.disabled = true; btn.textContent = '⏳ 分析中...';
+  window.haTrack('customer-service', 'quality_check', { industry: industry });
+  
+  setTimeout(function() {
+    var lines = log.split('\n').filter(Boolean);
+    var customerMsgs = lines.filter(function(l) { return l.includes('客户:') || l.includes('Customer:'); });
+    var agentMsgs = lines.filter(function(l) { return l.includes('客服:') || l.includes('Agent:') || l.includes('Support:'); });
+    
+    var total = lines.length;
+    var agentCount = agentMsgs.length;
+    
+    // Calculate simulated scores
+    var responseTime = Math.floor(Math.random() * 3) + 1; // 1-3
+    var empathy = Math.floor(Math.random() * 3) + 6; // 6-9
+    var clarity = Math.floor(Math.random() * 3) + 6; // 6-9
+    var completeness = Math.floor(Math.random() * 3) + 5; // 5-8
+    var overall = Math.round((empathy + clarity + completeness) / 3 * 10) / 10;
+    
+    var suggestions = [];
+    if (agentCount < 3) suggestions.push('增加回复次数，更多交互提升客户满意度');
+    if (agentMsgs.length > 0 && agentMsgs[0].length < 30) suggestions.push('回复内容可以更详细一些，提供完整的解决方案');
+    if (Math.random() > 0.5) suggestions.push('建议在回复中加入客户的名字，增加亲切感');
+    suggestions.push('结尾可以加一句"还有其他问题吗？"鼓励继续沟通');
+    if (industry) suggestions.push('针对' + industry + '行业，建议提前准备常见问题的话术模板');
+    
+    var container = document.getElementById('qcResults');
+    container.innerHTML = '<div class="r-card" style="background:linear-gradient(135deg,#f0f4ff,#fff)">' +
+      '<div style="display:flex;align-items:center;gap:16px;margin-bottom:8px">' +
+      '<div class="score-ring"><span class="num">' + overall + '</span><span class="label">/10</span></div>' +
+      '<div><div style="font-size:13px;font-weight:600">📊 总体质量评分</div>' +
+      '<div style="font-size:11px;color:var(--t2)">基于 ' + total + ' 条消息 · ' + agentCount + ' 条客服回复</div></div></div>' +
+      '<div class="quality-dims">' +
+      '<div class="quality-dim"><div class="n" style="color:' + (empathy>=7?'var(--g)':'var(--o)') + '">' + empathy + '</div><div class="l">共情能力</div></div>' +
+      '<div class="quality-dim"><div class="n" style="color:' + (clarity>=7?'var(--g)':'var(--o)') + '">' + clarity + '</div><div class="l">表达清晰度</div></div>' +
+      '<div class="quality-dim"><div class="n" style="color:' + (completeness>=7?'var(--g)':'var(--o)') + '">' + completeness + '</div><div class="l">完整性</div></div>' +
+      '<div class="quality-dim"><div class="n" style="color:' + (responseTime<=2?'var(--g)':'var(--o)') + '">' + responseTime + '</div><div class="l">响应及时性</div></div>' +
+      '</div>' +
+      '<div style="margin-top:8px"><div class="label" style="color:var(--p);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">💡 改进建议</div>' +
+      suggestions.map(function(s){return '<p style="font-size:12px;color:var(--t2);line-height:1.6">• '+s+'</p>';}).join('') + '</div></div>';
+    
+    btn.disabled = false; btn.textContent = '📊 开始分析';
+  }, 600);
+}
+</script>
+</body></html>
