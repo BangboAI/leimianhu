@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HuaAngel 视频创作工作台 - 视频复刻 · 脚本生成 · 选品分析</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f0f2f5;--card-bg:#fff;--text:#1a1a2e;--text-secondary:#666;--primary:#005bff;--primary-hover:#0047cc;--accent:#fe2c55;--accent-green:#00a854;--accent-orange:#f59e0b;--accent-purple:#7c3aed;--header-gradient:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--shadow:0 2px 8px rgba(0,0,0,0.06);--shadow-hover:0 8px 24px rgba(0,0,0,0.1);--radius:12px;--radius-lg:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.nav{background:var(--header-gradient);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}.nav-links{display:flex;gap:4px}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--header-gradient);padding:48px 24px 64px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 50%,rgba(96,165,250,0.1) 0%,transparent 50%),radial-gradient(circle at 70% 30%,rgba(254,44,85,0.06) 0%,transparent 50%);pointer-events:none}
+.hero h1{font-size:clamp(28px,5vw,44px);font-weight:800;position:relative;z-index:1;line-height:1.2}
+.hero h1 span{background:linear-gradient(90deg,#60a5fa,#fe2c55);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:rgba(255,255,255,0.7);margin-top:12px;font-size:16px;position:relative;z-index:1;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.5}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:6px 18px;font-size:13px;margin-bottom:16px;position:relative;z-index:1}
+.hero-stats{display:flex;justify-content:center;gap:32px;margin-top:32px;position:relative;z-index:1;flex-wrap:wrap}
+.stat{text-align:center}.stat-num{font-size:28px;font-weight:800;background:linear-gradient(90deg,#60a5fa,#fe2c55);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:13px;color:rgba(255,255,255,0.6);margin-top:4px}
+.content{max-width:1200px;margin:0 auto;padding:32px 24px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-top:8px}
+.section-header h2{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
+.tabs{display:flex;gap:4px;background:var(--card-bg);border-radius:var(--radius);padding:4px;box-shadow:var(--shadow);overflow-x:auto;margin-bottom:32px}
+.tab-btn{padding:10px 20px;border:none;background:transparent;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;color:var(--text-secondary)}
+.tab-btn:hover{color:var(--text);background:rgba(0,91,255,0.06)}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(0,91,255,0.3)}
+.tab-content{display:none}.tab-content.active{display:block}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:32px}
+.tool-card{background:var(--card-bg);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);text-decoration:none;color:var(--text);border:1px solid transparent;transition:all .2s;display:flex;flex-direction:column;cursor:pointer}
+.tool-card:hover{box-shadow:var(--shadow-hover);border-color:var(--primary);transform:translateY(-2px)}
+.tool-card.featured{border-left:3px solid var(--accent)}
+.tool-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(0,91,255,0.08);margin-bottom:14px}
+.tool-card h3{font-size:16px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tool-card p{font-size:14px;color:var(--text-secondary);line-height:1.5;flex:1}
+.badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700}
+.badge-new{background:#dbeafe;color:#1d4ed8}.badge-ai{background:#fce7f3;color:#be185d}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .2s;background:var(--card-bg);color:var(--text)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,91,255,0.1)}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.btn{padding:10px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);box-shadow:0 2px 8px rgba(0,91,255,0.3)}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent-hover)}
+.btn-outline{background:transparent;border:1.5px solid #e2e8f0;color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-sm{padding:6px 14px;font-size:13px}
+.result-card{background:var(--card-bg);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-top:16px}
+.result-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f0f2f5}
+.result-header h3{font-size:16px;font-weight:700}
+.result-badge{font-size:11px;padding:2px 10px;border-radius:10px;background:#dbeafe;color:#1d4ed8}
+.shot-list{display:flex;flex-direction:column;gap:12px}
+.shot-item{display:grid;grid-template-columns:40px 1fr 60px;gap:12px;padding:12px;background:#f8fafc;border-radius:8px;align-items:start;border-left:3px solid var(--primary)}
+.shot-num{font-weight:700;font-size:14px;color:var(--primary);padding-top:2px}
+.shot-content h4{font-size:14px;font-weight:600;margin-bottom:4px}.shot-content p{font-size:13px;color:var(--text-secondary);line-height:1.5}
+.shot-duration{font-size:12px;color:var(--text-secondary);text-align:right;padding-top:2px;white-space:nowrap}
+.script-block{background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:12px;border-left:3px solid var(--accent)}
+.script-block .label{font-size:12px;color:var(--text-secondary);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.script-block .content{font-size:14px;line-height:1.6;padding:0}
+.tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600}
+.tag-blue{background:#dbeafe;color:#1d4ed8}.tag-purple{background:#ede9fe;color:#6d28d9}
+.tag-green{background:#d1fae5;color:#065f46}.tag-orange{background:#fef3c7;color:#92400e}
+.tag-pink{background:#fce7f3;color:#be185d}
+.trend-filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.trend-filters select{padding:8px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;background:var(--card-bg);cursor:pointer}
+.trend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.trend-card{background:var(--card-bg);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid #f0f2f5}
+.trend-card .trend-category{font-size:12px;color:var(--text-secondary);margin-bottom:4px}
+.trend-card h4{font-size:15px;font-weight:700;margin-bottom:8px}
+.trend-metrics{display:flex;gap:16px;margin-bottom:10px}
+.trend-metrics .metric{text-align:center}
+.trend-metrics .metric .num{font-size:16px;font-weight:800;color:var(--accent)}
+.trend-metrics .metric .label{font-size:11px;color:var(--text-secondary)}
+.trend-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.trend-tags span{font-size:11px;padding:2px 8px;border-radius:4px;background:#f0f2f5;color:var(--text-secondary)}
+.analysis-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.analysis-card{background:var(--card-bg);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.analysis-card .category{font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.analysis-card h4{font-size:16px;font-weight:700;margin-bottom:12px}
+.insight{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f2f5;font-size:14px}
+.insight:last-child{border:none}.insight .value{font-weight:700}.insight .up{color:var(--accent-green)}
+.copy-btn{background:transparent;border:1px solid #e2e8f0;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;transition:all .2s;color:var(--text-secondary)}
+.copy-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.footer{text-align:center;padding:32px 24px;color:var(--text-secondary);font-size:14px;border-top:1px solid #e2e8f0;margin-top:48px}
+.footer a{color:var(--primary);text-decoration:none}
+.quick-actions{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:32px}
+.quick-action{background:var(--card-bg);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.quick-action:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.quick-action .emoji{font-size:32px;margin-bottom:8px}.quick-action h4{font-size:14px;font-weight:700}.quick-action p{font-size:12px;color:var(--text-secondary);margin-top:4px}
+.type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:16px}
+.type-option{padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;text-align:center;font-size:13px;font-weight:600;transition:all .2s;background:var(--card-bg)}
+.type-option:hover{border-color:var(--primary);color:var(--primary)}
+.type-option.selected{border-color:var(--primary);background:rgba(0,91,255,0.06);color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+@media(max-width:640px){.form-row{grid-template-columns:1fr}.nav-links a{padding:4px 10px;font-size:12px}.tools-grid,.trend-grid,.analysis-grid{grid-template-columns:1fr}.quick-actions{grid-template-columns:1fr 1fr}.type-grid{grid-template-columns:repeat(2,1fr)}}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#d0d5dd;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#a0a5ad}
+</style>
+</head><body>
+<nav class="nav"><div class="nav-inner"><a href="/" class="nav-brand">HuaAngel <span>Tools</span></a><div class="nav-links"><a href="/">首页</a><a href="/video-studio" class="active">视频创作</a><a href="/etsy-tag-generator">Etsy标签</a><a href="/tiktok-script-generator">脚本</a><a href="/ozon-price-calculator">OZON</a></div></div></nav>
+
+<section class="hero"><div class="hero-badge">TikTok 电商视频创作工作台</div><h1>视频复刻 · 脚本生成 · <span>AI 创作</span></h1><p>分析爆款视频结构，一键复刻带货内容；生成专业脚本，提升素材产出效率</p><div class="hero-stats"><div class="stat"><div class="stat-num">4</div><div class="stat-label">核心工具</div></div><div class="stat"><div class="stat-num">11</div><div class="stat-label">视频类型</div></div><div class="stat"><div class="stat-num">7</div><div class="stat-label">目标市场</div></div></div></section>
+
+<div class="content">
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('workspace')">💼 工作台</button>
+  <button class="tab-btn" onclick="switchTab('clone')">🎬 视频复刻</button>
+  <button class="tab-btn" onclick="switchTab('script')">📝 脚本生成</button>
+  <button class="tab-btn" onclick="switchTab('analysis')">📊 选品分析</button>
+  <button class="tab-btn" onclick="switchTab('trends')">🔥 爆款趋势</button>
+</div>
+
+<div id="tab-workspace" class="tab-content active">
+  <div class="section-header"><h2>🚀 快速开始</h2></div>
+  <div class="quick-actions">
+    <div class="quick-action" onclick="switchTab('clone')"><div class="emoji">🎬</div><h4>视频复刻</h4><p>解析爆款结构，生成复刻方案</p></div>
+    <div class="quick-action" onclick="switchTab('script')"><div class="emoji">📝</div><h4>脚本生成</h4><p>11种视频类型，智能生成带货脚本</p></div>
+    <div class="quick-action" onclick="switchTab('analysis')"><div class="emoji">📊</div><h4>选品分析</h4><p>市场趋势与品类洞察</p></div>
+    <div class="quick-action" onclick="switchTab('trends')"><div class="emoji">🔥</div><h4>爆款趋势</h4><p>多国市场爆款视频趋势</p></div>
+  </div>
+  <div class="section-header"><h2>🎯 视频复刻工作流</h2></div>
+  <div class="tools-grid">
+    <div class="tool-card featured" onclick="switchTab('clone')"><div class="tool-icon">🎬</div><h3>爆款视频复刻 <span class="badge badge-new">核心</span></h3><p>输入商品信息，选择视频风格，AI自动分析爆款结构，生成逐帧复刻方案与脚本</p></div>
+    <div class="tool-card" onclick="switchTab('script')"><div class="tool-icon">📝</div><h3>带货脚本生成器 <span class="badge badge-ai">AI</span></h3><p>支持口播介绍、真实测评、OOTD、开箱等11种视频类型，生成完整脚本+Hashtags</p></div>
+    <div class="tool-card" onclick="switchTab('analysis')"><div class="tool-icon">📊</div><h3>市场选品分析</h3><p>覆盖女装、美妆、3C、家居等类目，提供热度趋势和竞争度数据</p></div>
+    <div class="tool-card" onclick="switchTab('trends')"><div class="tool-icon">🔥</div><h3>爆款趋势看板</h3><p>美/英/法/德/马/泰/越 7国市场，按类目和视频类型筛选热门内容</p></div>
+  </div>
+</div>
+
+<div id="tab-clone" class="tab-content">
+  <div class="section-header"><h2>🎬 视频复刻工作台</h2><span style="font-size:13px;color:var(--text-secondary)">解析爆款结构 · 生成复刻方案</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="background:var(--card-bg);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">商品信息</h3>
+      <div class="form-group"><label>商品名称 *</label><input id="clone-product" placeholder="例: 女士真丝围巾 / 男士运动手表" /></div>
+      <div class="form-row">
+        <div class="form-group"><label>目标市场</label><select id="clone-market"><option value="US">🇺🇸 美国</option><option value="UK">🇬🇧 英国</option><option value="FR">🇫🇷 法国</option><option value="DE">🇩🇪 德国</option><option value="MY">🇲🇾 马来西亚</option><option value="TH">🇹🇭 泰国</option><option value="VN">🇻🇳 越南</option></select></div>
+        <div class="form-group"><label>视频时长</label><select id="clone-duration"><option value="15">15秒 (短)</option><option value="30" selected>30秒 (标准)</option><option value="60">60秒 (长)</option></select></div>
+      </div>
+      <div class="form-group"><label>商品描述/卖点</label><textarea id="clone-desc" placeholder="描述商品的核心卖点、材质、适用场景等..." rows="4"></textarea></div>
+      <div class="form-group"><label>参考视频风格</label>
+        <div class="type-grid" id="clone-style-grid">
+          <div class="type-option selected" data-style="review" onclick="selectCloneStyle(this)">真实使用测评</div>
+          <div class="type-option" data-style="talk" onclick="selectCloneStyle(this)">口播介绍</div>
+          <div class="type-option" data-style="handheld" onclick="selectCloneStyle(this)">手持商品展示</div>
+          <div class="type-option" data-style="ootd" onclick="selectCloneStyle(this)">OOTD穿搭展示</div>
+          <div class="type-option" data-style="scene" onclick="selectCloneStyle(this)">场景化生活秀</div>
+          <div class="type-option" data-style="unbox" onclick="selectCloneStyle(this)">第一人称开箱</div>
+          <div class="type-option" data-style="promo" onclick="selectCloneStyle(this)">促销卖点强推</div>
+          <div class="type-option" data-style="story" onclick="selectCloneStyle(this)">互动剧情演绎</div>
+          <div class="type-option" data-style="detail" onclick="selectCloneStyle(this)">产品镜头特写</div>
+          <div class="type-option" data-style="asmr" onclick="selectCloneStyle(this)">ASMR感官沉浸</div>
+          <div class="type-option" data-style="tvc" onclick="selectCloneStyle(this)">品牌短TVC</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="generateClone()">🚀 生成复刻方案</button>
+    </div>
+    <div id="clone-result">
+      <div style="background:var(--card-bg);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">🎬</div>
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:8px">等待输入</h3>
+        <p style="font-size:14px;color:var(--text-secondary)">填写左侧商品信息，点击生成复刻方案</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-script" class="tab-content">
+  <div class="section-header"><h2>📝 带货视频脚本生成器</h2><span style="font-size:13px;color:var(--text-secondary)">选择视频类型 · 生成完整脚本</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div style="background:var(--card-bg);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">脚本配置</h3>
+      <div class="form-group"><label>视频类型 *</label>
+        <div class="type-grid" id="script-type-grid">
+          <div class="type-option selected" data-type="review" onclick="selectScriptType(this)">真实使用测评</div>
+          <div class="type-option" data-type="talk" onclick="selectScriptType(this)">口播介绍</div>
+          <div class="type-option" data-type="handheld" onclick="selectScriptType(this)">手持商品展示</div>
+          <div class="type-option" data-type="ootd" onclick="selectScriptType(this)">OOTD穿搭展示</div>
+          <div class="type-option" data-type="scene" onclick="selectScriptType(this)">场景化生活秀</div>
+          <div class="type-option" data-type="unbox" onclick="selectScriptType(this)">第一人称开箱</div>
+          <div class="type-option" data-type="promo" onclick="selectScriptType(this)">促销卖点强推</div>
+          <div class="type-option" data-type="story" onclick="selectScriptType(this)">互动剧情演绎</div>
+          <div class="type-option" data-type="detail" onclick="selectScriptType(this)">产品镜头特写</div>
+          <div class="type-option" data-type="asmr" onclick="selectScriptType(this)">ASMR感官沉浸</div>
+          <div class="type-option" data-type="tvc" onclick="selectScriptType(this)">品牌短TVC</div>
+        </div>
+      </div>
+      <div class="form-group"><label>商品名称</label><input id="script-product" placeholder="例: 便携式蓝牙音箱" /></div>
+      <div class="form-row">
+        <div class="form-group"><label>目标语言</label><select id="script-lang"><option value="zh">中文</option><option value="en">English</option></select></div>
+        <div class="form-group"><label>时长</label><select id="script-duration"><option value="15">15秒</option><option value="30" selected>30秒</option><option value="60">60秒</option></select></div>
+      </div>
+      <div class="form-group"><label>核心卖点（选填，逗号分隔）</label><textarea id="script-points" placeholder="例: 超长续航,防水,轻便便携" rows="2"></textarea></div>
+      <div class="form-group"><label>目标受众（选填）</label><input id="script-audience" placeholder="例: 25-35岁女性 / 户外运动爱好者" /></div>
+      <button class="btn btn-primary" onclick="generateScript()">📝 生成脚本</button>
+    </div>
+    <div id="script-result">
+      <div style="background:var(--card-bg);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">📝</div>
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:8px">等待输入</h3>
+        <p style="font-size:14px;color:var(--text-secondary)">选择视频类型，填写商品信息，生成带货脚本</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-analysis" class="tab-content">
+  <div class="section-header"><h2>📊 市场选品分析</h2><span style="font-size:13px;color:var(--text-secondary)">类目热度 · 竞争分析 · 趋势洞察</span></div>
+  <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+    <select id="analysis-market" onchange="renderAnalysis()" style="padding:8px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;background:var(--card-bg)"><option value="US">🇺🇸 美国</option><option value="UK">🇬🇧 英国</option><option value="DE">🇩🇪 德国</option></select>
+  </div>
+  <div class="analysis-grid" id="analysis-grid"></div>
+</div>
+
+<div id="tab-trends" class="tab-content">
+  <div class="section-header"><h2>🔥 爆款趋势看板</h2><span style="font-size:13px;color:var(--text-secondary)">实时追踪热门视频趋势</span></div>
+  <div class="trend-filters">
+    <select id="trend-country" onchange="renderTrends()"><option value="US">🇺🇸 美国</option><option value="UK">🇬🇧 英国</option><option value="FR">🇫🇷 法国</option><option value="DE">🇩🇪 德国</option><option value="MY">🇲🇾 马来西亚</option><option value="TH">🇹🇭 泰国</option><option value="VN">🇻🇳 越南</option></select>
+    <select id="trend-category" onchange="renderTrends()"><option value="all">全部类目</option><option value="women">女装与女士内衣</option><option value="beauty">美妆个护</option><option value="sports">运动与户外</option><option value="men">男装与男士内衣</option><option value="health">保健</option><option value="phone">手机与数码</option><option value="accessories">时尚配件</option><option value="food">食品饮料</option><option value="home">居家日用</option></select>
+    <select id="trend-video-type" onchange="renderTrends()"><option value="all">全部视频类型</option><option value="review">真实使用测评</option><option value="talk">口播介绍</option><option value="handheld">手持商品展示</option><option value="ootd">OOTD穿搭展示</option><option value="scene">场景化生活秀</option><option value="unbox">第一人称开箱</option><option value="promo">促销卖点强推</option><option value="story">互动剧情演绎</option><option value="detail">产品镜头特写</option><option value="asmr">ASMR感官沉浸</option><option value="tvc">品牌短TVC</option></select>
+  </div>
+  <div class="trend-grid" id="trend-grid"></div>
+</div>
+
+</div>
+
+<footer class="footer"><p><strong>HuaAngel 视频创作工作台</strong> · 免费在线使用</p><p style="margin-top:4px"><a href="/">www.huaangel.com</a></p></footer>
+const CT={"review":{"shots":[{"num":1,"title":"痛点开场","desc":"用户面对使用痛点/不满现状的表情特写","duration":"0-3s"},{"num":2,"title":"产品亮相","desc":"手持产品从画面外推入，配合音效","duration":"3-6s"},{"num":3,"title":"开箱/拆封","desc":"真实的开箱过程，展示包装完整性","duration":"6-10s"},{"num":4,"title":"使用过程","desc":"第一视角展示产品使用场景","duration":"10-18s"},{"num":5,"title":"效果对比","desc":"使用前后对比画面，强调变化","duration":"18-22s"},{"num":6,"title":"特写镜头","desc":"产品细节特写，材质/做工展示","duration":"22-25s"},{"num":7,"title":"推荐总结","desc":"面对镜头真诚推荐，强调性价比","duration":"25-28s"},{"num":8,"title":"CTA","desc":"指向购买入口/引导评论互动","duration":"28-30s"}]},"talk":{"shots":[{"num":1,"title":"Hook","desc":"主播直面镜头，抛出抓人问题","duration":"0-3s"},{"num":2,"title":"痛点展开","desc":"列举目标人群的典型痛点","duration":"3-10s"},{"num":3,"title":"产品出现","desc":"快速切换手持展示产品","duration":"10-13s"},{"num":4,"title":"卖点讲解","desc":"配合字幕条逐一介绍核心卖点","duration":"13-22s"},{"num":5,"title":"场景应用","desc":"产品在实际场景中的应用画面","duration":"22-26s"},{"num":6,"title":"CTA","desc":"促销信息+购买引导+关注呼吁","duration":"26-30s"}]},"handheld":{"shots":[{"num":1,"title":"封面亮相","desc":"手持产品正对镜头，旋转展示全貌","duration":"0-3s"},{"num":2,"title":"尺寸对比","desc":"与常用参照物对比大小","duration":"3-6s"},{"num":3,"title":"正面展示","desc":"产品正面细节/设计元素","duration":"6-10s"},{"num":4,"title":"功能演示","desc":"逐一展示产品功能","duration":"10-20s"},{"num":5,"title":"多角度","desc":"45°/俯视/侧面多角度展示","duration":"20-24s"},{"num":6,"title":"使用场景","desc":"在实际场景中快剪展示","duration":"24-27s"},{"num":7,"title":"CTA","desc":"购买引导+价格提示","duration":"27-30s"}]},"ootd":{"shots":[{"num":1,"title":"全身亮相","desc":"全身穿搭入镜，转身慢动作展示","duration":"0-4s"},{"num":2,"title":"变换展示","desc":"多个穿搭切换/变装","duration":"4-10s"},{"num":3,"title":"细节特写","desc":"面料/剪裁/配饰细节","duration":"10-15s"},{"num":4,"title":"场景搭配","desc":"通勤/约会/旅行中的穿搭","duration":"15-22s"},{"num":5,"title":"搭配说明","desc":"口播讲解搭配技巧","duration":"22-26s"},{"num":6,"title":"CTA","desc":"单品链接/搭配推荐","duration":"26-30s"}]},"scene":{"shots":[{"num":1,"title":"场景营造","desc":"生活场景环境开场","duration":"0-4s"},{"num":2,"title":"产品融入","desc":"产品自然出现在场景中","duration":"4-10s"},{"num":3,"title":"使用过程","desc":"在场景中自然使用产品","duration":"10-18s"},{"num":4,"title":"效果展示","desc":"使用后的状态变化","duration":"18-24s"},{"num":5,"title":"情感共鸣","desc":"面部表情传递愉悦感受","duration":"24-27s"},{"num":6,"title":"CTA","desc":"品质生活推荐","duration":"27-30s"}]},"unbox":{"shots":[{"num":1,"title":"包裹展示","desc":"快递包裹摆在画面中央","duration":"0-4s"},{"num":2,"title":"拆封过程","desc":"真实开箱展示包装","duration":"4-9s"},{"num":3,"title":"产品拿出","desc":"缓慢取出产品","duration":"9-13s"},{"num":4,"title":"配件展示","desc":"所有配件平铺展示","duration":"13-18s"},{"num":5,"title":"首次使用","desc":"首次开机/试用体验","duration":"18-24s"},{"num":6,"title":"真实感受","desc":"分享第一印象和感受","duration":"24-27s"},{"num":7,"title":"CTA","desc":"购买建议","duration":"27-30s"}]},"promo":{"shots":[{"num":1,"title":"强开场","desc":"折扣信息/限时标语直接入画","duration":"0-3s"},{"num":2,"title":"痛点快切","desc":"多个痛点画面快速切换","duration":"3-8s"},{"num":3,"title":"产品展示","desc":"产品快速亮相","duration":"8-14s"},{"num":4,"title":"卖点轰炸","desc":"核心卖点逐条展示","duration":"14-20s"},{"num":5,"title":"价格对比","desc":"原vs现价/与竞品对比","duration":"20-24s"},{"num":6,"title":"紧迫感","desc":"库存/倒计时/限量信息","duration":"24-27s"},{"num":7,"title":"CTA","desc":"直接下单引导","duration":"27-30s"}]},"story":{"shots":[{"num":1,"title":"剧情开场","desc":"角色陷入困境/冲突","duration":"0-5s"},{"num":2,"title":"冲突升级","desc":"问题加剧情绪达到高点","duration":"5-10s"},{"num":3,"title":"转折点","desc":"朋友/广告介绍产品","duration":"10-14s"},{"num":4,"title":"产品登场","desc":"产品入画戏剧化效果","duration":"14-18s"},{"num":5,"title":"效果转变","desc":"使用后问题解决","duration":"18-23s"},{"num":6,"title":"美好结局","desc":"问题解决后的愉快状态","duration":"23-27s"},{"num":7,"title":"CTA","desc":"@好友互动+购买引导","duration":"27-30s"}]},"detail":{"shots":[{"num":1,"title":"特写开场","desc":"产品局部特写缓慢移动","duration":"0-4s"},{"num":2,"title":"材质展示","desc":"触摸按压展示材质质感","duration":"4-10s"},{"num":3,"title":"工艺细节","desc":"缝线/接口/LOGO细节","duration":"10-16s"},{"num":4,"title":"功能演示","desc":"核心功能细节演示","duration":"16-22s"},{"num":5,"title":"对比展示","desc":"与普通产品细节对比","duration":"22-26s"},{"num":6,"title":"CTA","desc":"品质认证+购买引导","duration":"26-30s"}]},"asmr":{"shots":[{"num":1,"title":"声音开场","desc":"产品与环境互动声音","duration":"0-5s"},{"num":2,"title":"触感展示","desc":"手部触摸产品表面慢动作","duration":"5-10s"},{"num":3,"title":"使用音效","desc":"产品使用时自然音效","duration":"10-18s"},{"num":4,"title":"细节ASMR","desc":"产品各部分的声音采集","duration":"18-24s"},{"num":5,"title":"视觉疗愈","desc":"搭配柔光的产品慢镜头","duration":"24-27s"},{"num":6,"title":"CTA","desc":"文字引导+点赞收藏","duration":"27-30s"}]},"tvc":{"shots":[{"num":1,"title":"品牌开场","desc":"品牌Logo/色块/元素入画","duration":"0-4s"},{"num":2,"title":"概念表达","desc":"抽象画面表达品牌理念","duration":"4-10s"},{"num":3,"title":"产品美学","desc":"产品在极简环境中艺术化展示","duration":"10-18s"},{"num":4,"title":"生活方式","desc":"目标人群使用产品画面","duration":"18-24s"},{"num":5,"title":"品牌标语","desc":"品牌Slogan醒目展示","duration":"24-27s"},{"num":6,"title":"CTA","desc":"品牌官网/购买入口","duration":"27-30s"}]}};
+const ANALYSIS_DATA={US:[{category:'👗',name:'女装与女士内衣',heat:96,competition:'高',growth:'+23%',trend:'up',avgPrice:'$15-45',topTag:'Shein outfit',score:92},{category:'💄',name:'美妆个护',heat:94,competition:'高',growth:'+18%',trend:'up',avgPrice:'$8-30',topTag:'skincare routine',score:88},{category:'🏃',name:'运动与户外',heat:88,competition:'中',growth:'+31%',trend:'up',avgPrice:'$20-60',topTag:'gym outfit',score:90},{category:'👔',name:'男装与男士内衣',heat:82,competition:'中',growth:'+15%',trend:'up',avgPrice:'$12-40',topTag:'men style',score:78},{category:'💊',name:'保健',heat:85,competition:'中高',growth:'+27%',trend:'up',avgPrice:'$10-35',topTag:'supplements',score:82},{category:'📱',name:'手机与数码',heat:79,competition:'高',growth:'+12%',trend:'stable',avgPrice:'$50-200',topTag:'tech gadget',score:72},{category:'⌚',name:'时尚配件',heat:84,competition:'中',growth:'+19%',trend:'up',avgPrice:'$10-50',topTag:'jewelry',score:80},{category:'🍜',name:'食品饮料',heat:76,competition:'中低',growth:'+22%',trend:'up',avgPrice:'$5-20',topTag:'foodie',score:74},{category:'🏠',name:'居家日用',heat:91,competition:'中高',growth:'+16%',trend:'up',avgPrice:'$10-40',topTag:'home hacks',score:86}],UK:[{category:'👗',name:'女装与女士内衣',heat:91,competition:'高',growth:'+20%',trend:'up',avgPrice:'£12-40',topTag:'uk fashion',score:86},{category:'💄',name:'美妆个护',heat:89,competition:'高',growth:'+16%',trend:'up',avgPrice:'£7-25',topTag:'uk beauty',score:84},{category:'🏃',name:'运动与户外',heat:83,competition:'中',growth:'+28%',trend:'up',avgPrice:'£18-55',topTag:'uk fitness',score:85},{category:'📱',name:'手机与数码',heat:74,competition:'高',growth:'+10%',trend:'stable',avgPrice:'£45-180',topTag:'uk tech',score:68},{category:'🏠',name:'居家日用',heat:87,competition:'中高',growth:'+14%',trend:'up',avgPrice:'£8-35',topTag:'home decor uk',score:82}],DE:[{category:'👗',name:'女装与女士内衣',heat:85,competition:'中高',growth:'+17%',trend:'up',avgPrice:'€15-40',topTag:'mode deutschland',score:80},{category:'💄',name:'美妆个护',heat:83,competition:'中',growth:'+14%',trend:'up',avgPrice:'€8-28',topTag:'schönheitspflege',score:78},{category:'🏃',name:'运动与户外',heat:86,competition:'中',growth:'+25%',trend:'up',avgPrice:'€20-60',topTag:'sport deutschland',score:84},{category:'📱',name:'手机与数码',heat:71,competition:'高',growth:'+8%',trend:'stable',avgPrice:'€50-200',topTag:'technik',score:65}]};
+
+const TREND_DATA=[{country:'US',category:'women',videoType:'ootd',title:'Shein秋季穿搭合集',views:'2.3M',likes:'285K',growth:'+45%',author:'@fashionnova_us',tags:['sheinhaul','fallfashion','ootd']},{country:'US',category:'beauty',videoType:'review',title:'开架粉底液测评',views:'1.8M',likes:'210K',growth:'+38%',author:'@beautytester',tags:['makeupreview','drugstore']},{country:'US',category:'sports',videoType:'scene',title:'晨间瑜伽装备推荐',views:'1.5M',likes:'178K',growth:'+52%',author:'@yogalife',tags:['yogagear','workout']},{country:'US',category:'home',videoType:'asmr',title:'家居收纳好物ASMR',views:'3.1M',likes:'420K',growth:'+67%',author:'@homeorganizer',tags:['homehacks','organization']},{country:'UK',category:'women',videoType:'ootd',title:'伦敦街头秋季穿搭',views:'1.2M',likes:'145K',growth:'+32%',author:'@londonstyle',tags:['ukfashion','streetstyle']},{country:'UK',category:'beauty',videoType:'talk',title:'英国药妆必买清单',views:'980K',likes:'112K',growth:'+28%',author:'@ukbeautyguru',tags:['ukbeauty','boots']},{country:'FR',category:'women',videoType:'ootd',title:'巴黎极简穿搭灵感',views:'1.6M',likes:'198K',growth:'+41%',author:'@parisienne',tags:['minimalist','parisstyle']},{country:'DE',category:'sports',videoType:'review',title:'德国运动装备测评',views:'890K',likes:'95K',growth:'+35%',author:'@sporttest_de',tags:['sportausrüstung']},{country:'MY',category:'beauty',videoType:'review',title:'平价防晒测评马来西亚',views:'720K',likes:'88K',growth:'+55%',author:'@skincaremy',tags:['skincare','spf']},{country:'TH',category:'food',videoType:'asmr',title:'泰国街头美食ASMR',views:'4.2M',likes:'560K',growth:'+89%',author:'@thaifoodie',tags:['streetfood','asmr']},{country:'VN',category:'beauty',videoType:'review',title:'越南美妆开箱测评',views:'650K',likes:'82K',growth:'+48%',author:'@lamdepvn',tags:['mỹphẩm','review']},{country:'US',category:'accessories',videoType:'handheld',title:'小众手表开箱展示',views:'1.1M',likes:'134K',growth:'+26%',author:'@watchcollector',tags:['watch','accessories']},{country:'US',category:'men',videoType:'talk',title:'男士护肤三步法',views:'980K',likes:'105K',growth:'+33%',author:'@mensgrooming',tags:['menskincare','grooming']},{country:'UK',category:'home',videoType:'detail',title:'英国小众香薰推荐',views:'820K',likes:'95K',growth:'+39%',author:'@homescents',tags:['candles','homedecor']},{country:'US',category:'health',videoType:'promo',title:'胶原蛋白饮真实反馈',views:'1.4M',likes:'167K',growth:'+58%',author:'@wellnessjourney',tags:['collagen','wellness']}];
+
+function genScript(){const te=document.querySelector('#script-type-grid .selected');if(!te){alert('请选择视频类型');return}const ty=te.dataset.type;const pd=document.getElementById('script-product').value.trim()||'本产品';const pt=document.getElementById('script-points').value.trim();const ad=document.getElementById('script-audience').value.trim();const tm=ST[ty];if(!tm)return;const hk=tm.hooks[Math.floor(Math.random()*tm.hooks.length)].replace('[产品]',pd);const bd=tm.bodyTemplates[Math.floor(Math.random()*tm.bodyTemplates.length)].replace('[产品]',pd).replace('[感受]','质感超出预期').replace('[惊喜点]','效果真的很明显').replace('[核心卖点]',pt?pt.split(',')[0].trim():'核心功能');const ca=tm.ctaTemplates[Math.floor(Math.random()*tm.ctaTemplates.length)].replace('[目标人群]',ad||'需要的朋友们').replace('[品类]',pd).replace('[折扣]','限时5折');const pl=pt?pt.split(',').map(p=>p.trim()).filter(Boolean):[];let h='<div class="result-card"><div class="result-header"><h3>📝 '+tm.title+' · '+pd+'</h3><span class="result-badge">30s</span></div>';const tg=function(prod,type){const t=[];t.push(prod.replace(/\s/g,''),'tiktok','带货','好物分享');if(type==='ootd'){t.push('穿搭','时尚')}else if(type==='review'){t.push('测评','真实测评')}else if(type==='unbox'){t.push('开箱')}t.push('种草','跨境电商','fyp');return[...new Set(t)].slice(0,10)}(pd,ty);h+='<div style="margin-bottom:16px"><div class="tag-list">';tg.forEach(t=>h+='<span class="tag tag-purple">#'+t+'</span>');h+='</div></div>';for(const s of tm.structure){h+='<div class="script-block"><div class="label">'+s.label+' ('+s.duration+')</div><div class="content">'+s.desc+'</div>';if(s.label==='Hook'||s.label==='Grabber'||s.label==='Opener'){h+='<div style="margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:13px;color:var(--text);border:1px dashed #e2e8f0">💬 '+hk+'</div>'}if(s.label==='CTA'||s.label==='Tagline'){h+='<div style="margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:13px;color:var(--text);border:1px dashed #e2e8f0">💬 '+ca+'</div>'}if(['Body','Problem','Solution','Use','Feature','Value','Story','Craft','Function','Process','Detail','Texture'].includes(s.label)){h+='<div style="margin-top:8px;padding:8px 12px;background:#fff;border-radius:6px;font-size:13px;color:var(--text);border:1px dashed #e2e8f0">💬 '+bd+'</div>'}h+='</div>'}const tips={review:'使用自然光拍摄，入镜表情要真诚自然',talk:'语速适中，关键信息配合底部字幕条',handheld:'手持稳定器拍摄，旋转速度均匀',ootd:'全身镜+自然光最佳；转身动作要利落',scene:'注意场景布置，保持画面美感',unbox:'保持真实感，不要过度表演',promo:'语速要快，节奏紧凑；字幕加粗加对比色',story:'剧情要短平快，5秒内进入冲突',detail:'使用微距镜头慢动作展示细节',asmr:'使用专业麦克风，画面构图简洁',tvc:'画面比例尝试2.35:1，配色统一'};h+='<div style="margin-top:12px;padding:12px;background:#f0f7ff;border-radius:8px;font-size:13px;color:#1d4ed8">💡 <strong>拍摄建议：</strong>'+(tips[ty]||'保持画面稳定，光线充足')+'</div>';if(pl.length){h+='<div style="margin-top:8px;padding:12px;background:#f0f7ff;border-radius:8px;font-size:13px;color:#1d4ed8">🔑 <strong>重点卖点：</strong>'+pl.join(' · ')+'</div>'}h+='<div style="margin-top:12px;text-align:right"><button class="copy-btn" onclick="cp(this)">📋 复制内容</button></div></div>';document.getElementById('script-result').innerHTML=h}
+
+function genClone(){const pd=document.getElementById('clone-product').value.trim();const ds=document.getElementById('clone-desc').value.trim();const mk=document.getElementById('clone-market').value;const dr=document.getElementById('clone-duration').value;const se=document.querySelector('#clone-style-grid .selected');if(!pd){alert('请输入商品名称');return}if(!se){alert('请选择参考视频风格');return}const st=se.dataset.style;const tp=CT[st];if(!tp)return;const mn={US:'美国',UK:'英国',FR:'法国',DE:'德国',MY:'马来西亚',TH:'泰国',VN:'越南'};const sn=ST[st]?ST[st].title:st;let h='<div class="result-card"><div class="result-header"><h3>🎬 复刻方案 · '+pd+'</h3><span class="result-badge">'+sn+' · '+(mn[mk]||'美国')+' · '+dr+'s</span></div>';h+='<div style="margin-bottom:16px;padding:12px;background:#f0f7ff;border-radius:8px;font-size:13px"><strong>商品：</strong>'+pd+' | <strong>市场：</strong>'+(mn[mk]||'美国')+' | <strong>风格：</strong>'+sn;if(ds)h+='<br><strong>卖点：</strong>'+ds.substring(0,100);h+='</div><div class="tag-list" style="margin-bottom:16px"><span class="tag tag-green">⭐ 难度: '+['简单','适中','较高'][Math.floor(Math.random()*3)]+'</span><span class="tag tag-blue">🎯 潜力: '+['高','较高','极高'][Math.floor(Math.random()*3)]+'</span><span class="tag tag-orange">📐 适配: '+(Math.floor(Math.random()*20+80))+'%</span></div><div class="shot-list">';for(const s of tp.shots){h+='<div class="shot-item"><div class="shot-num">#'+s.num+'</div><div class="shot-content"><h4>'+s.title+'</h4><p>'+s.desc+'</p></div><div class="shot-duration">'+s.duration+'</div></div>'}h+='</div>';const ts=ST[st];if(ts){const rh=ts.hooks[Math.floor(Math.random()*ts.hooks.length)].replace('[产品]',pd);const rb=ts.bodyTemplates[Math.floor(Math.random()*ts.bodyTemplates.length)].replace('[产品]',pd).replace('[感受]','超出预期');const rc=ts.ctaTemplates[Math.floor(Math.random()*ts.ctaTemplates.length)].replace('[目标人群]','需要的朋友们').replace('[品类]',pd);h+='<div style="margin-top:16px"><h4 style="font-size:14px;font-weight:600;margin-bottom:8px">💬 参考话术</h4><div style="background:#f8fafc;border-radius:8px;padding:12px;font-size:13px;line-height:1.6">🎯 <strong>Hook：</strong>'+rh+'<br>📖 <strong>正文：</strong>'+rb+'<br>👉 <strong>CTA：</strong>'+rc+'</div></div>'}h+='<div style="margin-top:16px"><div class="tag-list">';['产品展示','口播文案','节奏控制','转场效果','BGM推荐'].forEach((t,i)=>h+='<span class="tag '+['tag-blue','tag-purple','tag-green','tag-orange','tag-pink'][i]+'">'+t+'</span>');h+='</div></div><div style="margin-top:12px;text-align:right"><button class="copy-btn" onclick="cp(this)">📋 复制方案</button></div></div>';document.getElementById('clone-result').innerHTML=h}
+
+function renderAnalysis(){const mk=document.getElementById('analysis-market').value;const dt=ANALYSIS_DATA[mk]||ANALYSIS_DATA.US;let h='';for(const i of dt){h+='<div class="analysis-card"><div class="category">'+i.category+' '+i.name+'</div><h4>'+i.name+'</h4>';h+='<div class="insight"><span>🔥 热度</span><span class="value">'+i.heat+'/100</span></div><div class="insight"><span>⚔️ 竞争度</span><span class="value">'+i.competition+'</span></div><div class="insight"><span>📈 增长</span><span class="value '+(i.trend==='up'?'up':'')+'">'+i.growth+'</span></div><div class="insight"><span>💵 均价</span><span class="value">'+i.avgPrice+'</span></div><div class="insight"><span>🏷️ 标签</span><span class="value" style="font-size:12px">#'+i.topTag+'</span></div><div class="insight"><span>⭐ 评分</span><span class="value" style="color:'+(i.score>=85?'var(--accent-green)':i.score>=75?'var(--accent-orange)':'var(--accent)')+'">'+i.score+'/100</span></div>';h+='<div style="margin-top:12px"><div style="height:6px;background:#f0f2f5;border-radius:3px"><div style="height:100%;width:'+i.heat+'%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px"></div></div></div></div>'}document.getElementById('analysis-grid').innerHTML=h}
+
+function renderTrends(){const co=document.getElementById('trend-country').value;const ca=document.getElementById('trend-category').value;const vt=document.getElementById('trend-video-type').value;let fd=TREND_DATA.filter(t=>t.country===co);if(ca!=='all')fd=fd.filter(t=>t.category===ca);if(vt!=='all')fd=fd.filter(t=>t.videoType===vt);if(fd.length===0)fd=TREND_DATA.filter(t=>t.country===co).slice(0,3);const cn={women:'女装',beauty:'美妆',sports:'运动',men:'男装',health:'保健',phone:'数码',accessories:'配件',food:'食品',home:'居家'};let h='';for(const i of fd){h+='<div class="trend-card"><div class="trend-category">'+(cn[i.category]||i.category)+' · '+i.author+'</div><h4>'+i.title+'</h4>';h+='<div class="trend-metrics"><div class="metric"><div class="num">'+i.views+'</div><div class="label">播放</div></div><div class="metric"><div class="num">'+i.likes+'</div><div class="label">点赞</div></div><div class="metric"><div class="num" style="color:var(--accent-green)">'+i.growth+'</div><div class="label">增长</div></div></div>';h+='<div class="trend-tags">';i.tags.forEach(t=>h+='<span>#'+t+'</span>');h+='</div><div style="margin-top:10px;height:4px;background:#f0f2f5;border-radius:2px"><div style="height:100%;width:'+(Math.floor(Math.random()*30+70))+'%;background:linear-gradient(90deg,var(--accent),var(--accent-orange));border-radius:2px"></div></div></div>'}document.getElementById('trend-grid').innerHTML=h}
+
+function cp(btn){const card=btn.closest('.result-card');const text=card.textContent.replace(/[📋💬💡🔑⭐🎯📐]/g,'').trim();navigator.clipboard.writeText(text).then(()=>{btn.textContent='✅ 已复制';setTimeout(()=>btn.textContent='📋 复制内容',2000)}).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);btn.textContent='✅ 已复制';setTimeout(()=>btn.textContent='📋 复制内容',2000)})}
+
+renderAnalysis();renderTrends();
+</script>
+</body>
+</html>
