@@ -7,74 +7,92 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f0f2f5;--card-bg:#fff;--text:#1a1a2e;--text-secondary:#666;--primary:#005bff;--primary-hover:#0047cc;--accent:#fe2c55;--accent-hover:#e6244a;--accent-green:#00a854;--accent-orange:#f59e0b;--accent-purple:#7c3aed;--header-gradient:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--shadow:0 2px 8px rgba(0,0,0,0.06);--shadow-hover:0 8px 24px rgba(0,0,0,0.1);--radius:12px;--radius-lg:16px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .nav{background:var(--header-gradient);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
-.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
-.nav-brand span{color:#60a5fa}.nav-links{display:flex;gap:4px}
-.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px}
+.nav-brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff;font-size:18px;font-weight:700;white-space:nowrap}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s;white-space:nowrap}
 .nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
-.hero{background:var(--header-gradient);padding:64px 24px 80px;text-align:center;color:#fff;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 50%,rgba(96,165,250,0.1) 0%,transparent 50%),radial-gradient(circle at 70% 30%,rgba(254,44,85,0.06) 0%,transparent 50%);pointer-events:none}
-.hero-badge{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:6px 18px;font-size:13px;margin-bottom:16px;position:relative;z-index:1}
+.nav-more{position:relative;display:none}
+@media(max-width:768px){.nav-links a.nav-hide{display:none}.nav-more{display:inline-flex}}
+.nav-more-btn{color:rgba(255,255,255,0.75);background:transparent;border:none;padding:6px 14px;border-radius:8px;font-size:14px;cursor:pointer;transition:all .2s}
+.nav-more-btn:hover{color:#fff;background:rgba(255,255,255,0.12)}
+.nav-more-dropdown{display:none;position:absolute;top:100%;right:0;background:var(--card-bg);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.15);padding:8px;min-width:200px;z-index:200}
+.nav-more-dropdown.show{display:block}
+.nav-more-dropdown a{display:block;padding:8px 14px;border-radius:6px;text-decoration:none;color:var(--text);font-size:14px;transition:all .2s}
+.nav-more-dropdown a:hover{background:rgba(0,91,255,0.08);color:var(--primary)}
+.hero{background:var(--header-gradient);padding:48px 24px 64px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 50%,rgba(96,165,250,0.1) 0%,transparent 50%),radial-gradient(circle at 70% 30%,rgba(254,44,85,0.06) 0%,transparent 50%);pointer-events:none}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:5px 16px;font-size:13px;margin-bottom:14px;position:relative;z-index:1}
 .hero-badge .dot{display:inline-block;width:6px;height:6px;background:#00a854;border-radius:50%;margin-right:6px;vertical-align:middle}
-.hero h1{font-size:clamp(28px,5vw,44px);font-weight:800;position:relative;z-index:1;line-height:1.2}
+.hero h1{font-size:clamp(26px,5vw,42px);font-weight:800;position:relative;z-index:1;line-height:1.2}
 .hero h1 span{background:linear-gradient(90deg,#60a5fa,#fe2c55);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{color:rgba(255,255,255,0.7);margin-top:12px;font-size:16px;position:relative;z-index:1;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.5}
-.hero-stats{display:flex;justify-content:center;gap:32px;margin-top:32px;position:relative;z-index:1;flex-wrap:wrap}
-.stat{text-align:center}.stat-num{font-size:28px;font-weight:800;background:linear-gradient(90deg,#60a5fa,#fe2c55);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.stat-label{font-size:13px;color:rgba(255,255,255,0.6);margin-top:4px}
+.hero p{color:rgba(255,255,255,0.7);margin-top:10px;font-size:15px;position:relative;z-index:1;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.5}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:28px;position:relative;z-index:1;flex-wrap:wrap}
+.stat{text-align:center}.stat-num{font-size:26px;font-weight:800;background:linear-gradient(90deg,#60a5fa,#fe2c55);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:12px;color:rgba(255,255,255,0.55);margin-top:3px}
 .content{max-width:1200px;margin:0 auto;padding:32px 24px}
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-top:8px}
-.section-header h2{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
-.section-header .count{background:#e2e8f0;border-radius:10px;padding:2px 10px;font-size:12px;color:var(--text-secondary)}
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px}
-.tool-card{background:var(--card-bg);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);text-decoration:none;color:var(--text);border:1px solid transparent;transition:all .2s;display:flex;flex-direction:column}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-top:8px}
+.section-header h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+.section-header .count{background:#e2e8f0;border-radius:10px;padding:1px 10px;font-size:12px;color:var(--text-secondary)}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:28px}
+.tool-card{background:var(--card-bg);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);text-decoration:none;color:var(--text);border:1px solid transparent;transition:all .2s;display:flex;flex-direction:column}
 .tool-card:hover{box-shadow:var(--shadow-hover);border-color:var(--primary);transform:translateY(-2px)}
 .tool-card.featured{border-left:3px solid var(--accent)}
-.tool-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(0,91,255,0.08);margin-bottom:14px}
-.tool-card h3{font-size:16px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.tool-card p{font-size:14px;color:var(--text-secondary);line-height:1.5;flex:1}
-.badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700}
+.tool-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(0,91,255,0.08);margin-bottom:12px;flex-shrink:0}
+.tool-card h3{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tool-card p{font-size:13px;color:var(--text-secondary);line-height:1.5;flex:1}
+.badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
 .badge-new{background:#dbeafe;color:#1d4ed8}.badge-ai{background:#fce7f3;color:#be185d}
-.tool-arrow{text-align:right;margin-top:12px;color:#ccc;font-size:18px}
-.footer{text-align:center;padding:32px 24px;color:var(--text-secondary);font-size:14px;border-top:1px solid #e2e8f0;margin-top:32px}
+.tool-arrow{text-align:right;margin-top:10px;color:#ccc;font-size:16px}
+.footer{text-align:center;padding:28px 24px;color:var(--text-secondary);font-size:13px;border-top:1px solid #e2e8f0;margin-top:24px}
 .footer a{color:var(--primary);text-decoration:none}
-@media(max-width:640px){.tools-grid{grid-template-columns:1fr}.nav-links a{padding:4px 10px;font-size:12px}}
+@media(max-width:640px){.tools-grid{grid-template-columns:1fr}.nav-links a{padding:4px 8px;font-size:12px}.hero{padding:36px 16px 48px}.content{padding:24px 16px}}
 </style>
 </head>
 <body>
-
-<nav class="nav"><div class="nav-inner"><a href="/" class="nav-brand">HuaAngel <span>Tools</span></a><div class="nav-links"><a href="/" class="active">首页</a><a href="/video-studio">视频创作</a><a href="/etsy-tag-generator">Etsy标签</a><a href="/tiktok-script-generator">脚本</a><a href="/ozon-price-calculator">OZON</a></div></div></nav>
-
-<section class="hero"><div class="hero-badge"><span class="dot"></span>持续更新中 · v2.0</div><h1>跨境电商 <span>工具集</span></h1><p>为跨境卖家打造的智能工作台——从定价到上架，从脚本到内容，一站式搞定 · 视频创作</p><div class="hero-stats"><div class="stat"><div class="stat-num">6</div><div class="stat-label">工具</div></div><div class="stat"><div class="stat-num">2</div><div class="stat-label">AI 驱动</div></div><div class="stat"><div class="stat-num">24/7</div><div class="stat-label">在线可用</div></div></div></section>
-
+<nav class="nav"><div class="nav-inner"><a href="/" class="nav-brand">HuaAngel <span>Tools</span></a><div class="nav-links"><a href="/" class="active">首页</a><a href="/video-studio">视频</a><a href="/dashboard">看板</a><a href="/etsy-tag-generator">Etsy</a><a href="/ozon-price-calculator">OZON</a><a href="/tiktok-script-generator">脚本</a><a href="/pricing">定价</a></div></div></nav>
+<section class="hero"><div class="hero-badge"><span class="dot"></span>持续更新中 · v2.0</div><h1>跨境电商 <span>工具集</span></h1><p>为跨境卖家打造的智能工作台——从定价到上架，从脚本到内容，一站式搞定</p><div class="hero-stats"><div class="stat"><div class="stat-num">15</div><div class="stat-label">工具</div></div><div class="stat"><div class="stat-num">7</div><div class="stat-label">AI 驱动</div></div><div class="stat"><div class="stat-num">24/7</div><div class="stat-label">在线可用</div></div></div></section>
 <div class="content">
-  <!-- 视频创作工具 -->
   <div class="section-header">
-    <h2>🎬 视频创作工具</h2>
-    <span class="count">4</span>
+    <h2>🎬 视频创作</h2>
+    <span class="count">2</span>
   </div>
   <div class="tools-grid">
-
     <a href="/video-studio" class="tool-card featured">
       <div class="tool-icon" style="background:#fef3ed">🎬</div>
       <div class="tool-info">
         <h3>视频创作工作台 <span class="badge badge-new">NEW</span> <span class="badge badge-ai">AI</span></h3>
-        <p>视频复刻 · 脚本生成 · 选品分析 · 爆款趋势 · 灵感来自 ClipCat</p>
+        <p>视频复刻 · 脚本生成 · 选品分析 · 爆款趋势 · ClipCat 灵感</p>
       </div>
       <div class="tool-arrow">→</div>
     </a>
-
+    <a href="/tiktok-script-generator" class="tool-card">
+      <div class="tool-icon" style="background:#fff5f7">📝</div>
+      <div class="tool-info">
+        <h3>TikTok 带货脚本生成器 <span class="badge badge-ai">AI</span></h3>
+        <p>上传商品信息，自动生成带货口播脚本 + 视频标题 + Hashtags</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
   </div>
 
-  <!-- OZON 运营工具 -->
   <div class="section-header">
-    <h2>🛍 OZON 运营工具</h2>
-    <span class="count">1</span>
+    <h2>🛍️ OZON 运营</h2>
+    <span class="count">2</span>
   </div>
   <div class="tools-grid">
-
+    <a href="/ozon-content-generator" class="tool-card">
+      <div class="tool-icon" style="background:#fef3ed">📝</div>
+      <div class="tool-info">
+        <h3>OZON 内容生成器 <span class="badge badge-ai">AI</span></h3>
+        <p>输入产品信息，一键生成俄语标题 / 描述 / 关键词标签</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
     <a href="/ozon-price-calculator" class="tool-card">
       <div class="tool-icon" style="background:#e6f7ff">🧮</div>
       <div class="tool-info">
@@ -83,34 +101,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       </div>
       <div class="tool-arrow">→</div>
     </a>
-
   </div>
 
-  <!-- 内容创作 -->
   <div class="section-header">
-    <h2>🎀 内容创作工具</h2>
-    <span class="count">1</span>
+    <h2>🎀 Etsy 运营</h2>
+    <span class="count">2</span>
   </div>
   <div class="tools-grid">
-
-    <a href="/tiktok-script-generator" class="tool-card">
-      <div class="tool-icon" style="background:#fff5f7">🎬</div>
-      <div class="tool-info">
-        <h3>TikTok 带货脚本生成器 <span class="badge badge-ai">AI</span></h3>
-        <p>上传商品图片，自动生成带货口播脚本 + 视频标题 + Hashtags</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-
-  </div>
-
-  <!-- Etsy 专区 -->
-  <div class="section-header">
-    <h2>🎀 Etsy 运营工具</h2>
-    <span class="count">1</span>
-  </div>
-  <div class="tools-grid">
-
     <a href="/etsy-tag-generator" class="tool-card featured">
       <div class="tool-icon" style="background:#fef3ed">🏷️</div>
       <div class="tool-info">
@@ -119,16 +116,106 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       </div>
       <div class="tool-arrow">→</div>
     </a>
+    <a href="/etsy-calculator" class="tool-card">
+      <div class="tool-icon" style="background:#fef3ed">💰</div>
+      <div class="tool-info">
+        <h3>Etsy Fee & Profit 计算器 <span class="badge badge-new">NEW</span></h3>
+        <p>全方位费用分解：交易费 / 支付手续费 / 运费 / Offsite Ads，实时计算净利润与建议售价</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+  </div>
 
-    </div>
+  <div class="section-header">
+    <h2>🤖 AI 工具</h2>
+    <span class="count">3</span>
+  </div>
+  <div class="tools-grid">
+    <a href="/ai-title-generator" class="tool-card featured">
+      <div class="tool-icon" style="background:#f0f4ff">🤖</div>
+      <div class="tool-info">
+        <h3>AI 标题生成器 <span class="badge badge-ai">AI</span></h3>
+        <p>智能生成高转化标题，支持多语言、多平台适配</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a href="/product-research" class="tool-card">
+      <div class="tool-icon" style="background:#f0f4ff">🧠</div>
+      <div class="tool-info">
+        <h3>AI 产品研究助手 <span class="badge badge-ai">AI</span></h3>
+        <p>市场洞察 · 竞品分析 · 趋势预测 · 选品建议</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a href="/customer-service" class="tool-card">
+      <div class="tool-icon" style="background:#f0f4ff">💬</div>
+      <div class="tool-info">
+        <h3>AI 客户服务 <span class="badge badge-ai">AI</span></h3>
+        <p>智能客服 · 自动回复 · 多语言支持 · 7×24 在线</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+  </div>
 
-  <!-- 通用工具 -->
+  <div class="section-header">
+    <h2>📊 数据与营销</h2>
+    <span class="count">3</span>
+  </div>
+  <div class="tools-grid">
+    <a href="/dashboard" class="tool-card">
+      <div class="tool-icon" style="background:#f0f9ff">📊</div>
+      <div class="tool-info">
+        <h3>数据看板</h3>
+        <p>核心指标总览 · 趋势图表 · 数据可视化</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a href="/competitor-monitor" class="tool-card">
+      <div class="tool-icon" style="background:#f0f9ff">🔍</div>
+      <div class="tool-info">
+        <h3>竞品监控</h3>
+        <p>追踪竞品动态 · 分析对手策略 · 发现市场机会</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a href="/promotions" class="tool-card">
+      <div class="tool-icon" style="background:#f0f9ff">📅</div>
+      <div class="tool-info">
+        <h3>营销活动管理</h3>
+        <p>活动日历 · 效果分析 · 策略优化 · 自动化运营</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+  </div>
+
+  <div class="section-header">
+    <h2>👤 账号与定价</h2>
+    <span class="count">2</span>
+  </div>
+  <div class="tools-grid">
+    <a href="/pricing" class="tool-card">
+      <div class="tool-icon" style="background:#faf5ff">💳</div>
+      <div class="tool-info">
+        <h3>定价方案</h3>
+        <p>套餐对比 · 功能说明 · 升级指南</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+    <a href="/user" class="tool-card">
+      <div class="tool-icon" style="background:#faf5ff">👤</div>
+      <div class="tool-info">
+        <h3>用户管理</h3>
+        <p>个人信息 · 账号设置 · 使用记录</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+  </div>
+
   <div class="section-header">
     <h2>🛠 通用工具</h2>
     <span class="count">1</span>
   </div>
   <div class="tools-grid">
-
     <a href="/unit-converter" class="tool-card">
       <div class="tool-icon" style="background:#f0f9ff">📏</div>
       <div class="tool-info">
@@ -137,13 +224,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       </div>
       <div class="tool-arrow">→</div>
     </a>
-
   </div>
 
 </div>
 
 <footer class="footer">
-  <p>🛍 <strong>HuaAngel Tools</strong> · 跨境卖家的效率工作台</p>
+  <p><strong>HuaAngel Tools</strong> · 跨境卖家的效率工作台</p>
   <p style="margin-top:4px"><a href="https://www.huaangel.com">www.huaangel.com</a></p>
 </footer>
 
