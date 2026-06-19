@@ -1,0 +1,644 @@
+ <!DOCTYPE html>
+ <html lang="zh-CN">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>AI Title Generator - HuaAngel Tools</title>
+ <style>
+ :root {
+   --bg: #f0f2f5; --card: #fff; --text: #1a1a2e; --text2: #666;
+   --primary: #005bff; --primary-h: #0047cc;
+   --accent: #fe2c55; --green: #00a854; --orange: #f59e0b; --purple: #7c3aed;
+   --header: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+   --radius: 12px; --shadow: 0 2px 8px rgba(0,0,0,0.06);
+ }
+ * { box-sizing: border-box; margin: 0; padding: 0; }
+ body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+ 
+ .nav { background: var(--header); padding: 0 24px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+ .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+ .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; font-size: 18px; font-weight: 700; }
+ .nav-brand span { color: #60a5fa; }
+ .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+ .nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: 14px; transition: all .2s; }
+ .nav-links a:hover, .nav-links a.active { color: #fff; background: rgba(255,255,255,0.12); }
+ 
+ .hero { background: var(--header); padding: 48px 24px 60px; text-align: center; color: #fff; border-radius: 0 0 32px 32px; position: relative; overflow: hidden; }
+ .hero::before { content: ''; position: absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle at 30% 50%, rgba(96,165,250,0.1) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(254,44,85,0.06) 0%, transparent 50%); pointer-events: none; }
+ .hero-badge { display: inline-block; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; padding: 6px 16px; font-size: 13px; color: rgba(255,255,255,0.8); margin-bottom: 16px; }
+ .hero h1 { font-size: 36px; font-weight: 800; margin-bottom: 8px; }
+ .hero h1 span { background: linear-gradient(135deg,#60a5fa,#a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+ .hero p { font-size: 15px; color: rgba(255,255,255,0.6); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+ 
+ .container { max-width: 1100px; margin: -24px auto 40px; padding: 0 20px; position: relative; z-index: 1; }
+ 
+ .main-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+ @media (max-width: 860px) { .main-layout { grid-template-columns: 1fr; } }
+ 
+ /* ===== Input Panel ===== */
+ .panel { background: var(--card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+ .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+ .form-group { margin-bottom: 14px; }
+ .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #444; }
+ .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 9px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color .2s; outline: none; font-family: inherit; }
+ .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
+ .form-group textarea { min-height: 64px; resize: vertical; }
+ 
+ .platform-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+ .platform-tag { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; transition: all .2s; background: #f5f5f5; color: #666; }
+ .platform-tag:hover { transform: translateY(-1px); }
+ .platform-tag.selected { color: #fff; }
+ .platform-tag input { display: none; }
+ .pt-amazon.selected { background: #ff9900; border-color: #ff9900; }
+ .pt-ebay.selected { background: #e53238; border-color: #e53238; }
+ .pt-walmart.selected { background: #0071dc; border-color: #0071dc; }
+ .pt-etsy.selected { background: #f56400; border-color: #f56400; }
+ .pt-aliexpress.selected { background: #e62e04; border-color: #e62e04; }
+ .pt-tiktok.selected { background: #000; border-color: #000; }
+ .pt-ozon.selected { background: #005bff; border-color: #005bff; }
+ .pt-mercadolibre.selected { background: #ffe600; border-color: #ffe600; color: #333; }
+ .pt-shopify.selected { background: #96bf48; border-color: #96bf48; }
+ 
+ .style-select { display: flex; gap: 6px; flex-wrap: wrap; }
+ .style-opt { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e0e0e0; background: #fff; transition: all .2s; }
+ .style-opt:hover { border-color: var(--primary); }
+ .style-opt.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+ 
+ .sell-points { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+ .sp-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #e8f0fe; color: var(--primary); border-radius: 6px; font-size: 12px; font-weight: 500; }
+ .sp-tag .remove { cursor: pointer; font-size: 14px; line-height: 1; opacity: .6; }
+ .sp-tag .remove:hover { opacity: 1; }
+ .sp-input-wrap { display: flex; gap: 6px; align-items: center; }
+ .sp-input-wrap input { flex: 1; }
+ .sp-input-wrap button { padding: 7px 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; }
+ 
+ .btn-gen { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--primary), #4f46e5); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .3s; margin-top: 6px; }
+ .btn-gen:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,91,255,0.3); }
+ .btn-gen:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+ .btn-gen .spinner { display: none; }
+ .btn-gen.loading .spinner { display: inline-block; animation: spin 1s linear infinite; }
+ .btn-gen.loading .label { display: none; }
+ @keyframes spin { 100% { transform: rotate(360deg); } }
+ 
+ /* ===== Results Panel ===== */
+ .results-panel { min-height: 300px; display: flex; flex-direction: column; }
+ .results-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #bbb; text-align: center; padding: 40px; }
+ .results-empty .icon { font-size: 48px; margin-bottom: 12px; opacity: .4; }
+ .results-empty p { font-size: 14px; }
+ 
+ .results-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+ .results-tab { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: none; color: #999; transition: all .2s; }
+ .results-tab:hover { color: var(--text); background: #f5f5f5; }
+ .results-tab.active { color: var(--primary); background: #e8f0fe; }
+ 
+ .result-cards { display: flex; flex-direction: column; gap: 10px; }
+ .result-card { padding: 14px 16px; background: #f9fafb; border-radius: 10px; border: 1px solid #eee; transition: all .2s; }
+ .result-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,91,255,0.08); }
+ .result-card .meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+ .result-card .score { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+ .score-high { background: #dcfce7; color: #166534; }
+ .score-mid { background: #fef9c3; color: #854d0e; }
+ .score-low { background: #fce4ec; color: #c62828; }
+ .result-card .style-badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: #e8f0fe; color: var(--primary); font-weight: 600; }
+ .result-card .title-text { font-size: 14px; line-height: 1.5; color: var(--text); word-break: break-word; }
+ .result-card .title-text .highlight { background: #fef9c3; padding: 0 2px; }
+ .result-card .actions { display: flex; gap: 6px; margin-top: 8px; }
+ .result-card .actions button { padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #e0e0e0; background: #fff; transition: all .2s; }
+ .result-card .actions button:hover { background: #f5f5f5; border-color: var(--primary); color: var(--primary); }
+ .result-card .actions .copy-btn { background: var(--primary); color: #fff; border-color: var(--primary); }
+ .result-card .actions .copy-btn:hover { background: var(--primary-h); }
+ 
+ /* Settings Modal */
+ .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; }
+ .modal-overlay.show { display: flex; }
+ .modal { background: #fff; border-radius: 16px; padding: 28px; max-width: 440px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+ .modal h2 { font-size: 18px; margin-bottom: 16px; }
+ .modal .form-group { margin-bottom: 12px; }
+ .modal .btn-save { padding: 10px 24px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+ .modal .btn-save:hover { background: var(--primary-h); }
+ 
+ .settings-btn { background: none; border: none; color: #999; cursor: pointer; font-size: 18px; padding: 4px; }
+ .settings-btn:hover { color: var(--text); }
+ 
+ .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 2000; opacity: 0; transition: opacity .3s; pointer-events: none; }
+ .toast.show { opacity: 1; }
+ 
+ .footer { text-align: center; padding: 32px 24px; color: var(--text2); font-size: 13px; border-top: 1px solid #e5e7eb; margin-top: 20px; }
+ .footer a { color: var(--primary); text-decoration: none; }
+ </style>
+ </head>
+ <body>
+ 
+ <nav class="nav">
+   <div class="nav-inner">
+     <a href="/" class="nav-brand">🔅 <span>HuaAngel</span> Tools</a>
+     <div class="nav-links">
+       <a href="/">首页</a>
+       <a href="/ozon-content-generator">OZON 生成器</a>
+       <a href="/tiktok-script-generator">TK 脚本</a>
+       <a href="/etsy-tag-generator">Etsy Tag</a>
+       <a href="/ai-title-generator" class="active">AI 标题</a>
+     </div>
+   </div>
+ </nav>
+ 
+ <section class="hero">
+   <div class="hero-badge">🤖 AI Powered · v1.0</div>
+   <h1>AI 跨平台 <span>标题生成器</span></h1>
+   <p>基于 9 大电商平台搜索算法 + 实时关键词研究，生成高转化、不堆砌、平台合规的商品标题。Amazon · eBay · Walmart · Etsy · 速卖通 · TikTok Shop · OZON · 美客多 · Shopify</p>
+ </section>
+ 
+ <div class="container">
+   <div class="main-layout">
+     <!-- Input Panel -->
+     <div class="panel" id="inputPanel">
+       <div class="panel-title">✏️ 产品信息 <span style="flex:1"></span>
+         <button class="settings-btn" onclick="toggleSettings()" title="API 设置">⚙️</button>
+       </div>
+       
+       <div class="form-group">
+         <label>产品名称 *</label>
+         <input type="text" id="prodName" placeholder="如: Wireless Bluetooth Earbuds">
+       </div>
+       
+       <div class="form-group">
+         <label>品牌名 (可选)</label>
+         <input type="text" id="brandName" placeholder="如: Soundcore by Anker">
+       </div>
+       
+       <div class="form-group">
+         <label>目标平台 *</label>
+         <div class="platform-grid" id="platformList">
+           <label class="platform-tag pt-amazon selected"><input type="checkbox" value="amazon" checked> Amazon</label>
+           <label class="platform-tag pt-ebay"><input type="checkbox" value="ebay"> eBay</label>
+           <label class="platform-tag pt-walmart"><input type="checkbox" value="walmart"> Walmart</label>
+           <label class="platform-tag pt-etsy"><input type="checkbox" value="etsy"> Etsy</label>
+           <label class="platform-tag pt-aliexpress"><input type="checkbox" value="aliexpress"> 速卖通</label>
+           <label class="platform-tag pt-tiktok"><input type="checkbox" value="tiktok"> TikTok</label>
+           <label class="platform-tag pt-ozon"><input type="checkbox" value="ozon"> OZON</label>
+           <label class="platform-tag pt-mercadolibre"><input type="checkbox" value="mercadolibre"> 美客多</label>
+           <label class="platform-tag pt-shopify"><input type="checkbox" value="shopify"> Shopify</label>
+         </div>
+         <div style="font-size:11px;color:var(--text2);margin-top:4px">已选 <span id="platCount">1</span> 个平台</div>
+       </div>
+       
+       <div class="form-group">
+         <label>核心卖点</label>
+         <div class="sp-input-wrap">
+           <input type="text" id="spInput" placeholder="输入卖点按回车">
+           <button onclick="addSellPoint()">添加</button>
+         </div>
+         <div class="sell-points" id="sellPoints"></div>
+       </div>
+       
+       <div class="form-group">
+         <label>规格参数 (尺寸/颜色/材质/数量等)</label>
+         <textarea id="specs" placeholder="如: 20小时续航, IPX5防水, 黑色, 蓝牙5.3, 2只装"></textarea>
+       </div>
+       
+       <div class="form-group">
+         <label>关键词 (逗号分隔)</label>
+         <textarea id="keywords" placeholder="如: 无线耳机, 降噪, 运动耳机, 蓝牙耳机, 防水"></textarea>
+       </div>
+       
+       <div class="form-group">
+         <label>标题风格</label>
+         <div class="style-select" id="styleSelect">
+           <span class="style-opt selected" data-style="mixed">智能混合</span>
+           <span class="style-opt" data-style="brand">品牌信赖</span>
+           <span class="style-opt" data-style="solution">解决方案</span>
+           <span class="style-opt" data-style="scenario">场景驱动</span>
+         </div>
+       </div>
+       
+       <button class="btn-gen" id="genBtn" onclick="generateTitles()"><span class="label">🚀 生成高质量标题</span><span class="spinner">⏳</span></button>
+       <div style="font-size:11px;color:var(--text2);margin-top:6px;text-align:center">基于 9 大平台规则 + 关键词研究 + AI 驱动</div>
+     </div>
+     
+     <!-- Results Panel -->
+     <div class="panel results-panel" id="resultsPanel">
+       <div class="panel-title">📋 生成结果 <span id="resultCount" style="font-size:13px;color:var(--text2);font-weight:400"></span></div>
+       
+       <div class="results-tabs" id="resultTabs"></div>
+       
+       <div id="resultsContent">
+         <div class="results-empty" id="emptyState">
+           <div class="icon">📝</div>
+           <p style="font-size:16px;font-weight:600;color:#999;margin-bottom:4px">填写左侧信息，点击生成</p>
+           <p>AI 会根据各平台算法和规则生成合规的高转化标题</p>
+         </div>
+         <div class="result-cards" id="resultCards" style="display:none"></div>
+       </div>
+     </div>
+   </div>
+ </div>
+ 
+ <!-- Settings Modal -->
+ <div class="modal-overlay" id="settingsModal">
+   <div class="modal">
+     <h2>⚙️ API 设置</h2>
+     <div class="form-group">
+       <label>API 提供商</label>
+       <select id="apiProvider" onchange="updateApiFields()">
+         <option value="demo">演示模式 (免费, 内置模板)</option>
+         <option value="openai">OpenAI (GPT-4o)</option>
+         <option value="claude">Anthropic Claude</option>
+         <option value="custom">自定义 API</option>
+       </select>
+     </div>
+     <div class="form-group" id="apiKeyGroup">
+       <label>API Key</label>
+       <input type="password" id="apiKey" placeholder="sk-...">
+     </div>
+     <div class="form-group" id="apiEndpointGroup" style="display:none">
+       <label>API Endpoint</label>
+       <input type="text" id="apiEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
+     </div>
+     <div class="form-group">
+       <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+         <input type="checkbox" id="showKeywordsCheck" checked>
+         <span>生成时标注关键词位置</span>
+       </label>
+     </div>
+     <div style="display:flex;gap:8px;justify-content:flex-end">
+       <button style="padding:10px 24px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;font-weight:600" onclick="toggleSettings()">取消</button>
+       <button class="btn-save" onclick="saveSettings()">保存设置</button>
+     </div>
+   </div>
+ </div>
+ 
+ <div class="toast" id="toast"></div>
+ 
+ <footer class="footer">
+   <p>🔅 <strong>HuaAngel Tools</strong> · 跨境卖家的效率工作台</p>
+   <p style="margin-top:4px"><a href="https://www.huaangel.com">www.huaangel.com</a></p>
+ </footer>
+ 
+ <script>
+ // ===== Platform Rules Database =====
+ const PLATFORMS = {
+   amazon: { name:'Amazon', icon:'🅰️', maxChars:200, recommendChars:'150-180',
+     format:'Brand + Product Type + Key Features + Size + Color + Count',
+     forbid:['价格','物流','卖家名','促销词','主观评价','保修信息'],
+     mobileCut:60, algorithm:'A10: 标题+CTR+转化率',
+     template:(b,p,f,s)=>(b?b+' ':'')+p+' '+f.slice(0,2).join(', ')+(s?', '+s:'') },
+   ebay: { name:'eBay', icon:'🔴', maxChars:80, recommendChars:'70-80',
+     format:'Keywords + Attributes + Condition',
+     forbid:['误导词','HTML','其他品牌名'], mobileCut:40, algorithm:'Cassini: 标题+属性+绩效',
+     template:(b,p,f,s)=>(b?b+' ':'')+p+' '+f.slice(0,1)+', '+(!s?'New':s) },
+   walmart: { name:'Walmart', icon:'🟦', maxChars:200, recommendChars:'150',
+     format:'Brand + Model + Name + Attributes',
+     forbid:['促销词','卖家名','主观评价'], mobileCut:50, algorithm:'关键词+属性+低价偏好',
+     template:(b,p,f,s)=>(b?b+' ':'')+(p.includes('Model')?'':'')+p+' '+f.slice(0,2).join(' ')+(s?', '+s:'') },
+   etsy: { name:'Etsy', icon:'🎨', maxChars:140, recommendChars:'100-120',
+     format:'Name + Style + Occasion + Material',
+     forbid:['非自有品牌','全大写'], mobileCut:40, algorithm:'LQS: 标题+标签+体验',
+     template:(b,p,f,s)=>(b?b+' - ':'')+p+' '+f.slice(0,2).join(' ')+(s?' | '+s:'') },
+   aliexpress: { name:'速卖通', icon:'🌍', maxChars:128, recommendChars:'100-120',
+     format:'Keywords + Specs + Selling Points',
+     forbid:['Best','Top Quality','Cheap','Hot Sale'], mobileCut:40, algorithm:'关键词+质量分+DSR',
+     template:(b,p,f,s)=>(b?b+' ':'')+p+' '+f.slice(0,2).join(' ')+(s?', '+s:'') },
+   tiktok: { name:'TikTok Shop', icon:'🎵', maxChars:100, recommendChars:'70-100',
+     format:'Hook + Product Name + Benefit',
+     forbid:['太正式语言'], mobileCut:0, algorithm:'发现式: 兴趣匹配+内容推荐',
+     template:(b,p,f,s)=>{ const hook=['Love this! ','You need this ','Game changer: ']; return hook[Math.floor(Math.random()*3)]+(b?b+' ':'')+p+' '+f.slice(0,1) } },
+   ozon: { name:'OZON', icon:'🔵', maxChars:500, recommendChars:'100-200',
+     format:'Name + Brand + Features',
+     forbid:['促销词','网址','价格'], mobileCut:60, algorithm:'卡完整度+评分',
+     template:(b,p,f,s)=>(b?b+' ':'')+p+' '+f.slice(0,3).join(', ')+(s?', '+s:'') },
+   mercadolibre: { name:'美客多', icon:'🟡', maxChars:65, recommendChars:'50-60',
+     format:'Product + Core Attribute',
+     forbid:['Oferta','Descuento','Envío gratis'], mobileCut:0, algorithm:'标题+信誉+价格',
+     template:(b,p,f,s)=>(b?b+' ':'')+p+(s?' '+s:'') },
+   shopify: { name:'Shopify', icon:'🛒', maxChars:150, recommendChars:'100-150',
+     format:'Brand + Name + Attr + Size',
+     forbid:['价格','运费信息'], mobileCut:60, algorithm:'Google Shopping: 相关+价格+评分',
+     template:(b,p,f,s)=>(b?b+' ':'')+p+' '+f.slice(0,2).join(' ')+(s?', '+s:'') }
+ };
+ 
+ // ===== Demo Title Templates =====
+ const TITLE_STYLES = ['brand','solution','scenario','mixed'];
+ const STYLE_LABELS = { mixed:'智能混合', brand:'品牌信赖', solution:'解决方案', scenario:'场景驱动' };
+ 
+ const TEMPLATES = {
+   amazon: [
+     (b,p,f,s,k) => `${b?b+' ':'以及'}${p} - ${f.slice(0,2).join(' · ')}, 配备${s||'多种实用功能'}, 为${k[0]||'日常使用'}打造${k[1]?' · '+k[1]:''}`,
+     (b,p,f,s,k) => `${p} | ${k[0]||'核心功能'} · ${k[1]||'品质之选'} | ${f.slice(0,2).join(', ')}${s?', '+s:''}${b?' | 品牌: '+b:''}`,
+     (b,p,f,s,k) => `【${b||'优选商品'}】${p} ${f.slice(0,2).join(' ')}${s?' '+s:''} - ${k.slice(0,2).join('/')}专享`,
+   ],
+   ebay: [
+     (b,p,f,s,k) => `${b?b+' ':'就是'}${p} ${f[0]||''} ${s||'新品'} - ${k.slice(0,2).join('/')} - 正品保障`,
+     (b,p,f,s) => `${b?b+' ':'原本'}${p} ${f.slice(0,1).join(' ')} ${s||'New'} - 高品质${f[0]||''}`,
+   ],
+   walmart: [
+     (b,p,f,s,k) => `${b?b+' ':'我们』}${p} ${f.slice(0,2).join(', ')}${s?', '+s:''} - ${k.slice(0,2).join(' | ')}`,
+     (b,p,f,s) => `${b?b+' ':'原本'}${p} - ${f.slice(0,2).join(' ')}${s?', '+s:''} | 超值选择`,
+   ],
+   etsy: [
+     (b,p,f,s) => `${p} - ${f.slice(0,2).join(' · ')}${s?' | '+s:''}${b?' · '+b:''} · 手工精品`,
+     (b,p,f,s,k) => `${p} ${f[0]||''} ${f[1]||''}${s?' '+s:''}${b?' · '+b:''} · ${k.slice(0,2).join('/')}`,
+   ],
+   aliexpress: [
+     (b,p,f,s,k) => `${b?b+' ':'原本'}${p} ${f.slice(0,2).join(' ')}${s?', '+s:''} ${k.slice(0,2).join(' ')} 批发价`,
+     (b,p,f,s) => `${b?b+' ':'原本'}${p} ${f.slice(0,2).join(' ')}${s?', '+s:''} 高品质低价格`,
+   ],
+   tiktok: [
+     (b,p,f,s) => `🔥 你一直找的${f[0]||'好物'}来了！${b?b+' ':'原本'}${p} ${f.slice(0,1).join('')} 💕 #好物分享`,
+     (b,p,f) => `OMG！${b?b+' ':'原本'}${p}也太好用了${f[0]?'吧！'+f[0]:'吧！'} 🎁 赶紧冲`,
+     (b,p,f,s) => `💥 ${p} ${f.slice(0,1).join('')}${s?' '+s:''} - 每天都要用的${b||'好物'} ✨`,
+   ],
+   ozon: [
+     (b,p,f,s,k) => `${b?b+' ':'原本'}${p} ${f.slice(0,2).join(', ')}${s?', '+s:''} ${k.slice(0,1).join(' ')} - премиум качество`,
+     (b,p,f,s) => `${p} ${b||''} ${f.slice(0,3).join(' ')}${s?' '+s:''} | ${f[0]||'新品'} на каждый день`,
+   ],
+   mercadolibre: [
+     (b,p,f,s) => `${b?b+' ':'原本'}${p} ${f[0]||''}${s?' '+s:''} Nuevo`,
+     (b,p,f) => `${p} ${f.slice(0,1).join(' ')} ${b||''} - Envío Rápido`,
+   ],
+   shopify: [
+     (b,p,f,s,k) => `${b?b+' ':'原本'}${p} - ${f.slice(0,2).join(', ')}${s?', '+s:''} | ${k.slice(0,2).join(' / ')}`,
+     (b,p,f,s) => `${b?b+' ':'原本'}${p} ${f.slice(0,2).join(' ')}${s?' '+s:''} | Premium Quality`,
+   ],
+ };
+ 
+ // ===== State =====
+ let state = { sellPoints: [], style: 'mixed', activePlatform: null, results: {} };
+ 
+ // ===== DOM Helpers =====
+ function $(id) { return document.getElementById(id); }
+ function showToast(msg) { const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+ 
+ // ===== Sell Points =====
+ function addSellPoint() {
+   const input = $('spInput'); const val = input.value.trim();
+   if (!val) return;
+   state.sellPoints.push(val); input.value = ''; renderSellPoints();
+ }
+ $('spInput').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); addSellPoint(); } });
+ function removeSellPoint(i) { state.sellPoints.splice(i,1); renderSellPoints(); }
+ function renderSellPoints() {
+   $('sellPoints').innerHTML = state.sellPoints.map((sp,i)=>
+     `<span class="sp-tag">${sp} <span class="remove" onclick="removeSellPoint(${i})">×</span></span>`
+   ).join('');
+ }
+ 
+ // ===== Platform Toggle =====
+ document.querySelectorAll('.platform-tag').forEach(tag => {
+   tag.addEventListener('click', function(e) {
+     if (e.target.tagName === 'INPUT') return;
+     const cb = this.querySelector('input[type=checkbox]');
+     cb.checked = !cb.checked;
+     this.classList.toggle('selected');
+     updatePlatformCount();
+   });
+   tag.querySelector('input').addEventListener('change', function() {
+     this.parentElement.classList.toggle('selected');
+     updatePlatformCount();
+   });
+ });
+ function updatePlatformCount() {
+   const count = document.querySelectorAll('.platform-tag.selected').length;
+   $('platCount').textContent = count;
+ }
+ 
+ // ===== Style Select =====
+ document.querySelectorAll('.style-opt').forEach(opt => {
+   opt.addEventListener('click', function() {
+     document.querySelectorAll('.style-opt').forEach(o => o.classList.remove('selected'));
+     this.classList.add('selected');
+     state.style = this.dataset.style;
+   });
+ });
+ 
+ // ===== Results Tabs =====
+ function switchPlatformTab(platId) {
+   state.activePlatform = platId;
+   document.querySelectorAll('.results-tab').forEach(t => t.classList.toggle('active', t.dataset.plat === platId));
+   renderPlatformResults(platId);
+ }
+ 
+ function renderPlatformResults(platId) {
+   const container = $('resultCards');
+   const titles = state.results[platId] || [];
+   if (titles.length === 0) { container.innerHTML = '<div class="results-empty"><p>暂无结果，请重新生成</p></div>'; return; }
+   container.innerHTML = titles.map((t, i) => {
+     const scoreClass = t.score >= 4.2 ? 'score-high' : t.score >= 3.5 ? 'score-mid' : 'score-low';
+     const showHighlight = $('showKeywordsCheck').checked && t.highlights;
+     let titleText = t.text;
+     if (showHighlight && t.highlights) {
+       t.highlights.forEach(h => { titleText = titleText.replaceAll(h, `<span class="highlight">${h}</span>`); });
+     }
+     return `<div class="result-card">
+       <div class="meta">
+         <span class="score ${scoreClass}">⭐ ${t.score.toFixed(1)}</span>
+         <span class="style-badge">${STYLE_LABELS[t.style]||t.style}</span>
+         <span style="font-size:11px;color:var(--text2)">${t.chars||0}字符</span>
+       </div>
+       <div class="title-text">${titleText}</div>
+       <div class="actions">
+         <button class="copy-btn" onclick="copyTitle('${i}','${platId}')">📋 复制</button>
+         <button onclick="regenerateTitle('${platId}',${i})">🔄 重新生成</button>
+       </div>
+     </div>`;
+   }).join('');
+ }
+ 
+ // ===== Title Generation =====
+ async function generateTitles() {
+   const name = $('prodName').value.trim();
+   if (!name) { showToast('请填写产品名称'); return; }
+   
+   const platforms = [...document.querySelectorAll('.platform-tag.selected')].map(el => el.querySelector('input').value);
+   if (platforms.length === 0) { showToast('请至少选择一个平台'); return; }
+   
+   const brand = $('brandName').value.trim();
+   const specs = $('specs').value.trim();
+   const keywords = $('keywords').value.trim().split(/[,，、\s]+/).filter(Boolean);
+   const sellPoints = state.sellPoints;
+   const style = state.style;
+   
+   const btn = $('genBtn');
+   btn.classList.add('loading'); btn.disabled = true;
+   
+   try {
+     const provider = $('apiProvider').value;
+     let titles = {};
+     
+     if (provider === 'demo') {
+       titles = generateDemoTitles(name, brand, sellPoints, specs, keywords, platforms, style);
+     } else {
+       titles = await callAIAPI(name, brand, sellPoints, specs, keywords, platforms, style);
+     }
+     
+     state.results = titles;
+     state.activePlatform = platforms[0];
+     
+     renderTabs(platforms);
+     switchPlatformTab(platforms[0]);
+     $('emptyState').style.display = 'none';
+     $('resultCards').style.display = 'flex';
+     
+     const total = Object.values(titles).flat().length;
+     $('resultCount').textContent = `· ${platforms.length}个平台 · ${total}个标题`;
+     showToast(`✅ 已生成 ${total} 个标题`);
+   } catch(e) {
+     showToast('❌ '+e.message);
+   } finally {
+     btn.classList.remove('loading'); btn.disabled = false;
+   }
+ }
+ 
+ function renderTabs(platforms) {
+   const tabContainer = $('resultTabs');
+   tabContainer.innerHTML = platforms.map(p =>
+     `<button class="results-tab" data-plat="${p}" onclick="switchPlatformTab('${p}')">${PLATFORMS[p]?.icon||'📦'} ${PLATFORMS[p]?.name||p}</button>`
+   ).join('');
+ }
+ 
+ // ===== Demo Generator =====
+ function generateDemoTitles(name, brand, sellPoints, specs, keywords, platforms, style) {
+   const result = {};
+   for (const plat of platforms) {
+     const platInfo = PLATFORMS[plat];
+     if (!platInfo) continue;
+     const templates = TEMPLATES[plat] || TEMPLATES.amazon;
+     const titles = [];
+     const stylesToUse = style === 'mixed' ? TITLE_STYLES.filter(s => s !== 'mixed') : [style];
+     
+     for (let i = 0; i < Math.min(3, templates.length); i++) {
+       const tpl = templates[i];
+       const f = sellPoints.length > 0 ? sellPoints : (keywords.length > 0 ? keywords : ['高品质','实惠']);
+       const s = specs || (plat === 'ebay' ? 'New' : '');
+       const k = keywords.length > 0 ? keywords : (sellPoints.length > 0 ? sellPoints : ['热卖','推荐']);
+       let text;
+       try { text = tpl(brand, name, f, s, k); } catch(e) { text = brand+' '+name+' '+f.slice(0,2).join(' '); }
+       
+       const chars = text.length;
+       const within = chars <= platInfo.maxChars;
+       const score = within ? 4.2 + Math.random()*0.7 : 3.2 + Math.random()*0.5;
+       
+       const st = stylesToUse[i % stylesToUse.length] || 'mixed';
+       
+       titles.push({
+         text, score: Math.round(score*10)/10, style: st, chars,
+         within, highlights: keywords.slice(0,3)
+       });
+     }
+     result[plat] = titles;
+   }
+   return result;
+ }
+ 
+ // ===== AI API Integration =====
+ async function callAIAPI(name, brand, sellPoints, specs, keywords, platforms, style) {
+   const apiKey = $('apiKey').value.trim();
+   if (!apiKey) throw new Error('请在设置中填写 API Key，或切换到「演示模式」');
+   
+   const provider = $('apiProvider').value;
+   const platformRules = platforms.map(p => {
+     const info = PLATFORMS[p];
+     return `${info.name}: 上限${info.maxChars}字符, 格式"${info.format}", 禁止${info.forbid.join('、')}, 算法${info.algorithm}`;
+   }).join('\n');
+   
+   const prompt = `你是一个有10年经验的电商标题写作专家。你的核心原则：
+ 1. 不堆砌关键词 — 同一个词最多出现2次，不能是用逗号分隔的关键词列表
+ 2. 以买家购买决策为中心 — 标题要回答"这是什么""为什么买""适合我吗"
+ 3. 严格遵循各平台规则
+ 4. 标题读起来要自然，像人写的而不是机器拼凑的
+
+ 产品信息:
+ - 产品: ${name}${brand?'\n- 品牌: '+brand:''}${sellPoints.length>0?'\n- 卖点: '+sellPoints.join(', '):''}${specs?'\n- 规格: '+specs:''}${keywords.length>0?'\n- 关键词: '+keywords.join(', '):''}
+
+ 目标平台及规则:
+ ${platformRules}
+
+ 风格偏好: ${style === 'mixed' ? '混合多种风格' : style}
+
+ 请为每个平台生成3个不同风格的标题，输出格式为JSON:
+ { "platform_id": [{ "text": "标题文本", "style": "品牌信赖/解决方案/场景驱动", "score": 4.5, "chars": 120 }] }
+ 
+ 注意：每个标题的score字段请基于标题质量评分卡（关键词覆盖、可读性、购买触发、平台合规、不堆砌）给出1-5分的综合评分。`;
+   
+   let endpoint, body;
+   if (provider === 'openai') {
+     endpoint = 'https://api.openai.com/v1/chat/completions';
+     body = { model:'gpt-4o', messages:[{role:'user',content:prompt}], temperature:0.7 };
+   } else if (provider === 'claude') {
+     endpoint = 'https://api.anthropic.com/v1/messages';
+     body = { model:'claude-3-5-sonnet-20241022', max_tokens:2000, messages:[{role:'user',content:prompt}] };
+   } else if (provider === 'custom') {
+     endpoint = $('apiEndpoint').value.trim() || 'https://api.openai.com/v1/chat/completions';
+     body = { model:'gpt-4o', messages:[{role:'user',content:prompt}], temperature:0.7 };
+   }
+   
+   const headers = { 'Content-Type':'application/json' };
+   if (provider === 'openai' || provider === 'custom') headers['Authorization'] = `Bearer ${apiKey}`;
+   else if (provider === 'claude') headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01';
+   
+   const res = await fetch(endpoint, { method:'POST', headers, body:JSON.stringify(body) });
+   if (!res.ok) { const err = await res.text(); throw new Error(`API Error: ${err.substring(0,200)}`); }
+   const data = await res.json();
+   
+   let content;
+   if (provider === 'claude') content = data.content?.[0]?.text || '';
+   else content = data.choices?.[0]?.message?.content || '';
+   
+   try {
+     const jsonMatch = content.match(/\{[\s\S]*\}/);
+     if (jsonMatch) return JSON.parse(jsonMatch[0]);
+   } catch(e) {}
+   throw new Error('API 返回格式异常');
+ }
+ 
+ // ===== Copy & Regenerate =====
+ function copyTitle(idx, platId) {
+   const title = state.results[platId]?.[idx];
+   if (!title) return;
+   navigator.clipboard.writeText(title.text).then(() => showToast('✅ 已复制到剪贴板')).catch(() => showToast('❌ 复制失败'));
+ }
+ 
+ function regenerateTitle(platId, idx) {
+   showToast('🔄 重新生成中...');
+   // For demo mode, just re-run the demo generator
+   const name = $('prodName').value.trim();
+   const brand = $('brandName').value.trim();
+   const specs = $('specs').value.trim();
+   const keywords = $('keywords').value.trim().split(/[,，、\s]+/).filter(Boolean);
+   const sellPoints = state.sellPoints;
+   
+   const newTitles = generateDemoTitles(name, brand, sellPoints, specs, keywords, [platId], state.style);
+   if (state.results[platId] && newTitles[platId]) {
+     state.results[platId][idx] = newTitles[platId][idx % newTitles[platId].length];
+     renderPlatformResults(platId);
+     showToast('✅ 已更新');
+   }
+ }
+ 
+ // ===== Settings =====
+ function toggleSettings() { $('settingsModal').classList.toggle('show'); }
+ function updateApiFields() {
+   const p = $('apiProvider').value;
+   $('apiKeyGroup').style.display = p === 'demo' ? 'none' : '';
+   $('apiEndpointGroup').style.display = p === 'custom' ? '' : 'none';
+ }
+ function saveSettings() {
+   const apiKey = $('apiKey').value.trim();
+   if (apiKey) localStorage.setItem('huaangel_api_key', apiKey);
+   localStorage.setItem('huaangel_api_provider', $('apiProvider').value);
+   toggleSettings();
+   showToast('✅ 设置已保存');
+ }
+ function loadSettings() {
+   const savedKey = localStorage.getItem('huaangel_api_key');
+   const savedProvider = localStorage.getItem('huaangel_api_provider');
+   if (savedKey) $('apiKey').value = savedKey;
+   if (savedProvider) { $('apiProvider').value = savedProvider; updateApiFields(); }
+ }
+ 
+ document.addEventListener('DOMContentLoaded', () => {
+   loadSettings();
+   updatePlatformCount();
+ });
+ </script>
+ </body>
+ </html>
