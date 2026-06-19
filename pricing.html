@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>定价方案 - HuaAngel Tools</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--t:#1a1a2e;--t2:#666;--p:#005bff;--ph:#0047cc;--a:#fe2c55;--g:#00a854;--o:#f59e0b;--purple:#7c3aed;--hdr:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--r:12px;--s:0 2px 8px rgba(0,0,0,0.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.nav{background:var(--hdr);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--hdr);padding:48px 24px 56px;text-align:center;color:#fff;border-radius:0 0 32px 32px}
+.hero h1{font-size:32px;font-weight:800;margin-bottom:6px}
+.hero h1 span{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:15px;color:rgba(255,255,255,0.55);max-width:550px;margin:0 auto;line-height:1.5}
+.hero .stats{display:flex;gap:32px;justify-content:center;margin-top:20px}
+.hero .stat{text-align:center}
+.hero .stat-n{font-size:24px;font-weight:700}
+.hero .stat-l{font-size:12px;color:rgba(255,255,255,0.4)}
+.container{max-width:1000px;margin:-24px auto 40px;padding:0 20px;position:relative;z-index:1}
+
+/* Pricing Grid */
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+@media(max-width:750px){.pg{grid-template-columns:1fr;max-width:400px;margin:0 auto 20px}}
+.pc{background:#fff;border-radius:16px;padding:28px 24px;box-shadow:var(--s);position:relative;text-align:center;transition:all .3s;border:2px solid transparent}
+.pc:hover{box-shadow:0 8px 32px rgba(0,0,0,0.1);transform:translateY(-3px)}
+.pc.featured{border-color:var(--p);box-shadow:0 8px 32px rgba(0,91,255,0.12)}
+.pc .popular{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--p);color:#fff;padding:4px 18px;border-radius:20px;font-size:11px;font-weight:700}
+.pc .pname{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:4px}
+.pc .pprice{font-size:36px;font-weight:800;margin-bottom:2px}
+.pc .pprice span{font-size:16px;font-weight:400;color:var(--t2)}
+.pc .pperiod{font-size:13px;color:var(--t2);margin-bottom:14px}
+.pc .pdesc{font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.5}
+.pc .pbtn{display:inline-block;padding:10px 32px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;cursor:pointer;border:none;width:100%}
+.pc .pbtn-primary{background:var(--p);color:#fff}
+.pc .pbtn-primary:hover{box-shadow:0 4px 16px rgba(0,91,255,0.3)}
+.pc .pbtn-outline{background:transparent;color:var(--p);border:1.5px solid var(--p)}
+.pc .pbtn-outline:hover{background:#f0f4ff}
+.pc .features{text-align:left;margin-top:16px}
+.pc .features li{list-style:none;font-size:13px;color:var(--t2);padding:5px 0;display:flex;align-items:center;gap:6px}
+.pc .features li::before{content:'✅';font-size:11px}
+.pc .features li.na::before{content:'—';color:#ccc}
+
+/* Comparison Table */
+.ct{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--s);margin-bottom:20px;overflow-x:auto}
+.ct h2{font-size:16px;font-weight:700;margin-bottom:12px}
+.ct table{width:100%;border-collapse:collapse;font-size:13px}
+.ct th,.ct td{padding:10px 12px;border-bottom:1px solid #f0f0f0;text-align:center}
+.ct th:first-child,.ct td:first-child{text-align:left;font-weight:600}
+.ct th{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px}
+.ct .yes{color:var(--g);font-weight:700}
+.ct .no{color:#ccc}
+.ct tr:last-child td{border-bottom:none}
+.ct tr:hover td{background:#f9fafb}
+
+/* FAQ */
+.faq{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--s);margin-bottom:20px}
+.faq h2{font-size:16px;font-weight:700;margin-bottom:12px}
+.faq-item{border-bottom:1px solid #f0f0f0;padding:12px 0}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.faq-q:hover{color:var(--p)}
+.faq-a{font-size:13px;color:var(--t2);line-height:1.6;margin-top:6px;display:none}
+.faq-item.open .faq-a{display:block}
+
+/* Lead form */
+.lead{background:linear-gradient(135deg,#1a1a2e,#0f3460);border-radius:16px;padding:32px;text-align:center;color:#fff;margin-bottom:20px}
+.lead h2{font-size:20px;font-weight:700;margin-bottom:6px}
+.lead p{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px}
+.lead-form{display:flex;gap:8px;max-width:420px;margin:0 auto}
+.lead-form input{flex:1;padding:10px 14px;border-radius:8px;border:none;font-size:14px;outline:none}
+.lead-form button{padding:10px 24px;background:var(--p);color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap;font-size:14px}
+.lead-form button:hover{background:var(--ph)}
+
+.footer{text-align:center;padding:32px;color:var(--t2);font-size:13px;border-top:1px solid #e5e7eb}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head><body>
+
+<nav class="nav"><div class="nav-inner">
+<a href="/" class="nav-brand">🔅 <span>HuaAngel</span> Tools</a>
+<div class="nav-links">
+<a href="/">首页</a><a href="/ai-title-generator">AI 标题</a><a href="/pricing" class="active">💎 定价</a>
+<a href="/dashboard">📊 看板</a><a href="/user">👤 用户</a>
+</div></div></nav>
+
+<section class="hero">
+<h1>简单透明的 <span>定价方案</span></h1>
+<p>从个人卖家到电商团队，找到最适合你的工具方案。所有方案均包含 AI 标题生成器、竞品监控、客服助手等全套工具。</p>
+<div class="stats">
+<div class="stat"><div class="stat-n">10</div><div class="stat-l">专业工具</div></div>
+<div class="stat"><div class="stat-n">9</div><div class="stat-l">平台支持</div></div>
+<div class="stat"><div class="stat-n">24/7</div><div class="stat-l">在线可用</div></div>
+</div>
+</section>
+
+<div class="container">
+
+<div class="pg">
+  <!-- Free -->
+  <div class="pc">
+    <div class="pname">免费体验</div>
+    <div class="pprice">$0 <span>/月</span></div>
+    <div class="pperiod">随时开始，无需信用卡</div>
+    <div class="pdesc">适合想先体验工具的卖家</div>
+    <button class="pbtn pbtn-primary" onclick="window.location.href='/'">🎯 开始免费使用</button>
+    <ul class="features">
+      <li>AI 标题生成 5次/天</li>
+      <li>基础经营看板</li>
+      <li>竞品监控 3 个</li>
+      <li>客服助手 5条/天</li>
+      <li>全站使用统计</li>
+      <li class="na">批量导出</li>
+      <li class="na">优先支持</li>
+    </ul>
+  </div>
+
+  <!-- Pro (Recommended) -->
+  <div class="pc featured">
+    <div class="popular">🔥 最受欢迎</div>
+    <div class="pname">个人专业版</div>
+    <div class="pprice">$19 <span>/月</span></div>
+    <div class="pperiod">$149/年 (省 $79)</div>
+    <div class="pdesc">适合全职运营的电商卖家</div>
+    <button class="pbtn pbtn-primary" onclick="captureLead('pro')">💎 升级专业版</button>
+    <ul class="features">
+      <li>AI 标题生成 50次/天</li>
+      <li>完整数据看板 + 趋势图</li>
+      <li>竞品监控 20 个</li>
+      <li>客服助手 50条/天</li>
+      <li>全站使用统计 + 导出 CSV</li>
+      <li>AI 选品分析</li>
+      <li>邮件优先支持</li>
+    </ul>
+  </div>
+
+  <!-- Team -->
+  <div class="pc">
+    <div class="pname">团队版</div>
+    <div class="pprice">$49 <span>/月</span></div>
+    <div class="pperiod">$399/年 (省 $189)</div>
+    <div class="pdesc">适合 3-10 人运营团队</div>
+    <button class="pbtn pbtn-outline" onclick="captureLead('team')">👥 咨询团队方案</button>
+    <ul class="features">
+      <li>所有 Pro 功能</li>
+      <li>不限量标题生成</li>
+      <li>竞品监控不限量</li>
+      <li>团队多账号协作</li>
+      <li>API 对接支持</li>
+      <li>专属客户经理</li>
+      <li>定制报告服务</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Comparison Table -->
+<div class="ct">
+<h2>📊 功能对比</h2>
+<table>
+<tr><th>功能</th><th>免费版</th><th>个人专业版</th><th>团队版</th></tr>
+<tr><td>AI 标题生成器 (9平台)</td><td class="yes">5次/天</td><td class="yes">50次/天</td><td class="yes">不限量</td></tr>
+<tr><td>竞品监控工具</td><td class="yes">3个</td><td class="yes">20个</td><td class="yes">不限量</td></tr>
+<tr><td>AI 客服助手</td><td class="yes">5条/天</td><td class="yes">50条/天</td><td class="yes">不限量</td></tr>
+<tr><td>营销活动管理</td><td class="yes">基础</td><td class="yes">完整</td><td class="yes">完整</td></tr>
+<tr><td>AI 选品分析</td><td class="no">—</td><td class="yes">✅</td><td class="yes">✅</td></tr>
+<tr><td>数据看板 + 趋势图</td><td class="yes">基础</td><td class="yes">完整</td><td class="yes">完整+导出</td></tr>
+<tr><td>CSV 数据导出</td><td class="no">—</td><td class="yes">✅</td><td class="yes">✅</td></tr>
+<tr><td>团队多账号</td><td class="no">—</td><td class="no">—</td><td class="yes">✅</td></tr>
+<tr><td>API 接口</td><td class="no">—</td><td class="no">—</td><td class="yes">✅</td></tr>
+<tr><td>优先技术支持</td><td class="no">—</td><td class="yes">邮件</td><td class="yes">专属经理</td></tr>
+</table>
+</div>
+
+<!-- FAQ -->
+<div class="faq">
+<h2>❓ 常见问题</h2>
+<div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">免费版和付费版有什么区别？<span>▼</span></div><div class="faq-a">免费版可以体验所有工具的基础功能，但有每日使用次数限制。付费版解除限制，并解锁高级功能（数据导出、AI 选品分析、团队协作等）。</div></div>
+<div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">支持哪些付款方式？<span>▼</span></div><div class="faq-a">目前支持支付宝、微信支付和 PayPal。企业用户可开具发票对公转账。</div></div>
+<div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">可以随时取消订阅吗？<span>▼</span></div><div class="faq-a">是的，随时可以取消。取消后续期不会扣费，已付费用不退款，但已购服务可用到周期结束。</div></div>
+<div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">数据安全如何保证？<span>▼</span></div><div class="faq-a">所有用户数据存储在本地浏览器中，我们不会将您的店铺数据上传到服务器。付费用户的 API Key 加密存储。</div></div>
+<div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">团队版可以添加多少个成员？<span>▼</span></div><div class="faq-a">团队版支持添加最多 10 个子账号，适合 3-10 人运营团队。如需更多账号，请联系我们定制企业方案。</div></div>
+</div>
+
+<!-- Lead Capture -->
+<div class="lead">
+<h2>💎 准备好提升运营效率？</h2>
+<p>留下邮箱，我们会在支付系统上线后第一时间通知你，并赠送 7 天 Pro 试用</p>
+<div class="lead-form">
+<input type="email" id="leadEmail" placeholder="your@email.com">
+<button onclick="submitLead()">📩 获取早鸟优惠</button>
+</div>
+<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px">不会发送垃圾邮件，可随时退订</div>
+</div>
+</div>
+
+<footer class="footer"><p>🔅 <strong>HuaAngel Tools</strong> · 定价方案 v1.0</p></footer>
+<div class="toast" id="toast"></div>
+
+<script src="/track.js"></script>
+<script>
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
+
+function toggleFaq(el){
+  var item=el.parentElement;
+  item.classList.toggle('open');
+  el.querySelector('span').textContent=item.classList.contains('open')?'▲':'▼';
+}
+
+function captureLead(plan){
+  showToast('💎 感谢你的关注！请留下邮箱，我们会第一时间通知你');
+  document.getElementById('leadEmail').focus();
+  window.haTrack('pricing','click_upgrade',{plan:plan});
+}
+
+function submitLead(){
+  var email=document.getElementById('leadEmail').value.trim();
+  if(!email||!email.includes('@')){showToast('请输入有效邮箱');return}
+  // Save lead to localStorage
+  var leads=JSON.parse(localStorage.getItem('ha_leads')||'[]');
+  leads.push({email:email,date:new Date().toISOString(),plan:'interested',source:'pricing'});
+  localStorage.setItem('ha_leads',JSON.stringify(leads));
+  document.getElementById('leadEmail').value='';
+  window.haTrack('pricing','submit_lead',{email:email});
+  showToast('✅ 感谢！我们会尽快通知你');
+}
+
+// Show current tier in hero
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    var tier=window.haGetTier&&window.haGetTier();
+    if(tier&&tier.name==='admin'){
+      var btn=document.querySelector('.pc.featured .pbtn');
+      if(btn)btn.textContent='👑 当前为管理员';
+    }
+  }catch(e){}
+});
+</script>
+</body></html>
