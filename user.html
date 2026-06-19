@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>用户中心 - HuaAngel Tools</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--t:#1a1a2e;--t2:#666;--p:#005bff;--ph:#0047cc;--a:#fe2c55;--g:#00a854;--hdr:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--r:12px;--s:0 2px 8px rgba(0,0,0,0.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.nav{background:var(--hdr);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--hdr);padding:36px 24px 48px;text-align:center;color:#fff;border-radius:0 0 32px 32px}
+.hero h1{font-size:26px;font-weight:800}
+.hero h1 span{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:13px;color:rgba(255,255,255,0.5)}
+.container{max-width:460px;margin:-16px auto 40px;padding:0 20px;position:relative;z-index:1}
+.card{background:var(--card);border-radius:var(--r);padding:28px;box-shadow:var(--s)}
+.card h2{font-size:18px;font-weight:700;margin-bottom:4px;text-align:center}
+.card .sub{font-size:13px;color:var(--t2);text-align:center;margin-bottom:20px}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:#444}
+.fg input{width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;outline:none;transition:border-color .2s}
+.fg input:focus{border-color:var(--p)}
+.btn{width:100%;padding:11px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--p);color:#fff}
+.btn-primary:hover{background:var(--ph);box-shadow:0 4px 12px rgba(0,91,255,0.3)}
+.btn-outline{background:transparent;color:var(--p);border:1.5px solid var(--p)}
+.btn-outline:hover{background:#f0f4ff}
+.btn-danger{background:var(--a);color:#fff}
+.switch{text-align:center;margin-top:14px;font-size:13px;color:var(--t2)}
+.switch span{color:var(--p);cursor:pointer;font-weight:600}
+.error{display:none;color:var(--a);font-size:13px;text-align:center;margin-bottom:10px;padding:8px;background:#fff0f0;border-radius:6px}
+.success{display:none;color:var(--g);font-size:13px;text-align:center;margin-bottom:10px;padding:8px;background:#f0fff0;border-radius:6px}
+
+/* Profile */
+.profile-header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.profile-avatar{width:56px;height:56px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700}
+.profile-info h2{font-size:20px;margin-bottom:2px}
+.profile-info p{font-size:13px;color:var(--t2)}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-box{text-align:center;padding:14px;background:#f9fafb;border-radius:10px}
+.stat-box .num{font-size:22px;font-weight:800;color:var(--p)}
+.stat-box .lbl{font-size:11px;color:var(--t2);margin-top:2px}
+.actions{display:flex;gap:8px}
+.actions button{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.footer{text-align:center;padding:32px;color:var(--t2);font-size:13px}
+.tabs{display:flex;gap:0;margin-bottom:20px;background:#f5f5f5;border-radius:10px;padding:3px}
+.tab{flex:1;text-align:center;padding:8px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.tab.active{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.panel{display:none}
+.panel.active{display:block}
+</style>
+</head><body>
+
+<nav class="nav"><div class="nav-inner">
+<a href="/" class="nav-brand">🔅 <span>HuaAngel</span> Tools</a>
+<div class="nav-links">
+<a href="/">首页</a><a href="/ai-title-generator">AI 标题</a><a href="/dashboard">📊 看板</a><a href="/user" class="active">👤 用户</a>
+</div></div></nav>
+
+<section class="hero"><h1>👤 用户 <span>中心</span></h1><p>登录 · 注册 · 个人数据管理</p></section>
+
+<div class="container" id="app">
+  <!-- Login Form -->
+  <div class="card" id="loginPanel">
+    <h2>登录</h2>
+    <p class="sub">使用邮箱和密码登录，查看个人使用数据</p>
+    <div class="error" id="loginError"></div>
+    <div class="fg"><label>邮箱</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
+    <div class="fg"><label>密码</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+    <button class="btn btn-primary" onclick="doLogin()">登录</button>
+    <div class="switch">还没有账号？<span onclick="showTab('register')">立即注册</span></div>
+  </div>
+
+  <!-- Register Form (hidden by default) -->
+  <div class="card" id="registerPanel" style="display:none">
+    <h2>注册</h2>
+    <p class="sub">创建账号，开启个性化体验</p>
+    <div class="error" id="registerError"></div>
+    <div class="success" id="registerSuccess"></div>
+    <div class="fg"><label>昵称</label><input type="text" id="regName" placeholder="你的名字" autocomplete="name"></div>
+    <div class="fg"><label>邮箱</label><input type="email" id="regEmail" placeholder="your@email.com" autocomplete="email"></div>
+    <div class="fg"><label>密码</label><input type="password" id="regPassword" placeholder="至少6位" autocomplete="new-password"></div>
+    <button class="btn btn-primary" onclick="doRegister()">注册</button>
+    <div class="switch">已有账号？<span onclick="showTab('login')">去登录</span></div>
+  </div>
+
+  <!-- Profile Panel (shown when logged in) -->
+  <div class="card" id="profilePanel" style="display:none">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">?</div>
+      <div class="profile-info">
+        <h2 id="profileName">用户</h2>
+        <p id="profileEmail">email@example.com</p>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="num" id="statTotal">0</div><div class="lbl">总使用</div></div>
+      <div class="stat-box"><div class="num" id="statToday">0</div><div class="lbl">今日</div></div>
+      <div class="stat-box"><div class="num" id="statTools">0</div><div class="lbl">使用工具</div></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="window.location.href='/dashboard'">📊 查看完整数据</button>
+      <button class="btn btn-danger" onclick="doLogout()">退出登录</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer"><p>🔅 HuaAngel Tools · 用户系统 v1.0</p></footer>
+
+<script src="/track.js"></script>
+<script>
+// Tab switching
+function showTab(tab) {
+  document.getElementById('loginPanel').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('registerPanel').style.display = tab === 'register' ? '' : 'none';
+}
+
+// Login
+function doLogin() {
+  var email = document.getElementById('loginEmail').value.trim();
+  var password = document.getElementById('loginPassword').value;
+  var err = document.getElementById('loginError');
+  if (!email || !password) { err.textContent = '请填写邮箱和密码'; err.style.display = ''; return; }
+  var result = window.haLogin(email, password);
+  if (result.ok) {
+    window.location.reload();
+  } else {
+    err.textContent = result.error;
+    err.style.display = '';
+  }
+}
+
+// Register
+function doRegister() {
+  var name = document.getElementById('regName').value.trim();
+  var email = document.getElementById('regEmail').value.trim();
+  var password = document.getElementById('regPassword').value;
+  var err = document.getElementById('registerError');
+  var suc = document.getElementById('registerSuccess');
+  err.style.display = 'none'; suc.style.display = 'none';
+  if (!name || !email || !password) { err.textContent = '请填写所有字段'; err.style.display = ''; return; }
+  if (password.length < 6) { err.textContent = '密码至少6位'; err.style.display = ''; return; }
+  var result = window.haRegister(name, email, password);
+  if (result.ok) {
+    suc.textContent = '注册成功！正在进入...';
+    suc.style.display = '';
+    setTimeout(function() { window.location.reload(); }, 1000);
+  } else {
+    err.textContent = result.error;
+    err.style.display = '';
+  }
+}
+
+// Logout
+function doLogout() {
+  if (confirm('确定退出登录？')) {
+    window.haLogout();
+    window.location.reload();
+  }
+}
+
+// Check auth state on load
+document.addEventListener('DOMContentLoaded', function() {
+  var user = window.haGetUser();
+  if (window.haIsLoggedIn() && user) {
+    document.getElementById('loginPanel').style.display = 'none';
+    document.getElementById('registerPanel').style.display = 'none';
+    document.getElementById('profilePanel').style.display = '';
+    document.getElementById('profileAvatar').textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById('profileName').textContent = user.name;
+    document.getElementById('profileEmail').textContent = user.email;
+    
+    // Load usage stats for this user
+    try {
+      var events = JSON.parse(localStorage.getItem('ha_tracker') || '[]');
+      var toolEvents = events.filter(function(e) { return e.t !== 'page' && e.t !== 'user' && e.t !== 'dashboard'; });
+      var today = new Date().toISOString().slice(0,10);
+      var todayEvents = toolEvents.filter(function(e) { return e.date === today; });
+      var uniqueTools = [...new Set(toolEvents.map(function(e) { return e.t; }))];
+      document.getElementById('statTotal').textContent = toolEvents.length;
+      document.getElementById('statToday').textContent = todayEvents.length;
+      document.getElementById('statTools').textContent = uniqueTools.length;
+    } catch(e) {}
+  }
+  
+  // Enter key support
+  document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('regPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doRegister();
+  });
+});
+</script>
+</body></html>

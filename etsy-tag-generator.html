@@ -114,6 +114,7 @@ textarea{resize:vertical;min-height:70px}
 @keyframes shimmer{0%{background-position:-200px 0}100%{background-position:calc(200px + 100%) 0}}
 .shimmer{background:linear-gradient(90deg,var(--surface-alt) 25%,var(--border) 37%,var(--surface-alt) 63%);background-size:200px 100%;animation:shimmer 1.4s ease infinite;border-radius:5px}
 </style>
+<script src="/track.js"></script>
 </head>
 <body>
 <div class="app-wrap">
@@ -418,7 +419,8 @@ function extractProductType(title) {
 //  MAIN GENERATION ENGINE
 // ============================================================
 
-function generateTags(productTitle, productDesc, category, seeds) {
+function generateTags
+    window.haTrack("etsy-tag","generate",{});(productTitle, productDesc, category, seeds) {
   const selectedTags = [];
   const candidates = [];
 

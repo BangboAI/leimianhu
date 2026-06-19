@@ -51,6 +51,7 @@ input:focus,select:focus{outline:none;border-color:#005bff;box-shadow:0 0 0 2px 
 .note{font-size:12px;color:#888;margin-top:12px;padding:10px;background:#f9fafb;border-radius:6px;line-height:1.6}
 @media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
 </style>
+<script src="/track.js"></script>
 </head>
 <body>
 <nav class="nav">
@@ -151,7 +152,9 @@ input:focus,select:focus{outline:none;border-color:#005bff;box-shadow:0 0 0 2px 
 </div>
 </div>
 <script>
-function c(){
+function
+    window.haTrack("ozon-price","calculate",{});
+  function c(){
 var fp=parseFloat(document.getElementById('fp').value)||0;
 var wt=parseFloat(document.getElementById('wt').value)||0;
 var rate=parseFloat(document.getElementById('rate').value)||12;

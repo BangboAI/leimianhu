@@ -79,7 +79,28 @@
  .footer { text-align:center; padding:32px 24px; color:var(--t2); font-size:13px; border-top:1px solid #e5e7eb; }
  .footer a { color:var(--p); text-decoration:none; }
  </style>
- </head>
+ 
+<style>
+/* Dashboard additions */
+.dg2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:600px){.dg2{grid-template-columns:1fr}}
+.dw{display:flex;align-items:end;gap:4px;height:120px;padding:10px 0}
+.dw-bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--p),#4f46e5);position:relative;min-height:4px;transition:height .6s;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.dw-bar:hover{opacity:.8}
+.dw-bar .dv{font-size:9px;color:var(--t2);margin-bottom:2px;white-space:nowrap}
+.dw-bar .dl{font-size:9px;color:var(--t2);margin-top:2px}
+.heatmap{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;margin-top:8px}
+.hm-cell{height:16px;border-radius:2px;cursor:pointer;position:relative}
+.hm-cell:hover{opacity:.7}
+.hm-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--t2);margin-top:4px}
+.hm-legend{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-bottom:4px;font-size:10px;color:var(--t2)}
+.hm-legend span{display:inline-block;width:12px;height:12px;border-radius:2px}
+.export-btn{padding:8px 16px;background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600}
+.export-btn:hover{background:#eee}
+</style>
+<script src="/track.js"></script>
+
+</head>
  <body>
 
  <!-- PIN Overlay -->
@@ -110,14 +131,36 @@
 
  <section class="hero">
    <h1>📊 运营 <span>看板</span></h1>
-   <p>工具使用数据 · 用户行为分析 · 趋势统计</p>
+   <p>工具使用数据 · 用户行为分析 · 趋势统计 <span id="userGreeting" style="font-size:12px;color:rgba(255,255,255,0.3)"></span></p>
  </section>
 
  <div class="container" id="dashboardContent">
    <!-- Stats Cards -->
    <div class="dg" id="statCards"></div>
 
-   <!-- User Profile -->
+   
+  <!-- Daily Trend -->
+  <div class="panel">
+    <div class="panel-title">📈 最近7天趋势 <span style="font-size:12px;color:var(--t2);font-weight:400">· 所有工具使用量</span></div>
+    <div class="dw" id="trendChart"></div>
+  </div>
+
+  <!-- Hourly Heatmap -->
+  <div class="panel">
+    <div class="panel-title">🕐 时段分布 <span style="font-size:12px;color:var(--t2);font-weight:400">· 一天中什么时段工具用得最多</span></div>
+    <div class="hm-legend"><span style="background:#e8e8e8"></span>低 <span style="background:#93c5fd"></span>中 <span style="background:#2563eb"></span>高</div>
+    <div class="heatmap" id="heatMap"></div>
+    <div class="hm-labels"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+  </div>
+
+  <!-- Export -->
+  <div class="panel" style="display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:13px;color:var(--t2)">📤 导出所有使用数据为 CSV 文件</span>
+    <button class="export-btn" onclick="exportCSV()">导出 CSV</button>
+  </div>
+
+  <!-- User Profile -->
+
    <div class="panel">
      <div class="panel-title">👤 访客画像 <span style="font-size:11px;color:var(--t2);font-weight:400">· 基于当前浏览器</span></div>
      <div class="us" id="userSection">
@@ -251,6 +294,11 @@
  }
 
  function renderDashboard() {
+    renderTrendChart(events);
+    renderHeatMap(events);
+    var user = window.haGetUser && window.haGetUser();
+    var greeting = document.getElementById('userGreeting');
+    if (greeting && user && user.name) greeting.textContent = '· 欢迎回来，' + user.name;
    var events = getEvents();
    renderUserSection();
    renderStatCards(events);
@@ -321,7 +369,55 @@
    }).join('');
  }
 
- function resetData() {
+ function renderTrendChart(allEvents) {
+    var container = document.getElementById('trendChart');
+    if (!container) return;
+    var days = [];
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(); d.setDate(d.getDate() - i);
+      var key = d.toISOString().slice(0,10);
+      var label = (i === 0 ? '今天' : i === 1 ? '昨天' : d.toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'}));
+      var count = allEvents.filter(function(e) { return e.date === key && e.t !== 'page'; }).length;
+      days.push({ key: key, label: label, count: count });
+    }
+    var max = Math.max(1, Math.max.apply(null, days.map(function(d) { return d.count; })));
+    container.innerHTML = days.map(function(d) {
+      var h = Math.max(4, (d.count / max) * 100);
+      return '<div class="dw-bar" style="height:' + h + 'px" title="' + d.key + ': ' + d.count + '次"><span class="dv">' + d.count + '</span><span class="dl">' + d.label + '</span></div>';
+    }).join('');
+  }
+
+  function renderHeatMap(allEvents) {
+    var container = document.getElementById('heatMap');
+    if (!container) return;
+    var hours = [];
+    for (var i = 0; i < 24; i++) {
+      var count = allEvents.filter(function(e) { return e.hour === i; }).length;
+      hours.push(count);
+    }
+    var max = Math.max(1, Math.max.apply(null, hours));
+    container.innerHTML = hours.map(function(c) {
+      var intensity = c / max;
+      var bg = intensity === 0 ? '#f5f5f5' : 'rgba(37,99,235,' + (0.1 + intensity * 0.7) + ')';
+      return '<div class="hm-cell" style="background:' + bg + '" title="' + c + '次在' + hours.indexOf(c) + '时"></div>';
+    }).join('');
+  }
+
+  function exportCSV() {
+    var events = getEvents();
+    if (events.length === 0) { alert('暂无数据可导出'); return; }
+    var headers = '时间,工具,动作,详情\n';
+    var rows = events.map(function(e) {
+      return new Date(e.ts).toLocaleString() + ',' + (e.t || '') + ',' + (e.a || '') + ',' + (JSON.stringify(e.d) || '');
+    }).join('\n');
+    var blob = new Blob(['\uFEFF' + headers + rows], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = 'huaangel-stats-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click(); URL.revokeObjectURL(url);
+    window.haTrack('dashboard', 'export', { count: events.length });
+  }
+
+  function resetData() {
    if (confirm('确定清除所有本地数据？这个操作不可恢复。')) {
      localStorage.removeItem(STORAGE_KEY);
      renderDashboard();

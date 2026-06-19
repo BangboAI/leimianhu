@@ -162,6 +162,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .title-tab-content { display: none; }
 .title-tab-content.active { display: block; }
 </style>
+<script src="/track.js"></script>
 </head>
 <body>
 
@@ -503,7 +504,8 @@ function generateHook(style, product, points) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function generateScriptContent(config) {
+function generateScript
+    window.haTrack("tiktok-script","generate",{});Content(config) {
   const { product, category, audience, points, scenes, style, seconds, tone } = config;
   const slots = getTimeSlots(seconds);
   const hook = generateHook(style, product, points);

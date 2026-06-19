@@ -131,7 +131,8 @@
 + // HuaAngel Tracking (shared)
 + window.haTrack = (function(){var k='ha_tracker';return function(t,a,d){try{var e=JSON.parse(localStorage.getItem(k))||[];e.push({t:t,a:a,d:d||{},ts:Date.now(),date:new Date().toISOString().slice(0,10)});if(e.length>5000)e=e.slice(-5000);localStorage.setItem(k,JSON.stringify(e))}catch(e){}}})();
 + window.haTrack('title-generator','view',{});</script>
-+ </head>
++ <script src="/track.js"></script>
+</head>
  <body>
  
  <nav class="nav">
