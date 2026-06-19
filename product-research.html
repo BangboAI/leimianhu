@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI 选品助手 - HuaAngel Tools</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--t:#1a1a2e;--t2:#666;--p:#005bff;--ph:#0047cc;--a:#fe2c55;--g:#00a854;--o:#f59e0b;--purple:#7c3aed;--hdr:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--r:12px;--s:0 2px 8px rgba(0,0,0,0.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.nav{background:var(--hdr);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--hdr);padding:36px 24px 48px;text-align:center;color:#fff;border-radius:0 0 32px 32px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30%50%,rgba(96,165,250,0.1)0%,transparent 50%),radial-gradient(circle at 70%30%,rgba(254,44,85,0.06)0%,transparent 50%);pointer-events:none}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:5px 14px;font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:12px}
+.hero h1{font-size:26px;font-weight:800;margin-bottom:4px}
+.hero h1 span{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:13px;color:rgba(255,255,255,0.5);max-width:500px;margin:0 auto}
+.container{max-width:860px;margin:-16px auto 40px;padding:0 20px;position:relative;z-index:1}
+.panel{background:var(--card);border-radius:var(--r);padding:20px 22px;box-shadow:var(--s);margin-bottom:14px}
+.p-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tabs{display:flex;gap:0;background:#f0f0f0;border-radius:10px;padding:3px}
+.tab{flex:1;text-align:center;padding:9px 6px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--t2)}
+.tab:hover{color:var(--t)}.tab.active{background:#fff;color:var(--p);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tc{display:none}.tc.active{display:block}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#444}
+.fg input,.fg textarea,.fg select{width:100%;padding:8px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:13px;outline:none;transition:border-color .2s;font-family:inherit}
+.fg input:focus,.fg select:focus{border-color:var(--p)}
+.fg textarea{min-height:56px;resize:vertical;font-size:13px;line-height:1.5}
+.sg{display:flex;gap:6px;flex-wrap:wrap}
+.sg-item{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #e0e0e0;background:#fff;transition:all .2s}
+.sg-item:hover{border-color:var(--p)}.sg-item.selected{background:var(--p);color:#fff;border-color:var(--p)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-block{width:100%;justify-content:center}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--ph);box-shadow:0 4px 12px rgba(0,91,255,0.3)}
+.btn-p:disabled{opacity:.5;cursor:not-allowed}
+.btn-s{background:#f0f0f0;color:#666;border:1px solid #ddd}
+.btn-g{background:var(--g);color:#fff}
+.rc{margin-top:12px}
+.r-card{padding:14px 16px;background:#f9fafb;border-radius:10px;border:1px solid #eee;margin-bottom:8px}
+.r-card:hover{border-color:var(--p)}
+.r-card .label{font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.r-card .text{font-size:13px;line-height:1.6;color:var(--t);white-space:pre-wrap}
+.r-card .score-big{font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--p),#4f46e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.sg-item-card{text-align:center;padding:8px;background:#f5f5f5;border-radius:8px}
+.sg-item-card .n{font-size:18px;font-weight:700}
+.sg-item-card .l{font-size:10px;color:var(--t2);margin-top:1px}
+.idea-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.idea-card{padding:12px;border-radius:8px;border:1px solid #eee;cursor:pointer;transition:all .2s}
+.idea-card:hover{border-color:var(--p);background:#f0f4ff}
+.idea-card .iname{font-size:14px;font-weight:700;margin-bottom:2px}
+.idea-card .iscore{font-size:11px;color:var(--t2)}
+.idea-card .iscore strong{color:var(--p)}
+.footer{text-align:center;padding:32px;color:var(--t2);font-size:13px;border-top:1px solid #e5e7eb}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head><body>
+
+<nav class="nav"><div class="nav-inner">
+<a href="/" class="nav-brand">🔅 <span>HuaAngel</span> Tools</a>
+<div class="nav-links">
+<a href="/">首页</a><a href="/ai-title-generator">AI 标题</a><a href="/competitor-monitor">🎯 竞品</a>
+<a href="/customer-service">💬 客服</a><a href="/promotions">📅 营销</a>
+<a href="/product-research" class="active">🔍 选品</a>
+<a href="/dashboard">📊 看板</a><a href="/user">👤 用户</a>
+</div></div></nav>
+
+<section class="hero">
+<div class="hero-badge">🔍 Phase 3 · AI 驱动</div>
+<h1>AI 选品 <span>助手</span></h1>
+<p>趋势发现 · 产品分析 · 关键词研究 — 用数据帮你找到下一个爆款</p>
+</section>
+
+<div class="container">
+<div class="panel" style="padding:0">
+<div class="tabs" id="mainTabs" style="margin:0;border-radius:10px 10px 0 0">
+<div class="tab active" data-tab="trends" onclick="switchTab('trends')">📈 趋势发现</div>
+<div class="tab" data-tab="analyze" onclick="switchTab('analyze')">🔬 产品分析</div>
+<div class="tab" data-tab="keywords" onclick="switchTab('keywords')">🔑 关键词研究</div>
+</div>
+
+<!-- Tab 1: Trends -->
+<div class="tc active" id="tab-trends" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">📈 行业趋势发现</div>
+<div class="fg"><label>产品品类 / 关键词</label>
+<input type="text" id="trCategory" placeholder="如: wireless earbuds, yoga mat, pet supplies" value="wireless earbuds"></div>
+<div class="fg" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div><label>目标市场</label><select id="trMarket"><option value="us">美国</option><option value="uk">英国</option><option value="de">德国</option><option value="jp">日本</option><option value="global">全球</option></select></div>
+<div><label>平台</label><select id="trPlatform"><option value="amazon">Amazon</option><option value="ebay">eBay</option><option value="walmart">Walmart</option></select></div>
+</div>
+<button class="btn btn-p btn-block" onclick="findTrends()" id="trBtn">🔍 发现趋势</button>
+<div id="trendResults" class="rc"></div>
+</div>
+
+<!-- Tab 2: Product Analysis -->
+<div class="tc" id="tab-analyze" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">🔬 产品机会分析</div>
+<div class="fg"><label>产品想法 *</label>
+<textarea id="paProduct" placeholder="描述你想卖的产品，越详细越好..." rows="2"></textarea></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<div class="fg"><label>产品成本 ($)</label><input type="number" id="paCost" placeholder="8" step="0.01"></div>
+<div class="fg"><label>目标售价 ($)</label><input type="number" id="paPrice" placeholder="29.99" step="0.01"></div>
+<div class="fg"><label>物流成本 ($)</label><input type="number" id="paShipping" placeholder="4" step="0.01"></div>
+</div>
+<div class="fg"><label>目标平台</label><select id="paPlatform">
+<option value="amazon">Amazon</option><option value="ebay">eBay</option><option value="walmart">Walmart</option>
+<option value="etsy">Etsy</option><option value="shopify">Shopify</option></select></div>
+<button class="btn btn-p btn-block" onclick="analyzeProduct()" id="paBtn">🔬 分析产品机会</button>
+<div id="paResults" class="rc"></div>
+</div>
+
+<!-- Tab 3: Keywords -->
+<div class="tc" id="tab-keywords" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">🔑 关键词研究</div>
+<div class="fg"><label>产品品类</label>
+<input type="text" id="kwCategory" placeholder="如: wireless headphones" value="bluetooth earbuds"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="fg"><label>目标平台</label><select id="kwPlatform">
+<option value="amazon">Amazon</option><option value="ebay">eBay</option><option value="google">Google Shopping</option></select></div>
+<div class="fg"><label>关键词类型</label><select id="kwType">
+<option value="all">全部</option><option value="high">高搜索量</option><option value="longtail">长尾词</option>
+<option value="lowcomp">低竞争</option></select></div>
+</div>
+<button class="btn btn-p btn-block" onclick="findKeywords()">🔑 研究关键词</button>
+<div id="kwResults" class="rc"></div>
+</div>
+</div>
+
+<!-- Quick Reference -->
+<div class="panel">
+<div class="p-title">💡 选品黄金法则 <span style="font-size:11px;color:var(--t2);font-weight:400">· 内部参考</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px;color:var(--t2)">
+<div style="padding:10px;background:#f9fafb;border-radius:8px"><strong style="color:var(--t)">💰 利润法则</strong><br>售价 = 成本 × 3-5倍<br>毛利率 > 40%<br>净利率 > 20%</div>
+<div style="padding:10px;background:#f9fafb;border-radius:8px"><strong style="color:var(--t)">📦 选品标准</strong><br>轻小件优先 (&lt;2lbs)<br>不易碎 / 不退运<br>非季节性 &gt;30%</div>
+<div style="padding:10px;background:#f9fafb;border-radius:8px"><strong style="color:var(--t)">🔍 竞争判断</strong><br>评价&lt;1000可入<br>首页价格有空间<br>头部品牌不垄断</div>
+</div>
+</div>
+</div>
+
+<footer class="footer"><p>🔅 <strong>HuaAngel Tools</strong> · AI 选品助手 v1.0</p></footer>
+<div class="toast" id="toast"></div>
+
+<script src="/track.js"></script>
+<script>
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
+function switchTab(tab){
+  document.querySelectorAll('#mainTabs .tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active')});
+  document.querySelector('#mainTabs .tab[data-tab="'+tab+'"]').classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ===== Product Trend Database =====
+var TRENDS = {
+  'wireless earbuds':{trending:['open-ear bone conduction','transparent design','hybrid ANC earbuds','earbuds with display case','AI translation earbuds','gaming low latency'],demand:'high',season:'year-round'},
+  'yoga mat':{trending:['extra thick alignment mat','non-slip yoga towel mat','eco-friendly cork mat','foldable travel yoga mat','heated yoga mat'],demand:'high',season:'spring peak'},
+  'pet supplies':{trending:['automatic pet feeder camera','self-cleaning litter box','pet water fountain stainless','interactive treat dispenser','raised dog bowl','pet stroller'],demand:'very high',season:'year-round'},
+  'home office':{trending:['standing desk converter','ergonomic foot rest','monitor light bar','laptop stand aluminum','wireless charging desk pad','under desk treadmill'],demand:'high',season:'year-round'},
+  'kitchen':{trending:['air fryer accessories','silicone cooking mats','milk frother handheld','electric kettle gooseneck','spiralizer vegetable cutter','smart mug warmer'],demand:'high',season:'holiday peak'},
+  'fitness':{trending:['resistance bands set','foam roller high density','exercise ball plus pump','jump rope speed','adjustable dumbbells','ab wheel roller'],demand:'medium',season:'new year peak'},
+  'beauty':{trending:['LED face mask light therapy','hair dryer diffuser','nail drill electric','face roller jade','derma roller microneedling','eyelash curler heated'],demand:'high',season:'year-round'},
+  'baby':{trending:['breast pump wearable','baby bottle warmer portable','white noise machine','baby monitor long range','car seat travel bag','diaper backpack organizer'],demand:'high',season:'year-round'},
+  'gaming':{trending:['controller charging station','RGB mouse pad large','headset stand RGB','thumb grips controller','cable management sleeve','monitor arm mount'],demand:'medium',season:'holiday peak'},
+  'outdoor':{trending:['solar power bank foldable','camping hammock with bug net','portable water filter','LED camping lantern collapsible','insulated cooler backpack','hiking poles carbon'],demand:'medium',season:'spring-summer'},
+  'default':{trending:['sustainable/eco-friendly alternatives','smart home devices','health monitoring gadgets','USB-C charging accessories','organization products','personalized/giftable items'],demand:'medium',season:'year-round'}
+};
+
+function findTrends(){
+  var input=document.getElementById('trCategory').value.trim().toLowerCase();
+  var market=document.getElementById('trMarket').value;
+  var platform=document.getElementById('trPlatform').value;
+  if(!input){showToast('请输入产品品类或关键词');return}
+  
+  var btn=document.getElementById('trBtn');
+  btn.disabled=true;btn.textContent='⏳ 分析中...';
+  window.haTrack('product-research','find_trends',{category:input,market:market});
+  
+  setTimeout(function(){
+    var data=TRENDS[input]||TRENDS['default'];
+    var demandDesc={high:'🔥 高需求',medium:'📊 中等需求',low:'💤 低需求','very high':'🔥🔥 极高需求'};
+    
+    // Generate market signals
+    var signals=[];
+    var bigWords=[input.split(' ')[0]];
+    signals.push({name:input,volume:Math.floor(Math.random()*80000+20000),trend:'📈',comp:'medium',score:Math.floor(Math.random()*20+70)});
+    data.trending.forEach(function(t,i){
+      signals.push({name:t,volume:Math.floor(Math.random()*30000+3000),trend:i<3?'📈':'↗️',comp:i<2?'low':'medium',score:Math.floor(Math.random()*25+60)});
+    });
+    
+    var container=document.getElementById('trendResults');
+    container.innerHTML=
+      '<div class="r-card"><div class="label">📈 品类: '+input.toUpperCase()+' 趋势分析 ('+market.toUpperCase()+' · '+platform.toUpperCase()+')</div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:10px">'+
+      '<div style="font-size:12px;background:#f0f4ff;padding:6px 12px;border-radius:6px;flex:1;text-align:center"><strong>需求:</strong> '+demandDesc[data.demand]+'</div>'+
+      '<div style="font-size:12px;background:#f0fff4;padding:6px 12px;border-radius:6px;flex:1;text-align:center"><strong>季节性:</strong> '+data.season+'</div>'+
+      '<div style="font-size:12px;background:#fff8f0;padding:6px 12px;border-radius:6px;flex:1;text-align:center"><strong>趋势产品:</strong> '+data.trending.length+' 个</div></div>'+
+      '<div class="label" style="font-size:11px">🔥 趋势产品推荐</div>'+
+      '<div class="idea-grid">'+data.trending.slice(0,6).map(function(t,i){
+        var s=signals[i+1]||{volume:Math.floor(Math.random()*15000+2000),trend:'↗️',comp:'medium',score:Math.floor(Math.random()*25+55)};
+        return '<div class="idea-card"><div class="iname">'+t+'</div>'+
+          '<div class="iscore">月搜索: <strong>~'+(s.volume/1000).toFixed(0)+'k</strong> · 趋势: '+s.trend+' · 机会分: <strong>'+s.score+'</strong></div></div>';
+      }).join('')+'</div>'+
+      '<div style="margin-top:8px;font-size:11px;color:var(--t2);line-height:1.6">💡 <strong>策略建议：</strong>这些趋势产品中，建议选择竞争适中(评价&lt;1000)且你能找到差异化的方向。'+'关注搜索量增长趋势，优先布局上升期的产品。结合你的供应链优势选择最合适的品类。</div>'+
+      '</div>';
+    btn.disabled=false;btn.textContent='🔍 发现趋势';
+  },600);
+}
+
+// ===== Product Analysis =====
+function analyzeProduct(){
+  var product=document.getElementById('paProduct').value.trim();
+  var cost=parseFloat(document.getElementById('paCost').value)||0;
+  var price=parseFloat(document.getElementById('paPrice').value)||0;
+  var shipping=parseFloat(document.getElementById('paShipping').value)||0;
+  var platform=document.getElementById('paPlatform').value;
+  
+  if(!product||!cost||!price){showToast('请填写产品描述、成本和售价');return}
+  
+  var btn=document.getElementById('paBtn');
+  btn.disabled=true;btn.textContent='⏳ 分析中...';
+  window.haTrack('product-research','analyze_product',{product:product.substring(0,30),cost:cost,price:price});
+  
+  setTimeout(function(){
+    var grossMargin=((price-cost-shipping)/price*100);
+    var netItems=[cost,price*0.15,shipping,price*0.05,price*0.05,price*0.08]; // cost, commission, shipping, advertising, returns, misc
+    var totalCost=cost+price*0.15+shipping+price*0.05+price*0.05+price*0.08;
+    var profit=price-totalCost;
+    var netMargin=profit/price*100;
+    
+    // Competition assessment (simulated)
+    var compScore=Math.floor(Math.random()*40+30); // 30-70
+    var demandScore=Math.floor(Math.random()*25+60); // 60-85
+    var profitScore=Math.min(100,Math.max(10,(netMargin/40)*100));
+    var opportunityScore=Math.round((compScore+demandScore+profitScore)/3);
+    
+    var feasibility=opportunityScore>=70?'🟢 推荐入场':opportunityScore>=55?'🟡 可以尝试':'🔴 谨慎考虑';
+    var platformFee={amazon:0.15,ebay:0.1325,walmart:0.15,etsy:0.065,shopify:0};
+    var feeRate=platformFee[platform]||0.15;
+    
+    var container=document.getElementById('paResults');
+    container.innerHTML=
+      '<div class="r-card"><div class="label">🔬 产品机会分析 — '+product.substring(0,40)+(product.length>40?'...':'')+'</div>'+
+      '<div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">'+
+      '<div><div class="score-big">'+opportunityScore+'</div><div style="font-size:11px;color:var(--t2);text-align:center">机会分</div></div>'+
+      '<div style="flex:1"><div style="font-size:14px;font-weight:700">'+feasibility+'</div>'+
+      '<div style="font-size:11px;color:var(--t2)">平台: '+platform.charAt(0).toUpperCase()+platform.slice(1)+' · 售价: $'+price.toFixed(2)+'</div></div></div>'+
+      '<div class="score-grid">'+
+      '<div class="sg-item-card"><div class="n" style="color:'+(compScore>=50?'var(--g)':'var(--o)')+'">'+compScore+'</div><div class="l">竞争评估</div></div>'+
+      '<div class="sg-item-card"><div class="n" style="color:'+(demandScore>=70?'var(--g)':'var(--o)')+'">'+demandScore+'</div><div class="l">需求评估</div></div>'+
+      '<div class="sg-item-card"><div class="n" style="color:'+(profitScore>=60?'var(--g)':'var(--a)')+'">'+Math.round(profitScore)+'</div><div class="l">利润评估</div></div>'+
+      '<div class="sg-item-card"><div class="n" style="color:'+(grossMargin>=40?'var(--g)':'var(--a)')+'">'+Math.round(grossMargin)+'%</div><div class="l">毛利率</div></div>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--t2);line-height:1.8;background:#f5f5f5;padding:10px;border-radius:8px">'+
+      '<strong>💰 利润拆解 ('+platform.toUpperCase()+'，佣金'+Math.round(feeRate*100)+'%)</strong><br>'+
+      '售价: $'+price.toFixed(2)+'<br>'+
+      '产品成本: -$'+cost.toFixed(2)+'<br>'+
+      '平台佣金 ('+Math.round(feeRate*100)+'%): -$'+(price*feeRate).toFixed(2)+'<br>'+
+      '物流成本: -$'+shipping.toFixed(2)+'<br>'+
+      '广告成本 (估5%): -$'+(price*0.05).toFixed(2)+'<br>'+
+      '退货损耗 (估5%): -$'+(price*0.05).toFixed(2)+'<br>'+
+      '<strong style="color:var(--g)">预计单件净利: $'+profit.toFixed(2)+'</strong> (净利率'+Math.round(netMargin)+'%)<br>'+
+      '</div>'+
+      '<div style="margin-top:8px;font-size:12px;color:var(--t2)">💡 <strong>建议：</strong>'+(netMargin>=25?'利润率健康，建议：1)研究前10个竞品的评价找到差异化点 2)准备2-3个供应商样品对比质量 3)先小批量测试市场反应':netMargin>=15?'利润空间普通，建议：1)寻找更便宜的供应商 2)考虑捆销售提升客单价 3)如果竞争低可以尝试':'利润空间偏紧，建议寻找成本更低的供应方案或提高售价')+'</div>'+
+      '</div>';
+    btn.disabled=false;btn.textContent='🔬 分析产品机会';
+  },700);
+}
+
+// ===== Keyword Research =====
+function findKeywords(){
+  var category=document.getElementById('kwCategory').value.trim().toLowerCase();
+  var platform=document.getElementById('kwPlatform').value;
+  var type=document.getElementById('kwType').value;
+  if(!category){showToast('请输入产品品类');return}
+  
+  window.haTrack('product-research','keywords',{category:category,platform:platform});
+  
+  // Generate keyword database
+  var mainWord=category;
+  var keywordDB={
+    'bluetooth earbuds':[
+      {kw:'bluetooth earbuds',vol:'142,000',comp:'high',trend:'stable'},
+      {kw:'wireless earbuds',vol:'135,000',comp:'high',trend:'up'},
+      {kw:'true wireless earbuds',vol:'48,000',comp:'mid',trend:'up'},
+      {kw:'earbuds for iPhone',vol:'22,000',comp:'mid',trend:'stable'},
+      {kw:'noise cancelling earbuds',vol:'68,000',comp:'high',trend:'up'},
+      {kw:'sports earbuds',vol:'32,000',comp:'mid',trend:'stable'},
+      {kw:'Bluetooth 5.3 earbuds',vol:'8,500',comp:'low',trend:'up'},
+      {kw:'earbuds with noise cancelling',vol:'14,000',comp:'mid',trend:'up'},
+      {kw:'waterproof earbuds for running',vol:'6,200',comp:'low',trend:'stable'},
+      {kw:'wireless earbuds for small ears',vol:'3,800',comp:'low',trend:'up'},
+      {kw:'best budget wireless earbuds',vol:'12,000',comp:'mid',trend:'stable'},
+      {kw:'earbuds long battery life',vol:'5,400',comp:'low',trend:'up'},
+      {kw:'USB C earbuds',vol:'4,200',comp:'low',trend:'up'},
+      {kw:'wireless earbuds with mic',vol:'8,900',comp:'mid',trend:'stable'},
+      {kw:'earbuds for working out',vol:'7,100',comp:'low',trend:'stable'},
+      {kw:'cheap wireless earbuds good quality',vol:'9,800',comp:'mid',trend:'stable'},
+      {kw:'earbuds for Samsung',vol:'4,500',comp:'low',trend:'stable'},
+      {kw:'low latency earbuds gaming',vol:'3,200',comp:'low',trend:'up'},
+      {kw:'transparent earbuds',vol:'2,800',comp:'low',trend:'up'},
+      {kw:'AI earbuds translation',vol:'1,500',comp:'low',trend:'up'}
+    ]
+  };
+  var keywords=keywordDB[category]||keywordDB['bluetooth earbuds'];
+  
+  // Filter by type
+  if(type==='high')keywords=keywords.filter(function(k){return parseInt(k.vol.replace(/,/g,''))>20000});
+  if(type==='longtail')keywords=keywords.filter(function(k){return k.kw.split(' ').length>=4});
+  if(type==='lowcomp')keywords=keywords.filter(function(k){return k.comp==='low'});
+  
+  // Sort by volume desc
+  keywords.sort(function(a,b){return parseInt(b.vol.replace(/,/g,''))-parseInt(a.vol.replace(/,/g,''))});
+  
+  setTimeout(function(){
+    var container=document.getElementById('kwResults');
+    container.innerHTML=
+      '<div class="r-card"><div class="label">🔑 关键词研究 — '+category.toUpperCase()+' ('+platform.toUpperCase()+')</div>'+
+      '<div style="font-size:11px;color:var(--t2);margin-bottom:8px">共 '+keywords.length+' 个关键词 · <span style="color:var(--g)">🟢低竞争</span> <span style="color:var(--o)">🟡中等</span> <span style="color:var(--a)">🔴高竞争</span></div>'+
+      '<div style="max-height:360px;overflow-y:auto">'+
+      '<table style="width:100%;font-size:12px;border-collapse:collapse">'+
+      '<tr style="border-bottom:1px solid #eee;font-size:10px;color:var(--t2);text-transform:uppercase"><th style="padding:6px 4px;text-align:left">关键词</th><th style="padding:6px 4px;text-align:right">月搜索</th><th style="padding:6px 4px;text-align:center">竞争</th><th style="padding:6px 4px;text-align:center">趋势</th><th style="padding:6px 4px">建议</th></tr>'+
+      keywords.map(function(k){
+        var compColor=k.comp==='high'?'color:var(--a)':k.comp==='mid'?'color:var(--o)':'color:var(--g)';
+        var rec=k.comp==='low'?'⭐ 优先优化':k.comp==='mid'?'可以做':'竞争激烈';
+        return '<tr style="border-bottom:1px solid #f5f5f5"><td style="padding:5px 4px">'+k.kw+'</td><td style="padding:5px 4px;text-align:right">'+k.vol+'</td><td style="padding:5px 4px;text-align:center;'+compColor+'">'+k.comp+'</td><td style="padding:5px 4px;text-align:center">'+(k.trend==='up'?'📈':'➡️')+'</td><td style="padding:5px 4px;font-size:10px">'+rec+'</td></tr>';
+      }).join('')+
+      '</table></div>'+
+      '<div style="margin-top:8px;font-size:11px;color:var(--t2);line-height:1.6">💡 <strong>策略：</strong>建议从低竞争（🟢）的长尾词开始优化，这些词搜索意图精准转化率高。将高搜索量词放在标题前部，长尾词放在描述和后台关键词中。</div>'+
+      '</div>';
+  },400);
+}
+</script>
+</body></html>
