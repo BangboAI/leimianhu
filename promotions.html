@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>营销活动管理 - HuaAngel Tools</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--t:#1a1a2e;--t2:#666;--p:#005bff;--ph:#0047cc;--a:#fe2c55;--g:#00a854;--o:#f59e0b;--purple:#7c3aed;--hdr:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--r:12px;--s:0 2px 8px rgba(0,0,0,0.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.nav{background:var(--hdr);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--hdr);padding:36px 24px 48px;text-align:center;color:#fff;border-radius:0 0 32px 32px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30%50%,rgba(96,165,250,0.1)0%,transparent 50%),radial-gradient(circle at 70%30%,rgba(254,44,85,0.06)0%,transparent 50%);pointer-events:none}
+.hero h1{font-size:26px;font-weight:800;margin-bottom:4px}
+.hero h1 span{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:13px;color:rgba(255,255,255,0.5);max-width:500px;margin:0 auto}
+.container{max-width:860px;margin:-16px auto 40px;padding:0 20px;position:relative;z-index:1}
+.panel{background:var(--card);border-radius:var(--r);padding:20px 22px;box-shadow:var(--s);margin-bottom:14px}
+.p-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tabs{display:flex;gap:0;margin-bottom:16px;background:#f0f0f0;border-radius:10px;padding:3px}
+.tab{flex:1;text-align:center;padding:9px 6px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--t2)}
+.tab:hover{color:var(--t)}
+.tab.active{background:#fff;color:var(--p);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tc{display:none}.tc.active{display:block}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:#444}
+.fg input,.fg textarea,.fg select{width:100%;padding:8px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:13px;outline:none;font-family:inherit}
+.fg input:focus,.fg select:focus{border-color:var(--p)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-block{width:100%;justify-content:center}
+.btn-p{background:var(--p);color:#fff}.btn-p:hover{background:var(--ph);box-shadow:0 4px 12px rgba(0,91,255,0.3)}
+.btn-s{background:#f0f0f0;color:#666;border:1px solid #ddd}
+.btn-s:hover{background:#e5e5e5}
+.btn-g{background:var(--g);color:#fff}.btn-g:hover{opacity:.9}
+.rc{margin-top:12px}
+.r-card{padding:14px 16px;background:#f9fafb;border-radius:10px;border:1px solid #eee;margin-bottom:8px}
+.r-card:hover{border-color:var(--p)}
+.r-card .label{font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.r-card .text{font-size:13px;line-height:1.6;color:var(--t)}
+.r-card .actions{margin-top:8px;display:flex;gap:6px}
+.r-card .actions button{padding:3px 10px;border-radius:6px;font-size:10px;cursor:pointer;border:1px solid #ddd;background:#fff}
+.r-card .actions button:hover{background:#f5f5f5;border-color:var(--p)}
+.cal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.cal-grid{grid-template-columns:1fr}}
+.cal-card{padding:14px;border-radius:10px;border:1px solid #eee;position:relative;transition:all .2s}
+.cal-card:hover{border-color:var(--p);box-shadow:var(--s)}
+.cal-card .plat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.cal-card .name{font-size:15px;font-weight:700;margin-bottom:2px}
+.cal-card .date{font-size:12px;color:var(--t2);margin-bottom:6px}
+.cal-card .countdown{font-size:13px;font-weight:700;color:var(--a)}
+.cal-card .countdown.ok{color:var(--g)}
+.cal-card .desc{font-size:11px;color:var(--t2);line-height:1.4;margin-top:4px}
+.cal-card .plat-amz{color:#ff9900}.cal-card .plat-ebay{color:#e53238}
+.cal-card .plat-wmt{color:#0071dc}.cal-card .plat-etsy{color:#f56400}
+.cal-card .plat-ali{color:#e62e04}.cal-card .plat-tk{color:#000}
+.cal-card .plat-shop{color:#96bf48}
+.footer{text-align:center;padding:32px 24px;color:var(--t2);font-size:13px;border-top:1px solid #e5e7eb}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head><body>
+
+<nav class="nav"><div class="nav-inner">
+<a href="/" class="nav-brand">🔅 <span>HuaAngel</span> Tools</a>
+<div class="nav-links">
+<a href="/">首页</a><a href="/ai-title-generator">AI 标题</a>
+<a href="/competitor-monitor">🎯 竞品</a><a href="/customer-service">💬 客服</a>
+<a href="/promotions" class="active">📅 营销</a>
+<a href="/dashboard">📊 看板</a><a href="/user">👤 用户</a>
+</div></div></nav>
+
+<section class="hero"><h1>营销活动 <span>管理</span></h1>
+<p>大促日历 · 效果分析 · 优惠策略 — 让每次促销都算得清 ROI</p></section>
+
+<div class="container">
+<div class="panel" style="padding:0">
+<div class="tabs" style="margin:0;border-radius:10px 10px 0 0">
+<div class="tab active" data-tab="calendar" onclick="switchTab('calendar')">📅 大促日历</div>
+<div class="tab" data-tab="analysis" onclick="switchTab('analysis')">📊 效果分析</div>
+<div class="tab" data-tab="strategy" onclick="switchTab('strategy')">🎯 优惠策略</div>
+</div>
+
+<!-- Calendar Tab -->
+<div class="tc active" id="tab-calendar" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">📅 跨境电商大促日历 <span style="font-size:11px;color:var(--t2);font-weight:400">· 自动倒计时 · 点击添加自定义提醒</span></div>
+<div class="cal-grid" id="calGrid"></div>
+<div style="margin-top:12px">
+<div class="fg" style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end">
+<div><label>自定义提醒</label><input type="text" id="customEvent" placeholder="事件名称"></div>
+<div><label>日期</label><input type="date" id="customDate"></div>
+<div><label>标签</label><input type="text" id="customTag" placeholder="如: 我的活动" value="我的"></div>
+<button class="btn btn-s" onclick="addCustomEvent()" style="height:36px">添加</button>
+</div>
+</div>
+</div>
+
+<!-- Analysis Tab -->
+<div class="tc" id="tab-analysis" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">📊 活动效果分析</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="fg"><label>产品名</label><input type="text" id="anProduct" placeholder="如: Wireless Earbuds"></div>
+<div class="fg"><label>活动类型</label><select id="anType"><option value="coupon">优惠券</option><option value="deal">秒杀/Deal</option><option value="sale">全场打折</option><option value="bundle">捆绑销售</option></select></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<div class="fg"><label>活动前日均销量</label><input type="number" id="anBeforeSales" placeholder="10" step="1"></div>
+<div class="fg"><label>活动中日均销量</label><input type="number" id="anDuringSales" placeholder="35" step="1"></div>
+<div class="fg"><label>活动后日均销量</label><input type="number" id="anAfterSales" placeholder="15" step="1"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<div class="fg"><label>产品单价 ($)</label><input type="number" id="anPrice" placeholder="39.99" step="0.01"></div>
+<div class="fg"><label>产品成本 ($)</label><input type="number" id="anCost" placeholder="15" step="0.01"></div>
+<div class="fg"><label>折扣力度 (%)</label><input type="number" id="anDiscount" placeholder="20" step="1"></div>
+</div>
+<div class="fg"><label>活动天数</label><input type="number" id="anDays" placeholder="3" value="3" step="1"></div>
+<button class="btn btn-p btn-block" onclick="runAnalysis()">📊 分析活动效果</button>
+<div id="analysisResults" class="rc"></div>
+</div>
+
+<!-- Strategy Tab -->
+<div class="tc" id="tab-strategy" style="padding:20px 22px">
+<div class="p-title" style="margin-bottom:8px">🎯 优惠策略推荐</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="fg"><label>产品成本 ($)</label><input type="number" id="stCost" placeholder="15" step="0.01"></div>
+<div class="fg"><label>当前售价 ($)</label><input type="number" id="stPrice" placeholder="39.99" step="0.01"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="fg"><label>目标平台</label><select id="stPlatform"><option value="amazon">Amazon</option><option value="ebay">eBay</option><option value="walmart">Walmart</option><option value="etsy">Etsy</option><option value="shopify">Shopify</option></select></div>
+<div class="fg"><label>竞品折扣</label><select id="stCompetitor"><option value="none">竞品未打折</option><option value="low">竞品打9折</option><option value="mid">竞品打8折</option><option value="high">竞品打7折</option><option value="veryhigh">竞品打6折</option></select></div>
+</div>
+<div class="fg"><label>促销目标</label>
+<select id="stGoal"><option value="profit">利润最大化</option><option value="volume">冲销量/清库存</option><option value="rank">冲排名/BSR</option><option value="launch">新品推广</option></select></div>
+<button class="btn btn-p btn-block" onclick="runStrategy()">🎯 生成优惠策略</button>
+<div id="strategyResults" class="rc"></div>
+</div>
+</div>
+</div>
+
+<footer class="footer"><p>🔅 <strong>HuaAngel Tools</strong> · 营销活动管理 v1.0</p></footer>
+<div class="toast" id="toast"></div>
+
+<script src="/track.js"></script>
+<script>
+var CUSTOM_EVENTS_KEY = 'ha_custom_events';
+
+// Promotion Database
+var PROMOS = [
+  // Amazon
+  {plat:'AMZ',name:'Amazon Prime Day',date:'07-15',desc:'年度最大促销，Prime会员专享。建议提前2个月备货，提前1个月优化Listing',platCls:'plat-amz'},
+  {plat:'AMZ',name:'Amazon Prime Big Deal Days',date:'10-08',desc:'Prime会员秋季促销，适合测试新品和清库存',platCls:'plat-amz'},
+  {plat:'AMZ',name:'Black Friday',date:'11-25',desc:'全年最大促销旺季，所有品类爆发期。广告预算翻3-5倍',platCls:'plat-amz'},
+  {plat:'AMZ',name:'Cyber Monday',date:'11-28',desc:'网络星期一，电子产品和高客单价品类爆发',platCls:'plat-amz'},
+  {plat:'AMZ',name:'Back to School',date:'08-01',desc:'开学季，文具/书包/电子产品刚需期',platCls:'plat-amz'},
+  {plat:'AMZ',name:'Holiday Season',date:'12-01',desc:'圣诞新年旺季，礼品类/家居类/装饰类高峰',platCls:'plat-amz'},
+  // eBay
+  {plat:'eBay',name:'eBay Summer Sale',date:'07-01',desc:'夏季促销，服装/户外/家居品类表现好',platCls:'plat-ebay'},
+  {plat:'eBay',name:'eBay Black Friday',date:'11-24',desc:'eBay黑五促销，与Amazon黑五同步',platCls:'plat-ebay'},
+  {plat:'eBay',name:'eBay Holiday Deals',date:'12-01',desc:'假日促销季，eBay各品类全面促销',platCls:'plat-ebay'},
+  // Walmart
+  {plat:'Walmart',name:'Walmart+ Weekend',date:'06-02',desc:'Walmart会员专属促销，对标Amazon Prime Day',platCls:'plat-wmt'},
+  {plat:'Walmart',name:'Walmart Black Friday',date:'11-23',desc:'Walmart黑五促销，低价策略竞争激烈',platCls:'plat-wmt'},
+  // Etsy
+  {plat:'Etsy',name:'Etsy Valentine's Day',date:'02-01',desc:'情人节季，手工礼品/定制产品需求高峰',platCls:'plat-etsy'},
+  {plat:'Etsy',name:'Etsy Cyber Week',date:'11-28',desc:'Etsy网络周，手工品/礼品卡热销',platCls:'plat-etsy'},
+  {plat:'Etsy',name:'Etsy Holiday Gift Season',date:'11-01',desc:'假日礼品季 — Etsy最繁忙的时期',platCls:'plat-etsy'},
+  // AliExpress
+  {plat:'AliExpress',name:'11.11 Global Shopping Festival',date:'11-11',desc:'全球双十一，AliExpress年度最大促销',platCls:'plat-ali'},
+  {plat:'AliExpress',name:'AliExpress Summer Sale',date:'06-15',desc:' AliExpress夏季促销，适合时装/配饰/消费电子',platCls:'plat-ali'},
+  {plat:'AliExpress',name:'AliExpress Black Friday',date:'11-25',desc:'AliExpress黑五促销，全球同步',platCls:'plat-ali'},
+  // TikTok Shop
+  {plat:'TikTok',name:'TikTok BFCM',date:'11-20',desc:'TikTok黑五网一促销，短视频+直播带货高峰期',platCls:'plat-tk'},
+  {plat:'TikTok',name:'TikTok Summer Campaign',date:'06-15',desc:'TikTok夏季营销季，年轻用户活跃度高峰',platCls:'plat-tk'},
+  // Shopify
+  {plat:'Shopify',name:'BFCM Weekend',date:'11-25',desc:'Shopify卖家最大的促销周末，独立站全面爆发',platCls:'plat-shop'},
+  {plat:'Shopify',name:'End of Year Sale',date:'12-26',desc:'年末清仓促销，适合清库存+冲年度业绩',platCls:'plat-shop'},
+  // Cross-platform
+  {plat:'通用',name:'Chinese New Year',date:'01-22',desc:'春节，跨境卖家需提前备货应对工厂放假（提前1-2月）',platCls:''},
+  {plat:'通用',name:'Mother's Day',date:'05-14',desc:'母亲节全球，礼品/家居/珠宝/个护品类黄金期',platCls:''}
+];
+
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.tc').forEach(function(t){t.classList.remove('active')});
+  document.querySelector('.tab[data-tab="'+tab+'"]').classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+function getCustomEvents(){try{return JSON.parse(localStorage.getItem(CUSTOM_EVENTS_KEY))||[]}catch(e){return[]}}
+function saveCustomEvents(ev){localStorage.setItem(CUSTOM_EVENTS_KEY,JSON.stringify(ev))}
+
+function addCustomEvent(){
+  var name=document.getElementById('customEvent').value.trim();var date=document.getElementById('customDate').value;
+  var tag=document.getElementById('customTag').value.trim()||'我的';
+  if(!name||!date){showToast('请填写事件名称和日期');return}
+  var ev=getCustomEvents();ev.push({plat:tag,name:name,date:date,desc:'自定义事件',platCls:'',isCustom:true});saveCustomEvents(ev);
+  document.getElementById('customEvent').value='';renderCalendar();showToast('✅ 已添加 '+name)
+}
+
+function parseDateMD(mdStr){return new Date(new Date().getFullYear(),parseInt(mdStr.split('-')[0])-1,parseInt(mdStr.split('-')[1]))}
+function parseDateYMD(ymdStr){var p=ymdStr.split('-');return new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]))}
+function daysUntil(d){return Math.ceil((d-new Date())/86400000)}
+
+function renderCalendar(){
+  var grid=document.getElementById('calGrid');
+  var now=new Date();var year=now.getFullYear();var today=new Date(year,now.getMonth(),now.getDate());
+  
+  var events=[];
+  PROMOS.forEach(function(p){events.push({name:p.name,dateStr:year+'-'+p.date,desc:p.desc,plat:p.plat,platCls:p.platCls})});
+  getCustomEvents().forEach(function(e){events.push({name:e.name,dateStr:e.date,desc:e.desc||'',plat:e.plat||'',platCls:e.platCls||'',isCustom:true})});
+  
+  // Sort by date
+  events.sort(function(a,b){var da=parseDateYMD(a.dateStr),db=parseDateYMD(b.dateStr);return da-db});
+  
+  grid.innerHTML=events.map(function(e){
+    var d=parseDateYMD(e.dateStr);var diff=daysUntil(d);
+    var countdown=diff<0?'已结束':diff===0?'🔥 今天！':diff<=7?'🔥 '+diff+'天后':diff<=30?'📅 '+diff+'天后':diff+'天后';
+    var cls=diff<0?'countdown':'countdown'+(diff<=7?'':' ok');
+    var tag=e.isCustom?'<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;background:#e8f0fe;color:var(--p);font-weight:600;margin-bottom:4px">📌 '+e.plat+'</span>':'<div class="plat '+e.platCls+'">'+e.plat+'</div>';
+    return '<div class="cal-card"><div>'+tag+'</div><div class="name">'+e.name+'</div><div class="date">'+d.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'})+'</div><div class="'+cls+'">'+countdown+'</div><div class="desc">'+e.desc+(e.isCustom?'':e.isCustom===undefined?'':'')+'</div></div>';
+  }).join('');
+  window.haTrack('promotions','view_calendar',{count:events.length});
+}
+
+// ===== Activity Analysis =====
+function runAnalysis(){
+  var name=document.getElementById('anProduct').value.trim()||'产品';
+  var before=parseFloat(document.getElementById('anBeforeSales').value)||0;
+  var during=parseFloat(document.getElementById('anDuringSales').value)||0;
+  var after=parseFloat(document.getElementById('anAfterSales').value)||0;
+  var price=parseFloat(document.getElementById('anPrice').value)||0;
+  var cost=parseFloat(document.getElementById('anCost').value)||0;
+  var discount=parseFloat(document.getElementById('anDiscount').value)||0;
+  var days=parseInt(document.getElementById('anDays').value)||3;
+  var type=document.getElementById('anType').value;
+  
+  if(!during||!price||!cost){showToast('请填写必填数据（活动中销量、单价、成本）');return}
+  
+  var discountedPrice=price*(1-discount/100);
+  var unitMargin=discountedPrice-cost;
+  var dailyRevenueDuring=during*discountedPrice*1;
+  var dailyProfitDuring=during*unitMargin*1;
+  
+  // Estimates
+  var naturalGrowth=0.1; // assumed 10% natural growth
+  var expectedWithoutPromo=before*(1+naturalGrowth);
+  var liftDuring=((during-expectedWithoutPromo)/expectedWithoutPromo*100);
+  var liftAfter=((after-before)/before*100);
+  
+  var incrementalRevenue=(during*discountedPrice - expectedWithoutPromo*price)*1;
+  var incrementalProfit=(during*unitMargin - expectedWithoutPromo*(price-cost))*1;
+  
+  // Total promotion cost (discount given up + cost of promotion)
+  var totalDiscountCost=(price-discountedPrice)*during;
+  var roi=totalDiscountCost>0?((incrementalRevenue-totalDiscountCost)/totalDiscountCost*100):0;
+  
+  var container=document.getElementById('analysisResults');
+  container.innerHTML=
+    '<div class="r-card"><div class="label">📊 '+name+' — 活动效果总结 ('+type+')</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">'+
+    '<div style="text-align:center;padding:8px;background:#f0f4ff;border-radius:8px"><div style="font-size:20px;font-weight:800;color:'+(liftDuring>0?'var(--g)':'var(--a)')+'">'+(liftDuring>0?'+':'')+liftDuring.toFixed(0)+'%</div><div style="font-size:11px;color:var(--t2)">活动期销量提升</div></div>'+
+    '<div style="text-align:center;padding:8px;background:#f0fff4;border-radius:8px"><div style="font-size:20px;font-weight:800;color:var(--g)">$'+incrementalRevenue.toFixed(0)+'</div><div style="font-size:11px;color:var(--t2)">增量收入</div></div>'+
+    '<div style="text-align:center;padding:8px;background:#fff8f0;border-radius:8px"><div style="font-size:20px;font-weight:800;color:var(--o)">'+(roi>0?'+':'')+roi.toFixed(0)+'%</div><div style="font-size:11px;color:var(--t2)">ROI</div></div></div>'+
+    '<div class="label" style="font-size:11px;margin-top:6px">💡 分析详情</div>'+
+    '<div style="font-size:12px;color:var(--t2);line-height:1.8">'+
+    '• 活动期总销量: <strong>'+(during*days)+'</strong> 件 (日均'+during+'件，活动前日均'+before+'件)'+
+    '<br>• 折扣后单价: <strong>$'+discountedPrice.toFixed(2)+'</strong> (原价$'+price.toFixed(2)+', 打'+(100-discount)+'折)'+
+    '<br>• 活动期毛利: <strong>$'+(dailyProfitDuring*days).toFixed(0)+'</strong> (单件毛利$'+unitMargin.toFixed(2)+')'+
+    '<br>• 活动后销量: 日均'+after+'件 (较活动前'+(liftAfter>=0?'提升+'+liftAfter.toFixed(0)+'%':'下降'+Math.abs(liftAfter).toFixed(0)+'%')+')'+
+    '<br><br><strong>建议：</strong>'+getAnalysisSuggestion(liftDuring,roi,incrementalProfit,name)+
+    '</div></div>';
+  window.haTrack('promotions','run_analysis',{name:name,discount:discount,roi:roi.toFixed(0)});
+}
+
+function getAnalysisSuggestion(lift,roi,profit,name){
+  if(roi>200&&lift>100)return '🎉 活动非常成功！建议下次加大投入，考虑增加预算和延长活动天数。总结成功经验复制到其他产品。';
+  if(roi>100&&lift>50)return '👍 活动效果不错！ROI良好，建议优化折扣力度寻找最佳平衡点。可考虑在相同平台上复用此策略。';
+  if(roi>0)return '📊 活动有效果但空间大。建议：1)提高折扣力度测试弹性 2)优化活动页面和广告创意 3)缩短活动周期制造紧迫感。';
+  return '⚠️ 活动ROI为负，需要重新评估。建议：1)减少折扣幅度 2)检查是否选对了目标产品 3)分析竞品同期活动策略。';
+}
+
+// ===== Coupon Strategy =====
+function runStrategy(){
+  var cost=parseFloat(document.getElementById('stCost').value)||0;
+  var price=parseFloat(document.getElementById('stPrice').value)||0;
+  var platform=document.getElementById('stPlatform').value;
+  var comp=document.getElementById('stCompetitor').value;
+  var goal=document.getElementById('stGoal').value;
+  
+  if(!cost||!price){showToast('请填写成本和售价');return}
+  
+  var margin=(price-cost)/price*100;
+  var strategies=[];
+  var compDescriptions={none:'竞品未打折',low:'竞品打9折',mid:'竞品打8折',high:'竞品打7折',veryhigh:'竞品打6折'};
+  
+  // Generate strategies based on goal and margin
+  if(goal==='profit'){
+    strategies.push({discount:'10%',finalPrice:(price*0.9).toFixed(2),margin:((price*0.9-cost)/(price*0.9)*100).toFixed(1)+'%',desc:'保守型 — 保持利润，适合利润率不高或品牌力强的产品',recommendation:'⭐ 推荐：利润最大化，不打折竞争'});
+    if(margin>30)strategies.push({discount:'20%',finalPrice:(price*0.8).toFixed(2),margin:((price*0.8-cost)/(price*0.8)*100).toFixed(1)+'%',desc:'平衡型 — 适当让利，在利润和销量间取平衡',recommendation:''});
+  }else if(goal==='volume'){
+    var d=comp==='high'?35:comp==='veryhigh'?40:25;
+    strategies.push({discount:d+'%',finalPrice:(price*(1-d/100)).toFixed(2),margin:((price*(1-d/100)-cost)/(price*(1-d/100))*100).toFixed(1)+'%',desc:'激进型 — 大幅让利冲销量，适合清库存或冲KPI',recommendation:'⭐ 短期冲量首选'});
+    strategies.push({discount:'30%',finalPrice:(price*0.7).toFixed(2),margin:((price*0.7-cost)/(price*0.7)*100).toFixed(1)+'%',desc:'中高折扣 — 与竞品拉开差距',recommendation:''});
+  }else if(goal==='rank'){
+    strategies.push({discount:'20%',finalPrice:(price*0.8).toFixed(2),margin:((price*0.8-cost)/(price*0.8)*100).toFixed(1)+'%',desc:'中等折扣 — 冲排名同时保持基本利润',recommendation:'⭐ 冲排名+保利润'});
+    strategies.push({discount:'30%',finalPrice:(price*0.7).toFixed(2),margin:((price*0.7-cost)/(price*0.7)*100).toFixed(1)+'%',desc:'高折扣 — 快速拉升排名和评价量',recommendation:'🔥 适合新品冲榜'});
+  }else if(goal==='launch'){
+    strategies.push({discount:'35%',finalPrice:(price*0.65).toFixed(2),margin:((price*0.65-cost)/(price*0.65)*100).toFixed(1)+'%',desc:'深度折扣 — 新品破零，快速积累评价和排名',recommendation:'🔥 新品启动最佳策略'});
+    strategies.push({discount:'25%',finalPrice:(price*0.75).toFixed(2),margin:((price*0.75-cost)/(price*0.75)*100).toFixed(1)+'%',desc:'中等折扣 — 新品推广，平衡利润和速度',recommendation:''});
+  }
+  
+  // Platform specific recommendations
+  var platformTips={
+    amazon:'建议配合PPC广告同步投放，利用促销标签提高点击率',
+    ebay:'eBay的Best Match算法对带促销标记的Listing有排名加成',
+    walmart:'Walmart用户对比价格敏感，折扣力度要比Amazon略高才有效',
+    etsy:'Etsy用户更看重独特性而非价格，适当折扣+强调手工/独特性',
+    shopify:'独立站建议用分层优惠（满减/满赠）替代直接打折，保护品牌调性'
+  };
+  
+  var container=document.getElementById('strategyResults');
+  container.innerHTML=
+    '<div class="r-card"><div class="label">🎯 优惠策略推荐</div>'+
+    '<div style="font-size:12px;color:var(--t2);margin-bottom:10px">当前利润率: <strong>'+margin.toFixed(1)+'%</strong> | 目标: '+{profit:'利润最大化',volume:'冲销量',rank:'冲排名',launch:'新品推广'}[goal]+' | 竞品: '+compDescriptions[comp]+' | 平台: '+platform.toUpperCase()+'</div>'+
+    strategies.map(function(s,i){
+      var bg=i===0?'#f0f4ff':'#f9fafb';
+      return '<div style="padding:10px;background:'+bg+';border-radius:8px;margin-bottom:6px;display:flex;align-items:center;gap:12px">'+
+        '<div style="text-align:center;min-width:60px"><div style="font-size:18px;font-weight:800;color:var(--a)">'+s.discount+'</div><div style="font-size:10px;color:var(--t2)">OFF</div></div>'+
+        '<div style="flex:1"><div style="font-weight:600">$'+s.finalPrice+' <span style="font-weight:400;color:var(--t2);font-size:12px">| 利润率 '+s.margin+'</span></div>'+
+        '<div style="font-size:11px;color:var(--t2)">'+s.desc+'</div></div>'+
+        (s.recommendation?'<div style="font-size:10px;font-weight:700;color:var(--p);background:#e8f0fe;padding:4px 8px;border-radius:6px;white-space:nowrap">'+s.recommendation+'</div>':'')+'</div>';
+    }).join('')+
+    '<div style="margin-top:10px;font-size:12px;color:var(--t2);line-height:1.6">💡 <strong>平台建议：</strong>'+platformTips[platform]+'</div>'+
+    '</div>';
+  window.haTrack('promotions','run_strategy',{platform:platform,goal:goal});
+}
+
+document.addEventListener('DOMContentLoaded',renderCalendar);
+</script>
+</body></html>
