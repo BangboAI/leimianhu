@@ -1,372 +1,69 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HuaAngel Tools - 璺ㄥ鐢靛晢宸ュ叿绠?/title>
+<title>My Tools - 工具集</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #f0f2f5;
-  --card-bg: #fff;
-  --text: #1a1a2e;
-  --text-secondary: #666;
-  --primary: #005bff;
-  --primary-hover: #0047cc;
-  --accent: #fe2c55;
-  --accent-hover: #e6244a;
-  --accent-green: #00a854;
-  --accent-orange: #f59e0b;
-  --accent-purple: #7c3aed;
-  --header-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  --shadow: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-hover: 0 8px 24px rgba(0,0,0,0.1);
-  --radius: 12px;
-  --radius-lg: 16px;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-/* ===== Navigation ===== */
-.nav {
-  background: var(--header-gradient);
-  padding: 0 24px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-}
-.nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 56px;
-}
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-}
-.nav-brand span { color: #60a5fa; }
-.nav-links { display: flex; gap: 4px; }
-.nav-links a {
-  color: rgba(255,255,255,0.75);
-  text-decoration: none;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-.nav-links a:hover, .nav-links a.active {
-  color: #fff;
-  background: rgba(255,255,255,0.12);
-}
-
-/* ===== Hero ===== */
-.hero {
-  background: var(--header-gradient);
-  padding: 64px 24px 80px;
-  text-align: center;
-  color: #fff;
-  border-radius: 0 0 32px 32px;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -50%; left: -50%;
-  width: 200%; height: 200%;
-  background: radial-gradient(circle at 30% 50%, rgba(96,165,250,0.1) 0%, transparent 50%),
-              radial-gradient(circle at 70% 30%, rgba(254,44,85,0.06) 0%, transparent 50%);
-  pointer-events: none;
-}
-.hero-badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 24px;
-  padding: 6px 16px;
-  font-size: 13px;
-  color: rgba(255,255,255,0.8);
-  margin-bottom: 20px;
-  backdrop-filter: blur(10px);
-}
-.hero-badge .dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  background: #22c55e;
-  border-radius: 50%;
-  margin-right: 6px;
-  animation: pulse 2s infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-.hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
-.hero h1 span { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.hero p { font-size: 16px; color: rgba(255,255,255,0.6); max-width: 500px; margin: 0 auto; line-height: 1.6; }
-
-/* ===== Container ===== */
-.container { max-width: 1000px; margin: -20px auto 40px; padding: 0 24px; position: relative; z-index: 1; }
-
-/* ===== Section ===== */
-.section-header { margin: 32px 0 16px; display: flex; align-items: center; gap: 10px; }
-.section-header h2 { font-size: 18px; font-weight: 700; }
-.section-header .count { font-size: 12px; color: var(--text-secondary); background: #e5e7eb; padding: 2px 8px; border-radius: 10px; }
-
-/* ===== Tool Cards ===== */
-.tools-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-
-.tool-card {
-  background: var(--card-bg);
-  border-radius: var(--radius-lg);
-  padding: 20px 24px;
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  cursor: pointer;
-  transition: all 0.25s;
-  text-decoration: none;
-  color: inherit;
-  border: 2px solid transparent;
-  position: relative;
-  overflow: hidden;
-}
-.tool-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
-  border-color: var(--primary);
-}
-.tool-card.featured:hover { border-color: var(--accent); }
-.tool-card .tool-icon {
-  font-size: 32px;
-  width: 56px; height: 56px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 14px;
-  flex-shrink: 0;
-}
-.tool-card .tool-info { flex: 1; min-width: 0; }
-.tool-card .tool-info h3 {
-  font-size: 15px; font-weight: 600; margin-bottom: 3px;
-  display: flex; align-items: center; gap: 6px;
-}
-.tool-card .tool-info p { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
-.tool-card .tool-arrow { font-size: 18px; color: #ccc; transition: all 0.2s; }
-.tool-card:hover .tool-arrow { color: var(--primary); transform: translateX(4px); }
-.tool-card.featured:hover .tool-arrow { color: var(--accent); }
-
-/* Badges */
-.badge {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.3px;
-}
-.badge-new { background: var(--accent); color: #fff; }
-.badge-hot { background: var(--accent-orange); color: #fff; }
-.badge-ai { background: var(--accent-purple); color: #fff; }
-
-/* Icon backgrounds */
-.icon-ozon { background: #e6f7ff; }
-.icon-tk { background: #fff5f7; }
-.icon-tools { background: #f0fdf4; }
-.icon-docs { background: #f5f3ff; }
-
-/* ===== Footer ===== */
-.footer {
-  text-align: center;
-  padding: 40px 24px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  border-top: 1px solid #e5e7eb;
-  margin-top: 20px;
-}
-.footer a { color: var(--primary); text-decoration: none; }
-.footer a:hover { text-decoration: underline; }
-
-/* ===== Stats ===== */
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 24px;
-}
-.stat { text-align: center; }
-.stat-num {
-  font-size: 28px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #60a5fa, #a78bfa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.stat-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .hero { padding: 48px 20px 64px; }
-  .hero h1 { font-size: 28px; }
-  .hero p { font-size: 14px; }
-  .container { padding: 0 16px; margin-top: -12px; }
-  .nav-links a { font-size: 13px; padding: 4px 10px; }
-  .stats { gap: 24px; }
-  .stat-num { font-size: 22px; }
-  .tool-card { padding: 16px 18px; gap: 14px; }
-  .tool-card .tool-icon { width: 48px; height: 48px; font-size: 26px; }
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 48px 20px; text-align: center; }
+.header h1 { font-size: 28px; font-weight: 700; }
+.header h1 span { color: #fe2c55; }
+.header p { opacity: 0.7; margin-top: 8px; font-size: 14px; }
+.container { max-width: 800px; margin: -20px auto 40px; padding: 0 20px; }
+.card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 20px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+.card .icon { font-size: 40px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: #fff5f7; border-radius: 14px; flex-shrink: 0; }
+.card .info h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.card .info p { font-size: 13px; color: #666; }
+.card .arrow { margin-left: auto; font-size: 20px; color: #ccc; }
+.new-badge { display: inline-block; font-size: 10px; background: #fe2c55; color: white; padding: 1px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+.tag-badge { display: inline-block; font-size: 10px; background: #3b82f6; color: white; padding: 1px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+.footer { text-align: center; padding: 20px; font-size: 12px; color: #999; }
 </style>
 </head>
 <body>
 
-<!-- Navigation -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-brand">馃洅 <span>HuaAngel</span> Tools</a>
-    <div class="nav-links">
-      <a href="/" class="active">棣栭〉</a>
-      <a href="/ozon-content-generator">OZON 鐢熸垚鍣?/a>
-      <a href="/ozon-price-calculator">浠锋牸璁＄畻鍣?/a>
-      <a href="/tiktok-script-generator">TK 鑴氭湰</a>
-      <a href="/unit-converter">鍗曚綅鎹㈢畻</a>
-      <a href="/etsy-calculator">Etsy 璁＄畻鍣?/a>
-    </div>
-  </div>
-</nav>
+<div class="header">
+  <h1>🧰 <span>My Tools</span></h1>
+  <p>选择工具开始使用 · 持续更新中</p>
+</div>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="hero-badge"><span class="dot"></span>鎸佺画鏇存柊涓?路 v2.0</div>
-  <h1>璺ㄥ鐢靛晢 <span>宸ュ叿绠?/span></h1>
-  <p>涓?OZON 鍗栧鎵撻€犵殑鏅鸿兘宸ヤ綔鍙扳€斺€斾粠瀹氫环鍒颁笂鏋讹紝浠庤剼鏈埌鍐呭锛屼竴绔欏紡鎼炲畾</p>
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-num">7</div>
-      <div class="stat-label">宸ュ叿</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">3</div>
-      <div class="stat-label">AI 椹卞姩</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">24/7</div>
-      <div class="stat-label">鍦ㄧ嚎鍙敤</div>
-    </div>
-  </div>
-</section>
-
-<!-- Tools -->
 <div class="container">
 
-  <!-- OZON 涓撳尯 -->
-  <div class="section-header">
-    <h2>馃洅 OZON 杩愯惀宸ュ叿</h2>
-    <span class="count">3</span>
-  </div>
-  <div class="tools-grid">
+  <a href="etsy-tag-generator.html" class="card">
+    <div class="icon" style="background:#fff5f7;">🏷️</div>
+    <div class="info">
+      <h3>Etsy 13 Tag 智能生成器 <span class="new-badge">NEW</span></h3>
+      <p>基于 Etsy 搜索算法 + 长尾关键词 + 竞品标签分析，生成 13 个无重复优化标签</p>
+    </div>
+    <div class="arrow">→</div>
+  </a>
 
-    <a href="/ozon-content-generator" class="tool-card featured">
-      <div class="tool-icon icon-tk">馃</div>
-      <div class="tool-info">
-        <h3>OZON 鍐呭鐢熸垚鍣?<span class="badge badge-new">NEW</span> <span class="badge badge-ai">AI</span></h3>
-        <p>杈撳叆浜у搧淇℃伅锛屼竴閿敓鎴愪縿璇爣棰?/ 鎻忚堪 / 鍏抽敭璇嶆爣绛?/p>
-      </div>
-      <div class="tool-arrow">鈫?/div>
-    </a>
+  <a href="tiktok-script-generator.html" class="card">
+    <div class="icon">🎬</div>
+    <div class="info">
+      <h3>TikTok 带货脚本生成器</h3>
+      <p>上传商品图片，一键生成带货脚本 + 视频标题</p>
+    </div>
+    <div class="arrow">→</div>
+  </a>
 
-    <a href="/ozon-price-calculator" class="tool-card">
-      <div class="tool-icon icon-ozon">馃М</div>
-      <div class="tool-info">
-        <h3>OZON 鍞环璁＄畻鍣?/h3>
-        <p>FBO 鍏ㄩ摼璺垚鏈垎瑙ｃ€佸埄娑︾巼瀹炴椂璁＄畻銆佺珵鍝佸畾浠峰弬鑰?/p>
-      </div>
-      <div class="tool-arrow">鈫?/div>
-    </a>
-
-  </div>
-
-  <!-- 鍐呭鍒涗綔 -->
-  <div class="section-header">
-    <h2>馃幀 鍐呭鍒涗綔宸ュ叿</h2>
-    <span class="count">2</span>
-  </div>
-  <div class="tools-grid">
-
-    <a href="/tiktok-script-generator" class="tool-card">
-      <div class="tool-icon icon-tk">馃幀</div>
-      <div class="tool-info">
-        <h3>TikTok 甯﹁揣鑴氭湰鐢熸垚鍣?<span class="badge badge-ai">AI</span></h3>
-        <p>涓婁紶鍟嗗搧鍥剧墖锛岃嚜鍔ㄧ敓鎴愬甫璐у彛鎾剼鏈?+ 瑙嗛鏍囬 + Hashtags</p>
-      </div>
-      <div class="tool-arrow">鈫?/div>
-    </a>
-
-  </div>
-
-    <!-- Etsy 涓撳尯 -->
-  <div class="section-header">
-    <h2>馃М Etsy 杩愯惀宸ュ叿</h2>
-    <span class="count">2</span>
-  </div>
-  <div class="tools-grid">
-
-    <a href="/etsy-tag-generator" class="tool-card featured">
-      <div class="tool-icon icon-tk">🏷️</div>
-      <div class="tool-info">
-        <h3>Etsy 13 Tag 智能生成器<span class="badge badge-new">NEW</span> <span class="badge badge-ai">AI</span></h3>
-        <p>基于 Etsy 搜索算法 + 长尾关键词分析 + 竞品标签分析，一键生成 13 个优化产品标签</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-
-    <a href="/etsy-calculator" class="tool-card featured">
-      <div class="tool-icon icon-ozon" style="background:#fef3ed">馃挵</div>
-      <div class="tool-info">
-        <h3>Etsy Fee & Profit 璁＄畻鍣?<span class="badge badge-new">NEW</span></h3>
-        <p>鍏ㄦ柟浣嶈垂鐢ㄥ垎瑙ｏ細浜ゆ槗璐?/ 鏀粯鎵嬬画璐?/ 杩愯垂鎵嬬画璐?/ Offsite Ads锛屽疄鏃惰绠楀噣鍒╂鼎涓庡缓璁敭浠?/p>
-      </div>
-      <div class="tool-arrow">鈫?/div>
-    </a>
-
-  </div>
-
-  <!-- 閫氱敤宸ュ叿 -->
-  <div class="section-header">
-    <h2>馃敡 閫氱敤宸ュ叿</h2>
-    <span class="count">2</span>
-  </div>
-  <div class="tools-grid">
-
-    <a href="/unit-converter" class="tool-card">
-      <div class="tool-icon icon-tools">馃搻</div>
-      <div class="tool-info">
-        <h3>鍗曚綅鎹㈢畻鍣?/h3>
-        <p>閲嶉噺 KG/LBS銆侀暱搴?CM/INCH銆佽揣甯?RMB鈫扷SD/RUB/JPY 瀹炴椂鎹㈢畻</p>
-      </div>
-      <div class="tool-arrow">鈫?/div>
-    </a>
-
-  </div>
+  <a href="ozon-price-calculator.html" class="card">
+    <div class="icon" style="background:#e6f7ff;">🧮</div>
+    <div class="info">
+      <h3>OZON 箱包售价计算器</h3>
+      <p>OZON 跨境/本土定价、FBO费用、利润率自动计算</p>
+    </div>
+    <div class="arrow">→</div>
+  </a>
 
 </div>
 
-<footer class="footer">
-  <p>馃洅 <strong>HuaAngel Tools</strong> 路 璺ㄥ鍗栧鐨勬晥鐜囧伐浣滃彴</p>
-  <p style="margin-top:4px"><a href="https://www.huaangel.com">www.huaangel.com</a></p>
-</footer>
+<div class="footer">
+  后续工具会陆续添加到这个网站
+</div>
 
 </body>
 </html>
-
