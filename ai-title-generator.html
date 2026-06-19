@@ -126,7 +126,12 @@
  .footer { text-align: center; padding: 32px 24px; color: var(--text2); font-size: 13px; border-top: 1px solid #e5e7eb; margin-top: 20px; }
  .footer a { color: var(--primary); text-decoration: none; }
  </style>
- </head>
+ 
++ <script>
++ // HuaAngel Tracking (shared)
++ window.haTrack = (function(){var k='ha_tracker';return function(t,a,d){try{var e=JSON.parse(localStorage.getItem(k))||[];e.push({t:t,a:a,d:d||{},ts:Date.now(),date:new Date().toISOString().slice(0,10)});if(e.length>5000)e=e.slice(-5000);localStorage.setItem(k,JSON.stringify(e))}catch(e){}}})();
++ window.haTrack('title-generator','view',{});</script>
++ </head>
  <body>
  
  <nav class="nav">
@@ -459,6 +464,7 @@
    
    const btn = $('genBtn');
    btn.classList.add('loading'); btn.disabled = true;
+    window.haTrack('title-generator','generate',{platforms:platforms.join(','),name:name});
    
    try {
      const provider = $('apiProvider').value;
@@ -592,6 +598,7 @@
  
  // ===== Copy & Regenerate =====
  function copyTitle(idx, platId) {
+    window.haTrack('title-generator','copy',{platform:platId});
    const title = state.results[platId]?.[idx];
    if (!title) return;
    navigator.clipboard.writeText(title.text).then(() => showToast('✅ 已复制到剪贴板')).catch(() => showToast('❌ 复制失败'));

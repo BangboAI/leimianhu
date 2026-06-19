@@ -1,0 +1,365 @@
+ <!DOCTYPE html>
+ <html lang="zh-CN">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>运营看板 - HuaAngel Tools</title>
+ <style>
+ :root { --bg:#f0f2f5; --card:#fff; --t:#1a1a2e; --t2:#666; --p:#005bff; --ph:#0047cc; --a:#fe2c55; --g:#00a854; --o:#f59e0b; --purple:#7c3aed; --hdr:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); --r:12px; --s:0 2px 8px rgba(0,0,0,0.06); }
+ * { box-sizing:border-box; margin:0; padding:0; }
+ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--t); min-height:100vh; }
+ .nav { background:var(--hdr); padding:0 24px; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.15); }
+ .nav-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:56px; }
+ .nav-brand { display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-size:18px; font-weight:700; }
+ .nav-brand span { color:#60a5fa; }
+ .nav-links { display:flex; gap:4px; flex-wrap:wrap; }
+ .nav-links a { color:rgba(255,255,255,0.75); text-decoration:none; padding:6px 14px; border-radius:8px; font-size:14px; transition:all .2s; }
+ .nav-links a:hover,.nav-links a.active { color:#fff; background:rgba(255,255,255,0.12); }
+ .hero { background:var(--hdr); padding:40px 24px 52px; text-align:center; color:#fff; border-radius:0 0 32px 32px; }
+ .hero h1 { font-size:28px; font-weight:800; margin-bottom:4px; }
+ .hero h1 span { background:linear-gradient(135deg,#60a5fa,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+ .hero p { font-size:14px; color:rgba(255,255,255,0.5); }
+ .container { max-width:1000px; margin:-16px auto 40px; padding:0 20px; position:relative; z-index:1; }
+
+ /* PIN Overlay */
+ .pin-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+ .pin-overlay.hidden { display:none; }
+ .pin-card { background:#fff; border-radius:20px; padding:36px; max-width:380px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+ .pin-card h2 { font-size:20px; margin-bottom:4px; }
+ .pin-card p { font-size:13px; color:var(--t2); margin-bottom:20px; }
+ .pin-input { width:100%; padding:12px 16px; font-size:24px; text-align:center; letter-spacing:8px; border:2px solid #e0e0e0; border-radius:12px; outline:none; margin-bottom:16px; font-weight:700; }
+ .pin-input:focus { border-color:var(--p); }
+ .pin-error { display:none; color:var(--a); font-size:13px; margin-bottom:8px; }
+ .pin-error.show { display:block; }
+ .pin-btn { width:100%; padding:12px; background:var(--p); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; }
+ .pin-btn:hover { background:var(--ph); }
+ .pin-hint { font-size:12px; color:#bbb; margin-top:12px; }
+ .pin-logout { font-size:12px; color:var(--p); cursor:pointer; margin-top:8px; display:inline-block; }
+
+ /* Dashboard Grid */
+ .dg { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+ @media(max-width:700px){ .dg{grid-template-columns:repeat(2,1fr)} }
+ .dc { background:var(--card); border-radius:var(--r); padding:16px 18px; box-shadow:var(--s); }
+ .dc-label { font-size:12px; color:var(--t2); margin-bottom:2px; }
+ .dc-val { font-size:28px; font-weight:800; }
+ .dc-val.g { color:var(--g); } .dc-val.b { color:var(--p); } .dc-val.o { color:var(--o); } .dc-val.r { color:var(--a); }
+ .dc-sub { font-size:11px; color:var(--t2); margin-top:2px; }
+
+ .panel { background:var(--card); border-radius:var(--r); padding:20px 24px; box-shadow:var(--s); margin-bottom:16px; }
+ .panel-title { font-size:15px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+
+ /* Tool Table */
+ .tt { width:100%; border-collapse:collapse; }
+ .tt th { text-align:left; font-size:11px; color:var(--t2); text-transform:uppercase; letter-spacing:0.5px; padding:8px 10px; border-bottom:1px solid #eee; font-weight:600; }
+ .tt td { padding:10px; font-size:13px; border-bottom:1px solid #f0f0f0; }
+ .tt tr:last-child td { border-bottom:none; }
+ .tt .bar-wrap { background:#f0f0f0; border-radius:4px; height:16px; overflow:hidden; }
+ .tt .bar { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--p),#4f46e5); transition:width .6s; }
+
+ /* Activity Timeline */
+ .tl { display:flex; flex-direction:column; gap:3px; }
+ .tl-item { display:flex; align-items:center; gap:10px; padding:6px 0; font-size:13px; border-bottom:1px solid #f5f5f5; }
+ .tl-date { font-size:11px; color:var(--t2); width:70px; flex-shrink:0; }
+ .tl-tool { font-weight:600; width:80px; flex-shrink:0; }
+ .tl-action { color:var(--t2); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+ /* User Section */
+ .us { display:flex; flex-wrap:wrap; gap:12px; }
+ .us-item { display:flex; align-items:center; gap:10px; padding:12px 16px; background:#f9fafb; border-radius:10px; flex:1; min-width:200px; }
+ .us-avatar { width:40px; height:40px; border-radius:50%; background:var(--p); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; flex-shrink:0; }
+ .us-info { flex:1; }
+ .us-name { font-size:14px; font-weight:600; }
+ .us-email { font-size:12px; color:var(--t2); }
+ .us-tooltip { font-size:11px; color:var(--g); }
+
+ /* Reset button */
+ .reset-btn { font-size:12px; color:var(--a); cursor:pointer; opacity:.5; }
+ .reset-btn:hover { opacity:1; }
+
+ .footer { text-align:center; padding:32px 24px; color:var(--t2); font-size:13px; border-top:1px solid #e5e7eb; }
+ .footer a { color:var(--p); text-decoration:none; }
+ </style>
+ </head>
+ <body>
+
+ <!-- PIN Overlay -->
+ <div class="pin-overlay" id="pinOverlay">
+   <div class="pin-card">
+     <div style="font-size:40px;margin-bottom:8px">🔒</div>
+     <h2>运营看板</h2>
+     <p>请输入管理密码查看使用统计</p>
+     <input type="password" class="pin-input" id="pinInput" maxlength="6" placeholder="••••••" autocomplete="off">
+     <div class="pin-error" id="pinError">密码错误，请重试</div>
+     <button class="pin-btn" onclick="unlock()">解锁</button>
+     <div class="pin-hint">默认密码：<strong>888888</strong></div>
+     <span class="pin-logout" onclick="logout()">退出登录</span>
+   </div>
+ </div>
+
+ <!-- Navigation -->
+ <nav class="nav">
+   <div class="nav-inner">
+     <a href="/" class="nav-brand">🔅 <span>HuaAngel</span> Tools</a>
+     <div class="nav-links">
+       <a href="/">首页</a>
+       <a href="/ai-title-generator" class="active">AI 标题</a>
+       <a href="/dashboard" class="active">📊 看板</a>
+     </div>
+   </div>
+ </nav>
+
+ <section class="hero">
+   <h1>📊 运营 <span>看板</span></h1>
+   <p>工具使用数据 · 用户行为分析 · 趋势统计</p>
+ </section>
+
+ <div class="container" id="dashboardContent">
+   <!-- Stats Cards -->
+   <div class="dg" id="statCards"></div>
+
+   <!-- User Profile -->
+   <div class="panel">
+     <div class="panel-title">👤 访客画像 <span style="font-size:11px;color:var(--t2);font-weight:400">· 基于当前浏览器</span></div>
+     <div class="us" id="userSection">
+       <div class="us-item">
+         <div class="us-avatar">?</div>
+         <div class="us-info">
+           <div class="us-name">访客</div>
+           <div class="us-email">未登录</div>
+         </div>
+       </div>
+       <div class="us-item" style="flex-direction:column;align-items:flex-start;gap:6px">
+         <div style="font-size:13px;font-weight:600">📝 填写你的信息</div>
+         <div style="display:flex;gap:6px;width:100%">
+           <input type="text" id="userName" placeholder="你的名字" style="flex:1;padding:6px 10px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px">
+           <input type="email" id="userEmail" placeholder="邮箱" style="flex:1;padding:6px 10px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px">
+           <button onclick="saveUserProfile()" style="padding:6px 14px;background:var(--p);color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:12px">保存</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- Tool Stats -->
+   <div class="panel">
+     <div class="panel-title">🔧 工具使用排行 <span id="toolCount" style="font-size:12px;color:var(--t2);font-weight:400"></span></div>
+     <table class="tt" id="toolTable">
+       <thead><tr><th>工具</th><th>使用次数</th><th>使用占比</th><th>最后使用</th><th>趋势</th></tr></thead>
+       <tbody id="toolBody"></tbody>
+     </table>
+   </div>
+
+   <!-- Activity Timeline -->
+   <div class="panel">
+     <div class="panel-title">🕐 最近活动 <span style="font-size:12px;color:var(--t2);font-weight:400">· 最新 20 条</span></div>
+     <div class="tl" id="activityTimeline"></div>
+   </div>
+
+   <!-- Settings -->
+   <div class="panel" style="text-align:center;padding:16px">
+     <span class="reset-btn" onclick="resetData()">🗑️ 清除所有本地数据</span>
+     <span style="margin:0 8px;color:#eee">|</span>
+     <span class="reset-btn" onclick="changePin()">🔑 修改管理密码</span>
+   </div>
+ </div>
+
+ <footer class="footer">
+   <p>🔅 <strong>HuaAngel Tools</strong> · 运营看板 v1.0</p>
+ </footer>
+
+ <script>
+ // ===== Tracking System =====
+ var STORAGE_KEY = 'ha_tracker';
+ var PIN_KEY = 'ha_pin';
+ var USER_KEY = 'ha_user';
+
+ function getEvents() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
+ function saveEvents(events) { localStorage.setItem(STORAGE_KEY, JSON.stringify(events)); }
+ function getPin() { return localStorage.getItem(PIN_KEY) || '888888'; }
+ function setPin(p) { localStorage.setItem(PIN_KEY, p); }
+
+ // Public tracking API - used by all tools
+ window.haTrack = function(tool, action, data) {
+   var events = getEvents();
+   events.push({
+     t: tool, a: action, d: data || {},
+     ts: Date.now(),
+     date: new Date().toISOString().slice(0,10),
+     hour: new Date().getHours()
+   });
+   if (events.length > 5000) events = events.slice(-5000);
+   saveEvents(events);
+ };
+
+ // Track page view automatically
+ window.haTrack('page', 'view', { url: window.location.pathname });
+
+ // ===== Dashboard =====
+ function unlock() {
+   var input = document.getElementById('pinInput');
+   if (input.value === getPin()) {
+     document.getElementById('pinOverlay').classList.add('hidden');
+     renderDashboard();
+     return;
+   }
+   document.getElementById('pinError').classList.add('show');
+   input.value = '';
+   setTimeout(function() { document.getElementById('pinError').classList.remove('show'); }, 2000);
+ }
+
+ function logout() {
+   document.getElementById('pinOverlay').classList.remove('hidden');
+   document.getElementById('pinInput').value = '';
+ }
+
+ function changePin() {
+   var newPin = prompt('请输入新的 6 位管理密码：', '');
+   if (newPin && newPin.length === 6) {
+     setPin(newPin);
+     alert('密码已修改');
+   } else if (newPin) {
+     alert('密码需要 6 位数字');
+   }
+ }
+
+ function saveUserProfile() {
+   var name = document.getElementById('userName').value.trim();
+   var email = document.getElementById('userEmail').value.trim();
+   if (name || email) {
+     localStorage.setItem(USER_KEY, JSON.stringify({ name: name, email: email }));
+     renderUserSection();
+     window.haTrack('dashboard', 'save_profile', { name: name, email: email });
+   }
+ }
+
+ function renderUserSection() {
+   var userData = localStorage.getItem(USER_KEY);
+   var user = userData ? JSON.parse(userData) : null;
+   var section = document.getElementById('userSection');
+   var initial = user && user.name ? user.name.charAt(0).toUpperCase() : '?';
+   section.innerHTML =
+     '<div class="us-item">' +
+       '<div class="us-avatar">' + initial + '</div>' +
+       '<div class="us-info">' +
+         '<div class="us-name">' + (user && user.name || '访客') + '</div>' +
+         '<div class="us-email">' + (user && user.email || '未设置邮箱') + '</div>' +
+       '</div>' +
+     '</div>' +
+     '<div class="us-item">' +
+       '<div style="font-size:13px;color:var(--g)">✅ 信息已保存</div>' +
+       '<div style="font-size:12px;color:var(--t2)">数据存储在当前浏览器</div>' +
+     '</div>';
+ }
+
+ function renderDashboard() {
+   var events = getEvents();
+   renderUserSection();
+   renderStatCards(events);
+   renderToolTable(events);
+   renderTimeline(events);
+ }
+
+ function renderStatCards(events) {
+   var total = events.length;
+   var toolEvents = events.filter(function(e) { return e.t !== 'page'; });
+   var toolUses = toolEvents.length;
+   var pages = events.filter(function(e) { return e.t === 'page'; });
+   var uniqueTools = [...new Set(toolEvents.map(function(e) { return e.t; }))];
+   var today = new Date().toISOString().slice(0,10);
+   var todayEvents = events.filter(function(e) { return e.date === today; });
+
+   var container = document.getElementById('statCards');
+   container.innerHTML =
+     '<div class="dc"><div class="dc-label">📊 总事件</div><div class="dc-val g">' + total + '</div><div class="dc-sub">累计记录</div></div>' +
+     '<div class="dc"><div class="dc-label">🔧 工具使用</div><div class="dc-val b">' + toolUses + '</div><div class="dc-sub">' + uniqueTools.length + ' 个工具</div></div>' +
+     '<div class="dc"><div class="dc-label">📱 页面访问</div><div class="dc-val o">' + pages.length + '</div><div class="dc-sub">' + pages.filter(function(e){return e.date===today;}).length + ' 次今天</div></div>' +
+     '<div class="dc"><div class="dc-label">📅 今日活跃</div><div class="dc-val r">' + todayEvents.length + '</div><div class="dc-sub">' + new Date().toLocaleDateString() + '</div></div>';
+ }
+
+ function renderToolTable(events) {
+   var toolEvents = events.filter(function(e) { return e.t !== 'page' && e.t !== 'dashboard'; });
+   var toolMap = {};
+   toolEvents.forEach(function(e) {
+     if (!toolMap[e.t]) toolMap[e.t] = { count: 0, last: 0 };
+     toolMap[e.t].count++;
+     if (e.ts > toolMap[e.t].last) toolMap[e.t].last = e.ts;
+   });
+   var toolList = Object.keys(toolMap).sort(function(a,b) { return toolMap[b].count - toolMap[a].count; });
+   var total = toolEvents.length;
+   var maxCount = toolList.length > 0 ? toolMap[toolList[0]].count : 0;
+
+   var TOOL_NAMES = { 'title-generator':'AI 标题生成器', 'tiktok-script':'TikTok 脚本', 'etsy-tag':'Etsy Tag', 'ozon-content':'OZON 内容', 'ozon-price':'OZON 价格', 'unit-converter':'单位换算', 'etsy-calc':'Etsy 计算' };
+
+   document.getElementById('toolCount').textContent = '· 共 ' + toolList.length + ' 个工具';
+   document.getElementById('toolBody').innerHTML = toolList.map(function(t) {
+     var info = toolMap[t];
+     var pct = total > 0 ? (info.count / total * 100).toFixed(1) : 0;
+     var barWidth = maxCount > 0 ? (info.count / maxCount * 100) : 0;
+     var lastUsed = new Date(info.last);
+     var daysAgo = Math.floor((Date.now() - info.last) / 86400000);
+     var lastStr = daysAgo === 0 ? '今天' : daysAgo === 1 ? '昨天' : daysAgo + '天前';
+     var trend = daysAgo <= 1 ? '🔥 活跃' : daysAgo <= 7 ? '✅ 正常' : '💤 低频';
+     var name = TOOL_NAMES[t] || t;
+     return '<tr><td><strong>' + name + '</strong></td><td>' + info.count + '</td><td><div class="bar-wrap"><div class="bar" style="width:' + barWidth + '%"></div></div><span style="font-size:11px;color:var(--t2)">' + pct + '%</span></td><td style="font-size:12px;color:var(--t2)">' + lastStr + '</td><td style="font-size:12px">' + trend + '</td></tr>';
+   }).join('');
+ }
+
+ function renderTimeline(events) {
+   var timeline = document.getElementById('activityTimeline');
+   var recent = events.slice(-20).reverse();
+   if (recent.length === 0) {
+     timeline.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb">暂无使用数据</div>';
+     return;
+   }
+   var TOOL_NAMES = { 'title-generator':'AI 标题', 'tiktok-script':'TikTok', 'etsy-tag':'Etsy Tag', 'ozon-content':'OZON', 'ozon-price':'OZON价', 'unit-converter':'换算', 'etsy-calc':'Etsy', 'page':'页面', 'dashboard':'看板' };
+   timeline.innerHTML = recent.map(function(e) {
+     var time = new Date(e.ts);
+     var timeStr = time.toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+     var toolName = TOOL_NAMES[e.t] || e.t;
+     var actionMap = { view:'访问', generate:'生成', copy:'复制', save:'保存', unlock:'解锁' };
+     var action = actionMap[e.a] || e.a;
+     return '<div class="tl-item"><span class="tl-date">' + timeStr + '</span><span class="tl-tool">' + toolName + '</span><span class="tl-action">' + action + '</span></div>';
+   }).join('');
+ }
+
+ function resetData() {
+   if (confirm('确定清除所有本地数据？这个操作不可恢复。')) {
+     localStorage.removeItem(STORAGE_KEY);
+     renderDashboard();
+   }
+ }
+
+ // Check if already unlocked (session)
+ document.addEventListener('DOMContentLoaded', function() {
+   document.getElementById('pinInput').addEventListener('keydown', function(e) {
+     if (e.key === 'Enter') unlock();
+   });
+   // Auto-unlock if already authenticated in this session
+   var pin = getPin();
+   if (sessionStorage.getItem('ha_auth') === '1') {
+     document.getElementById('pinOverlay').classList.add('hidden');
+     renderDashboard();
+   }
+   // Override unlock to set session
+   var origUnlock = window.unlock;
+   window.unlock = function() {
+     var input = document.getElementById('pinInput');
+     if (input.value === getPin()) {
+       document.getElementById('pinOverlay').classList.add('hidden');
+       sessionStorage.setItem('ha_auth', '1');
+       renderDashboard();
+       window.haTrack('dashboard', 'unlock', {});
+       return;
+     }
+     document.getElementById('pinError').classList.add('show');
+     input.value = '';
+     setTimeout(function() { document.getElementById('pinError').classList.remove('show'); }, 2000);
+   };
+   window.logout = function() {
+     sessionStorage.removeItem('ha_auth');
+     document.getElementById('pinOverlay').classList.remove('hidden');
+     document.getElementById('pinInput').value = '';
+   };
+ });
+ </script>
+ </body>
+ </html>
