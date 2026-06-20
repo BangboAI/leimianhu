@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex 电商运营 Skill 推荐集 · HuaAngel Tools</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f0f2f5;--card-bg:#fff;--text:#1a1a2e;--text-secondary:#666;--primary:#005bff;--primary-hover:#0047cc;--accent:#fe2c55;--accent-hover:#e6244a;--accent-green:#00a854;--accent-orange:#f59e0b;--accent-purple:#7c3aed;--header-gradient:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--shadow:0 2px 8px rgba(0,0,0,0.06);--shadow-hover:0 8px 24px rgba(0,0,0,0.1);--radius:12px;--radius-lg:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.nav{background:var(--header-gradient);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px}
+.nav-brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff;font-size:18px;font-weight:700;white-space:nowrap}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--header-gradient);padding:48px 24px 64px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 50%,rgba(96,165,250,0.1) 0%,transparent 50%),radial-gradient(circle at 70% 30%,rgba(254,44,85,0.06) 0%,transparent 50%);pointer-events:none}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:5px 16px;font-size:13px;margin-bottom:14px;position:relative;z-index:1}
+.hero-badge .dot{display:inline-block;width:6px;height:6px;background:#00a854;border-radius:50%;margin-right:6px;vertical-align:middle}
+.hero h1{font-size:clamp(26px,5vw,38px);font-weight:800;position:relative;z-index:1;line-height:1.2}
+.hero h1 span{background:linear-gradient(90deg,#60a5fa,#fe2c55);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:rgba(255,255,255,0.7);margin-top:10px;font-size:15px;position:relative;z-index:1;max-width:680px;margin-left:auto;margin-right:auto;line-height:1.5}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:28px;position:relative;z-index:1;flex-wrap:wrap}
+.stat{text-align:center}.stat-num{font-size:26px;font-weight:800;background:linear-gradient(90deg,#60a5fa,#fe2c55);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:12px;color:rgba(255,255,255,0.55);margin-top:3px}
+.content{max-width:1200px;margin:0 auto;padding:32px 24px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-top:8px;flex-wrap:wrap;gap:8px}
+.section-header h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+.section-header .count{background:#e2e8f0;border-radius:10px;padding:1px 10px;font-size:12px;color:var(--text-secondary)}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-bottom:32px}
+.skill-card{background:var(--card-bg);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);border:1px solid transparent;transition:all .2s;display:flex;flex-direction:column;gap:8px}
+.skill-card:hover{box-shadow:var(--shadow-hover);border-color:var(--primary)}
+.skill-card.highlight{border-left:3px solid var(--accent);background:linear-gradient(135deg,#fff5f7 0%,#fff 100%)}
+.skill-name{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.skill-tag{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;white-space:nowrap}
+.tag-must{background:#fee2e2;color:#be123c}
+.tag-recommend{background:#dbeafe;color:#1d4ed8}
+.tag-ai{background:#fce7f3;color:#be185d}
+.tag-free{background:#dcfce7;color:#15803d}
+.skill-desc{font-size:13px;color:var(--text-secondary);line-height:1.5}
+.skill-use{font-size:12px;color:var(--primary);line-height:1.5;padding:6px 10px;background:rgba(0,91,255,0.04);border-radius:8px;margin-top:2px}
+.skill-use strong{color:var(--primary)}
+.toc{background:var(--card-bg);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:28px;box-shadow:var(--shadow)}
+.toc h3{font-size:15px;font-weight:700;margin-bottom:10px}
+.toc-links{display:flex;flex-wrap:wrap;gap:8px}
+.toc-links a{font-size:13px;color:var(--primary);text-decoration:none;padding:5px 14px;border-radius:20px;border:1px solid rgba(0,91,255,0.2);transition:all .2s;background:rgba(0,91,255,0.03)}
+.toc-links a:hover{background:rgba(0,91,255,0.1);border-color:var(--primary)}
+.footer{text-align:center;padding:28px 24px;color:var(--text-secondary);font-size:13px;border-top:1px solid #e2e8f0;margin-top:24px}
+.footer a{color:var(--primary);text-decoration:none}
+.cat-desc{font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.5}
+@media(max-width:640px){.skills-grid{grid-template-columns:1fr}.hero{padding:36px 16px 48px}.content{padding:24px 16px}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">HuaAngel <span>Tools</span></a>
+    <div class="nav-links">
+      <a href="/">首页</a>
+      <a href="/video-studio">视频</a>
+      <a href="/dashboard">看板</a>
+      <a href="/etsy-tag-generator">Etsy</a>
+      <a href="/ozon-price-calculator">OZON</a>
+      <a href="/tiktok-script-generator">脚本</a>
+      <a href="/codex-skills.html" class="active">Codex Skill</a>
+      <a href="/pricing">定价</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span>精选整理 · 持续更新</div>
+  <h1>Codex 电商运营 <span>Skill 推荐集</span></h1>
+  <p>为跨境电商运营者精选的 Codex Skill 清单，覆盖选品、内容制作、数据分析、自动化运营全链路。均可在 GitHub 搜索 Skill 名称获取安装方式。</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">41</div><div class="stat-label">精选 Skill</div></div>
+    <div class="stat"><div class="stat-num">7</div><div class="stat-label">分类</div></div>
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label">电商专用</div></div>
+  </div>
+</section>
+
+<div class="content">
+
+  <!-- 锚点导航 -->
+  <div class="toc">
+    <h3>📋 快速跳转</h3>
+    <div class="toc-links">
+      <a href="#must">⭐ 电商运营核心</a>
+      <a href="#video">🎬 视频 & 内容</a>
+      <a href="#design">🎨 设计 & UI</a>
+      <a href="#automation">🤖 AI & 自动化</a>
+      <a href="#data">📊 数据 & 知识</a>
+      <a href="#dev">🔧 开发辅助</a>
+      <a href="#crossborder">🌍 跨境电商专用</a>
+    </div>
+  </div>
+
+  <!-- ① 电商运营核心推荐 -->
+  <div class="section-header" id="must">
+    <h2>⭐ 电商运营核心（必装推荐）</h2>
+    <span class="count">6</span>
+  </div>
+  <p class="cat-desc">以下 Skill 是电商运营者使用 Codex 的最高频工具，建议优先安装。</p>
+  <div class="skills-grid">
+    <div class="skill-card highlight">
+      <div class="skill-name">Skill Creator / Skill-Creator <span class="skill-tag tag-must">必装</span></div>
+      <div class="skill-desc">打造专属工作流，将重复操作封装成自定义 Skill，是构建个人效率体系的第一步。</div>
+      <div class="skill-use"><strong>电商场景：</strong>把"每周Listing优化流程"封装成 Skill，一键执行</div>
+    </div>
+    <div class="skill-card highlight">
+      <div class="skill-name">find-skills <span class="skill-tag tag-must">必装</span></div>
+      <div class="skill-desc">自动拆解关键词，在 GitHub 搜索优质 Skill 库，快速发现适合自己业务的工具。</div>
+      <div class="skill-use"><strong>电商场景：</strong>搜索"Amazon PPC"、"Listing optimizer"等关键词找专用工具</div>
+    </div>
+    <div class="skill-card highlight">
+      <div class="skill-name">Superpowers <span class="skill-tag tag-recommend">推荐</span></div>
+      <div class="skill-desc">将开发/运营流程转化为问答形式，小白也能操作的友好模式，降低使用门槛。</div>
+      <div class="skill-use"><strong>电商场景：</strong>让团队非技术人员也能用 Codex 检查广告数据异常</div>
+    </div>
+    <div class="skill-card highlight">
+      <div class="skill-name">Baoyu / baoyu-skills <span class="skill-tag tag-recommend">推荐</span></div>
+      <div class="skill-desc">自动分析文章/竞品结构，生成匹配的视觉内容，非常适合内容营销。</div>
+      <div class="skill-use"><strong>电商场景：</strong>分析竞品详情页结构，自动生成优化版的页面视觉建议</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Context Engineering <span class="skill-tag tag-ai">AI</span></div>
+      <div class="skill-desc">记忆管理，优化上下文窗口使用效率，避免会话过长导致模型拒绝响应。</div>
+      <div class="skill-use"><strong>电商场景：</strong>长时间分析多店铺数据时保持上下文不超限</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Planning with Files <span class="skill-tag tag-free">免费</span></div>
+      <div class="skill-desc">将任务进度保存到文件，支持跨会话继续工作，适合长周期运营规划。</div>
+      <div class="skill-use"><strong>电商场景：</strong>分步骤执行选品计划，每次会话接续上次的进度</div>
+    </div>
+  </div>
+
+  <!-- ② 视频 & 内容制作 -->
+  <div class="section-header" id="video">
+    <h2>🎬 视频 & 内容制作</h2>
+    <span class="count">7</span>
+  </div>
+  <p class="cat-desc">TikTok / Reels / YouTube Shorts 内容制作全流程，从脚本到成片一键搞定。</p>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-name">HyperFrames <span class="skill-tag tag-recommend">推荐</span></div>
+      <div class="skill-desc">自动生成带字幕视频，输入文案即可输出成品，适合批量制作短视频。</div>
+      <div class="skill-use"><strong>电商场景：</strong>批量生成 TikTok 商品展示视频，自动加字幕</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Remotion / Remotion Skills</div>
+      <div class="skill-desc">用代码（React）生成视频模板，可编程控制每一帧，适合制作品牌化视频。</div>
+      <div class="skill-use"><strong>电商场景：</strong>制作统一风格的每周新品预告视频模板</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Creative Production</div>
+      <div class="skill-desc">批量生成创意素材，一次输入多位输出，适合 A/B 测试素材制作。</div>
+      <div class="skill-use"><strong>电商场景：</strong>同一商品生成 10 版不同风格的广告素材</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">video-use</div>
+      <div class="skill-desc">视频处理工具，支持剪辑、格式转换、特效添加等常见视频操作。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">videocut-skills</div>
+      <div class="skill-desc">视频剪辑专用工具集，封装了常见剪辑操作的工作流。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">seedance2-skill</div>
+      <div class="skill-desc">AI 视频生成工具，支持文生视频、图生视频等能力。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Generative Media</div>
+      <div class="skill-desc">生成式媒体工具集，覆盖图片、视频、音频等多种媒体生成。</div>
+    </div>
+  </div>
+
+  <!-- ③ 设计 & UI -->
+  <div class="section-header" id="design">
+    <h2>🎨 设计 & UI</h2>
+    <span class="count">3</span>
+  </div>
+  <p class="cat-desc">从截图转设计稿、设计稿转代码，到专业配色方案，覆盖电商视觉设计全流程。</p>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-name">Product Design <span class="skill-tag tag-recommend">推荐</span></div>
+      <div class="skill-desc">截图秒变产品原型，上传竞品页面截图即可生成可编辑的设计稿。</div>
+      <div class="skill-use"><strong>电商场景：</strong>截图竞品 Listing 页面，快速生成改版原型</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Figma / Figma MCP</div>
+      <div class="skill-desc">设计稿转代码/前端，直接读取 Figma 文件并输出可用前端代码。</div>
+      <div class="skill-use"><strong>电商场景：</strong>设计师完成后直接生成落地页代码，减少沟通成本</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">UI-UX-PRO-MAX</div>
+      <div class="skill-desc">内置 50+ 专业设计风格和 90+ 行业配色方案，一键应用专业设计系统。</div>
+      <div class="skill-use"><strong>电商场景：</strong>快速为品牌独立站选择合适的视觉风格</div>
+    </div>
+  </div>
+
+  <!-- ④ AI & 自动化 -->
+  <div class="section-header" id="automation">
+    <h2>🤖 AI & 自动化</h2>
+    <span class="count">8</span>
+  </div>
+  <p class="cat-desc">浏览器自动化、桌面自动化、跨 App 操作，让重复运营动作全部自动执行。</p>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-name">Browser / Web自动化 <span class="skill-tag tag-recommend">推荐</span></div>
+      <div class="skill-desc">自动抓取和操作网页，可模拟人工操作浏览器，适合数据采集和自动操作。</div>
+      <div class="skill-use"><strong>电商场景：</strong>自动抓取竞品价格、自动填写广告报表</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Playwright</div>
+      <div class="skill-desc">微软出品的浏览器自动化框架，稳定性强，适合复杂网页自动化场景。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Browser Testing</div>
+      <div class="skill-desc">自动测试网站功能和兼容性，确保页面改动不影响购物体验。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Computer Use / Desktop Automation</div>
+      <div class="skill-desc">桌面级自动化操作，可控制电脑上的任意应用程序，不仅限于浏览器。</div>
+      <div class="skill-use"><strong>电商场景：</strong>自动操作 Seller Central 等桌面应用</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">gstack</div>
+      <div class="skill-desc">23 位工程专家团队，协助评估需求可行性和制定技术方案。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Vercel Agent Skills</div>
+      <div class="skill-desc">网页质检工具，自动发现页面问题并给出修复建议。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Frontend Design</div>
+      <div class="skill-desc">优化 UI 前端设计，AI 辅助审查和改进界面设计。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Composio</div>
+      <div class="skill-desc">跨 App 操作，打通 Salesforce、Slack、Google Sheets 等 SaaS 工具。</div>
+      <div class="skill-use"><strong>电商场景：</strong>广告数据自动同步到 Google Sheets</div>
+    </div>
+  </div>
+
+  <!-- ⑤ 数据 & 知识管理 -->
+  <div class="section-header" id="data">
+    <h2>📊 数据 & 知识管理</h2>
+    <span class="count">6</span>
+  </div>
+  <p class="cat-desc">知识库构建、数据分析、报告生成，让运营决策有数据支撑。</p>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-name">Presentations <span class="skill-tag tag-recommend">推荐</span></div>
+      <div class="skill-desc">一键生成专业 PPT，输入内容即可输出可编辑的演示文稿。</div>
+      <div class="skill-use"><strong>电商场景：</strong>每周运营数据汇报 PPT 自动生成</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">NotebookLM</div>
+      <div class="skill-desc">Google 出品的知识库构建工具，可上传文档并基于内容回答问题。</div>
+      <div class="skill-use"><strong>电商场景：</strong>上传所有选品报告，构建选品知识库</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Notion Skills</div>
+      <div class="skill-desc">Notion 集成，可直接读写 Notion 数据库，适合知识管理自动化。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">MiniMax Skills</div>
+      <div class="skill-desc">提供多种内容生成模板，覆盖常见运营内容需求。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">GitHub <span class="skill-tag tag-free">免费</span></div>
+      <div class="skill-desc">代码仓库管理神器，适合管理 Codex Skill 配置和运营脚本版本。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Context Engineering</div>
+      <div class="skill-desc">（见核心推荐）管理长上下文会话，避免 token 超限。</div>
+    </div>
+  </div>
+
+  <!-- ⑥ 开发辅助 -->
+  <div class="section-header" id="dev">
+    <h2>🔧 开发辅助</h2>
+    <span class="count">4</span>
+  </div>
+  <p class="cat-desc">适合有技术背景的运营者，或需要定制开发运营工具的场景。</p>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-name">Superpowers <span class="skill-tag tag-ai">AI</span></div>
+      <div class="skill-desc">（见核心推荐）代码检查，开发流程问答化。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">gstack</div>
+      <div class="skill-desc">（见 AI 自动化）23 位工程专家团队协作评估。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Vercel Agent Skills</div>
+      <div class="skill-desc">（见 AI 自动化）网页质检。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Planning with Files</div>
+      <div class="skill-desc">（见核心推荐）保存进度，支持跨会话工作。</div>
+    </div>
+  </div>
+
+  <!-- ⑦ 跨境电商专用 Skill -->
+  <div class="section-header" id="crossborder">
+    <h2>🌍 跨境电商垂直专用 Skill</h2>
+    <span class="count">10</span>
+  </div>
+  <p class="cat-desc">专为跨境电商场景开发的 Skill，覆盖选品、运营、广告、供应链全链路。<strong>注：以下 Skill 需在 GitHub 搜索确认可用性，部分可能需自行配置 API。</strong></p>
+  <div class="skills-grid">
+    <div class="skill-card highlight">
+      <div class="skill-name">Amazon选品Agent <span class="skill-tag tag-must">必装</span></div>
+      <div class="skill-desc">亚马逊选品分析，综合销量、竞争度、利润空间等维度给出选品建议。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Listing文案优化工具 <span class="skill-tag tag-must">必装</span></div>
+      <div class="skill-desc">基于 SEO 和转化率优化商品标题、五点描述、A+页面文案。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">广告投放数据分析</div>
+      <div class="skill-desc">SP/SB/SD 广告数据分析，ACOS/ROAS 优化建议，自动生成调整方案。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">买家评论洞察Agent</div>
+      <div class="skill-desc">分析买家评论，提取产品改进建议和常见客诉点，指导产品迭代。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">多语种Listing翻译工具</div>
+      <div class="skill-desc">支持英语/日语/德语/法语/西班牙语等多语言商品描述翻译，保持 SEO 关键词。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">Ozon平台自动化</div>
+      <div class="skill-desc">OZON 店铺自动化运营，覆盖上架、定价、库存同步等操作。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">沃尔玛店铺运营</div>
+      <div class="skill-desc">Walmart Marketplace 店铺管理自动化工具。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">TikTok Shop短视频工具</div>
+      <div class="skill-desc">TikTok Shop 内容制作与发布管理，适合短视频带货运营。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">供应链库存自动化</div>
+      <div class="skill-desc">库存管理自动化，支持多平台库存同步、补货提醒。</div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-name">LinkFox Agent</div>
+      <div class="skill-desc">LinkFox 平台集成工具，具体功能请参考 LinkFox 官方说明。</div>
+    </div>
+  </div>
+
+  <!-- 安装指南 -->
+  <div class="toc" style="margin-top:8px">
+    <h3>📦 如何安装这些 Skill？</h3>
+    <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;margin-top:10px">
+      <p><strong>方法一（推荐）：</strong>在 Codex 对话框中输入 <code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:12px">/skills</code> 或类似命令打开 Skill 管理面板，搜索 Skill 名称一键安装。</p>
+      <p style="margin-top:8px"><strong>方法二：</strong>访问 <a href="https://github.com" style="color:var(--primary)">GitHub.com</a>，搜索 Skill 名称（如 <code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:12px">HyperFrames codex skill</code>），按 README 配置到对应目录。</p>
+      <p style="margin-top:8px"><strong>方法三：</strong>使用 <code style="background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:12px">find-skills</code> Skill（已在上方推荐），让 Codex 自动帮你搜索和安装。</p>
+      <p style="margin-top:12px;color:var(--text);font-weight:500">💡 提示：优先安装「⭐ 电商运营核心」中的 6 个 Skill，再根据业务需求添加垂直专用 Skill。</p>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <p><strong>HuaAngel Tools</strong> · 跨境卖家的效率工作台</p>
+  <p style="margin-top:4px"><a href="https://www.huaangel.com">www.huaangel.com</a> · 数据来源：雷勉鹄分享整理</p>
+</footer>
+
+</body>
+</html>
