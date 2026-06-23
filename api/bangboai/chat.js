@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method === 'GET') {
-    return res.status(200).json({ status: 'ok', server: 'BANGBOAI' });
+    return res.status(200).json({ status: 'ok', server: 'BANGBOAI', message: 'Use POST method to chat' });
   }
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -21,7 +21,10 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(API_SERVER + '/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+      },
       body: JSON.stringify({ query }),
       signal: AbortSignal.timeout(60000)
     });
