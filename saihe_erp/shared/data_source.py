@@ -1,4 +1,4 @@
-"""
+﻿"""
 数据源模块 - SOAP API 客户端 + CSV 本地模式
 自动重试3次，API不可用时降级到CSV
 """
@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
-from urllib.request import Request, urlopen
+import requests
 from urllib.error import URLError
 
 from .config import Config, PROJECT_ROOT
@@ -71,38 +71,24 @@ class SaiheAPIClient(DataSource):
 <OrderCode>{order_code}</OrderCode>
 </orderRequest></GetOrders></soap:Body></soap:Envelope>"""
 
-    def _call(self, soap_body: str, retries: int = 3) -> str:
+    def _call(self, soap_body, retries=3):
         for attempt in range(retries):
             try:
-                req = Request(
-                    self.base_url,
-                    data=soap_body.encode("utf-8"),
-                    headers={
-                        "Content-Type": "text/xml; charset=utf-8",
-                        "SOAPAction": self.soap_action,
-                    },
-                )
-                with urlopen(req, timeout=60) as resp:
-                    return resp.read().decode("utf-8")
-            except URLError as e:
+                resp = requests.post(self.base_url, data=soap_body.encode("utf-8"),
+                    headers={"Content-Type":"text/xml; charset=utf-8","SOAPAction":self.soap_action},
+                    timeout=60, verify=False)
+                return resp.text
+            except requests.RequestException as e:
                 logger.warning(f"API调用第{attempt+1}次失败: {e}")
-                if attempt < retries - 1:
-                    time.sleep(2 ** attempt)
-                else:
-                    raise
+                if attempt < retries - 1: time.sleep(2 ** attempt)
+                else: raise
 
     def _parse_order_xml(self, xml_text: str) -> list[SaiheOrder]:
-        """从SOAP响应XML中解析订单"""
+        """从SOAP响应XML中解析订单（用正则直接解析，和JS版一致）"""
         orders = []
-        root = ET.fromstring(xml_text)
-        ns = {"s": "http://tempuri.org/"}
-        result = root.find(".//s:GetOrdersResult", ns)
-        if result is None or not result.text:
-            return orders
-
-        # 直接解析XML中的ApiOrderInfo节点
-        items_raw = re.findall(r"<ApiOrderInfo>(.*?)</ApiOrderInfo>", result.text, re.DOTALL)
-        for raw in items_raw:
+        # 直接从原始XML文本中提取ApiOrderInfo块
+        blocks = re.findall(r"<ApiOrderInfo>(.*?)</ApiOrderInfo>", xml_text, re.DOTALL)
+        for raw in blocks:
             tp = self._extract_tag(raw, "TotalPrice")
             total_price = float(tp) if tp else 0.0
             if total_price <= 0:
@@ -117,8 +103,8 @@ class SaiheAPIClient(DataSource):
             )
 
             # 解析子项
-            items_raw_list = re.findall(r"<ApiOrderList>(.*?)</ApiOrderList>", raw, re.DOTALL)
-            for i_raw in items_raw_list:
+            item_blocks = re.findall(r"<ApiOrderList>(.*?)</ApiOrderList>", raw, re.DOTALL)
+            for i_raw in item_blocks:
                 sku = self._extract_tag(i_raw, "SKU")
                 if not sku:
                     continue
@@ -176,7 +162,11 @@ class SaiheAPIClient(DataSource):
                     has_more = re.search(r"<IsSetOrders>true</IsSetOrders>", raw)
                     next_token_m = re.search(r"<NextToken>(\d+)</NextToken>", raw)
                     if has_more and next_token_m and orders:
-                        token = int(next_token_m.group(1))
+                        next_token_val = next_token_m.group(1)
+                        if next_token_val and int(next_token_val) > 0:
+                            token = int(next_token_val)
+                        else:
+                            break
                     else:
                         break
                     if len(orders) == 0:
@@ -322,3 +312,4 @@ logger = setup_logger("data_source")
 
 # Default platform types (instead of All=0 which often returns empty)
 DEFAULT_PLATFORMS = [1, 45, 104, 57, 122, 50]  # Amazon, Walmart, TikTok, Etsy, Ozon, Shopify
+import re
