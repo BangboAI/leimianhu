@@ -63,7 +63,7 @@ pre{background:#f5f5f5;padding:10px;border-radius:6px;font-size:11px;overflow:au
 <div class="fld"><label class="lbl">描述</label><textarea id="pd" rows="3"></textarea></div></div>
 <button class="btn btn-g" id="btnFill" style="padding:6px 16px;font-size:12px;width:auto">填入上方</button></div></div>
 <script>
-var API="https://gg16.irobotbox.com/Api/API_ProductInfoManage.asmx";
+var API="/api/saibe-proxy";
 function esc(s){if(!s)return "";return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 function st(msg,type,detail){
   var el=document.getElementById("st");el.className="st "+type;el.innerHTML=msg;el.style.display="block";
