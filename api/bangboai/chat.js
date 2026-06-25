@@ -63,7 +63,18 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { query } = req.body || {};
-if (query && (/^(日报|分析|库存|广告|爆款|预警|趋势|今日)/i.test(query))) return handleAnalysisQuery(query, res);
+if (query && (/^(日报|分析|库存|广告|爆款|预警|趋势|今日)/i.test(query))) {
+  const analysisResp = await fetch("https://www.huaangel.com/api/analysis/daily?action=daily");
+  const analysisData = await analysisResp.json();
+  var answer = '📊 **BANGBOAI 每日经营分析**\n';
+  answer += '📅 ' + analysisData.date + '\n\n';
+  analysisData.sections.forEach(function(s) {
+    answer += '**' + s.title + '**\n';
+    answer += s.data + '\n\n';
+  });
+  answer += '💡 *如需详细数据请回复具体关键词：库存 | 广告 | 爆款 | 预警*';
+  return res.status(200).json({ answer: answer });
+}
   if (!query) return res.status(400).json({ error: 'Missing query' });
 
   try {
