@@ -1,6 +1,4 @@
-// 赛盒ERP API Proxy - Vercel Serverless Function
-// Proxies SOAP requests to the 赛盒ERP API to avoid CORS issues
-
+// 赛盒ERP API Proxy
 export default async function handler(req, res) {
   const API = "https://gg16.irobotbox.com/Api/API_ProductInfoManage.asmx";
   
@@ -9,12 +7,29 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, SOAPAction');
   
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).end('Method not allowed');
+  if (req.method !== 'POST') return res.status(405).end();
+
+  // Read body - Vercel may or may not parse XML body
+  let body = '';
+  if (typeof req.body === 'string') {
+    body = req.body;
+  } else if (Buffer.isBuffer(req.body)) {
+    body = req.body.toString('utf-8');
+  } else if (typeof req.body === 'object' && req.body !== null) {
+    // Try to stringify - might be a parsed object
+    try { body = JSON.stringify(req.body); } catch(e) { body = String(req.body); }
+  } else {
+    // Read from request stream as fallback
+    body = await new Promise(function(resolve) {
+      var chunks = [];
+      req.on('data', function(chunk) { chunks.push(chunk); });
+      req.on('end', function() { resolve(Buffer.concat(chunks).toString('utf-8')); });
+    });
+  }
+
+  var soapAction = req.headers['soapaction'] || '';
 
   try {
-    const soapAction = req.headers['soapaction'] || '';
-    const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-    
     const resp = await fetch(API, {
       method: 'POST',
       headers: {
@@ -28,6 +43,7 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'text/xml; charset=utf-8');
     res.status(200).send(text);
   } catch (e) {
+    res.setHeader('Content-Type', 'application/json');
     res.status(200).json({ Status: 'BadRequest', Msg: 'Proxy error: ' + e.message });
   }
 }
