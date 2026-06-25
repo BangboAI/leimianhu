@@ -1,0 +1,14 @@
+config.json
+.env
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+data/
+reports/
+logs/
+daily_history/
+daily_exports/
+.DS_Store
+*.egg-info/
+.venv/
+venv/

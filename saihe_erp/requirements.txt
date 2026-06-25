@@ -1,0 +1,20 @@
+# 核心依赖
+requests>=2.31.0
+
+# 数据分析
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# 看板 (模块三)
+streamlit>=1.28.0
+plotly>=5.18.0
+
+# 广告分析图表 (模块四)
+matplotlib>=3.7.0
+numpy>=1.24.0
+
+# 配置加载（可选，用于 .env 文件）
+python-dotenv>=1.0.0
+
+# 安装命令:
+# pip install -r requirements.txt
