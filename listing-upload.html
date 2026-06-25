@@ -73,7 +73,7 @@ function st(msg,type,detail){
 document.getElementById("btnTest").onclick=function(){
   st("测试连接中...","l");
   fetch(API,{method:"POST",headers:{"Content-Type":"text/xml; charset=utf-8","SOAPAction":"http://tempuri.org/CheckUserLogin"},
-  body:'<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><CheckUserLogin xmlns="http://tempuri.org/"><request><CustomerID>1502</CustomerID><UserName>leimianhu@loeldeal.com</UserName><Password>LOELcase3322</Password></request></CheckUserLogin></soap:Body></soap:Envelope>'})
+  body:JSON.stringify({soap:'<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><CheckUserLogin xmlns="http://tempuri.org/"><request><CustomerID>1502</CustomerID><UserName>leimianhu@loeldeal.com</UserName><Password>LOELcase3322</Password></request></CheckUserLogin></soap:Body></soap:Envelope>',action:"http://tempuri.org/CheckUserLogin"})
   .then(function(r){return r.text()})
   .then(function(t){t.indexOf("OK")>=0?st("✅ 连接成功！用户已验证","s"):st("❌ 连接失败","e",t)})
   .catch(function(e){st("❌ 网络错误","e",e.message)})
