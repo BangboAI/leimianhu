@@ -63,7 +63,35 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { query } = req.body || {};
-if (query && (/^(日报|分析|库存|广告|爆款|预警|趋势|今日)/i.test(query))) {
+
+// Handle data import format: "import:sku,revenue,qty\nSKU001,29.99,5"
+if (query && query.startsWith('import:')) {
+  var lines = query.split('\n');
+  var orders = [];
+  for (var i = 1; i < lines.length; i++) {
+    var parts = lines[i].split(',');
+    if (parts.length >= 3) {
+      orders.push({ sku: parts[0].trim(), totalPrice: parseFloat(parts[1]) || 0, qty: parseInt(parts[2]) || 1 });
+    }
+  }
+  if (orders.length) {
+    fetch("https://www.huaangel.com/api/analysis/daily", {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ data: { orders: orders, importedAt: new Date().toISOString() } })
+    }).then(function(r){return r.json()}).then(function(d){
+      if (d.status === 'ok') {
+        var msg = '✅ 成功导入 ' + orders.length + ' 条订单数据\n输入「分析」查看结果';
+        return res.status(200).json({ answer: msg });
+      }
+    }).catch(function(){});
+    return res.status(200).json({ answer: '正在导入 ' + orders.length + ' 条数据...\n请输入「分析」查看结果' });
+  }
+}
+if (/^(\u5BFC\u5165|\u6570\u636E|import|data)/i.test(query)) {
+  return res.status(200).json({ answer: '请在聊天窗口中输入以下格式导入订单数据：\n\nimport:sku,revenue,qty\nSKU001,29.99,5\nSKU002,49.99,3\n\n每行一个商品，用逗号分隔。或输入「分析」查看结果' });
+}
+
+  if (query && (/^(日报|分析|库存|广告|爆款|预警|趋势|今日)/i.test(query))) {
   const analysisResp = await fetch("https://www.huaangel.com/api/analysis/daily?action=daily");
   const analysisData = await analysisResp.json();
   var answer = '📊 **BANGBOAI 每日经营分析**\n';
