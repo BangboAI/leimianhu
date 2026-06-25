@@ -1,610 +1,417 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HuaAngel Tools - 跨境电商工具集</title>
+<title>HuaAngel Tools - 跨境电商工具箱</title>
 <style>
-/* ===== Reset & Base ===== */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f5f7fb;
-  --card-bg:#ffffff;
-  --text:#1a1a2e;
-  --text-secondary:#6b7280;
-  --text-muted:#9ca3af;
-  --primary:#4f46e5;
-  --primary-light:#818cf8;
-  --primary-bg:rgba(79,70,229,0.08);
-  --accent:#f43f5e;
-  --accent-light:#fb7185;
-  --green:#10b981;
-  --orange:#f59e0b;
-  --purple:#7c3aed;
-  --header-gradient:linear-gradient(135deg,#0f172a 0%,#1e1b4b 40%,#312e81 100%);
-  --shadow:0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-  --shadow-md:0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
-  --shadow-lg:0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
-  --shadow-xl:0 20px 40px rgba(0,0,0,0.12);
-  --radius:14px;
-  --radius-lg:20px;
-  --transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f0f2f5;
+  --card-bg: #fff;
+  --text: #1a1a2e;
+  --text-secondary: #666;
+  --primary: #005bff;
+  --primary-hover: #0047cc;
+  --accent: #fe2c55;
+  --accent-hover: #e6244a;
+  --accent-green: #00a854;
+  --accent-orange: #f59e0b;
+  --accent-purple: #7c3aed;
+  --header-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-lg: 16px;
 }
-html{scroll-behavior:smooth}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
-a{transition:var(--transition)}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
 
 /* ===== Navigation ===== */
-.nav{
-  background:rgba(15,23,42,0.85);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  padding:0 24px;
-  position:sticky;top:0;z-index:100;
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  transition:var(--transition);
+.nav {
+  background: var(--header-gradient);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
 }
-.nav.scrolled{background:rgba(15,23,42,0.95);box-shadow:0 4px 20px rgba(0,0,0,0.15)}
-.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
-.nav-brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#fff;font-size:19px;font-weight:800;white-space:nowrap;letter-spacing:-0.3px}
-.nav-brand .logo-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--primary-light),var(--accent-light));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:900;box-shadow:0 2px 8px rgba(79,70,229,0.3)}
-.nav-brand span{background:linear-gradient(90deg,#a5b4fc,#f9a8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
-.nav-links::-webkit-scrollbar{display:none}
-.nav-links a{color:rgba(255,255,255,0.7);text-decoration:none;padding:7px 14px;border-radius:8px;font-size:13.5px;transition:var(--transition);white-space:nowrap;font-weight:500}
-.nav-links a:hover{color:#fff;background:rgba(255,255,255,0.1)}
-.nav-links a.active{color:#fff;background:rgba(79,70,229,0.35);box-shadow:0 0 12px rgba(79,70,229,0.2)}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+.nav-brand span { color: #60a5fa; }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+}
 
 /* ===== Hero ===== */
-.hero{
-  background:var(--header-gradient);
-  padding:72px 24px 80px;
-  text-align:center;color:#fff;
-  position:relative;overflow:hidden;
+.hero {
+  background: var(--header-gradient);
+  padding: 64px 24px 80px;
+  text-align: center;
+  color: #fff;
+  border-radius: 0 0 32px 32px;
+  position: relative;
+  overflow: hidden;
 }
-.hero::before{
-  content:"";position:absolute;inset:0;
-  background:
-    radial-gradient(circle at 20% 30%,rgba(99,102,241,0.15) 0%,transparent 50%),
-    radial-gradient(circle at 80% 70%,rgba(244,63,94,0.08) 0%,transparent 50%),
-    radial-gradient(circle at 50% 50%,rgba(139,92,246,0.06) 0%,transparent 60%);
-  pointer-events:none;
-  animation:heroGlow 8s ease-in-out infinite alternate;
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at 30% 50%, rgba(96,165,250,0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(254,44,85,0.06) 0%, transparent 50%);
+  pointer-events: none;
 }
-@keyframes heroGlow{
-  0%{opacity:0.6}
-  100%{opacity:1}
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 24px;
+  padding: 6px 16px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
 }
-.hero::after{
-  content:"";position:absolute;bottom:0;left:0;right:0;height:60px;
-  background:linear-gradient(to top,var(--bg),transparent);pointer-events:none;
+.hero-badge .dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: pulse 2s infinite;
 }
-.hero-inner{position:relative;z-index:1;max-width:720px;margin:0 auto}
-.hero-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
-  border-radius:999px;padding:5px 16px;font-size:12.5px;margin-bottom:20px;
-  color:rgba(255,255,255,0.8);backdrop-filter:blur(4px);
-}
-.hero-badge .pulse{width:7px;height:7px;background:#34d399;border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.4)}}
-.hero h1{font-size:clamp(28px,5.5vw,48px);font-weight:900;line-height:1.15;letter-spacing:-0.5px;margin-bottom:14px}
-.hero h1 span{
-  background:linear-gradient(135deg,#a5b4fc 0%,#f9a8d4 50%,#fdbb84 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-size:200% auto;animation:gradientShift 4s ease-in-out infinite;
-}
-@keyframes gradientShift{0%,100%{background-position:0% center}50%{background-position:100% center}}
-.hero p{color:rgba(255,255,255,0.65);font-size:15.5px;max-width:560px;margin:0 auto;line-height:1.65}
-.hero-stats{display:flex;justify-content:center;gap:48px;margin-top:36px;flex-wrap:wrap}
-.stat{text-align:center;position:relative}
-.stat::after{content:"";position:absolute;right:-24px;top:50%;transform:translateY(-50%);width:1px;height:30px;background:rgba(255,255,255,0.1)}
-.stat:last-child::after{display:none}
-.stat-num{font-size:28px;font-weight:900;background:linear-gradient(135deg,#a5b4fc,#f9a8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.stat-label{font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px;font-weight:500}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
+.hero h1 span { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 16px; color: rgba(255,255,255,0.6); max-width: 500px; margin: 0 auto; line-height: 1.6; }
 
-/* ===== Content ===== */
-.content{max-width:1200px;margin:0 auto;padding:0 24px 40px}
+/* ===== Container ===== */
+.container { max-width: 1000px; margin: -20px auto 40px; padding: 0 24px; position: relative; z-index: 1; }
 
-/* ===== CTA Banner ===== */
-.cta-banner{
-  background:linear-gradient(135deg,#eef2ff 0%,#faf5ff 50%,#fef3f2 100%);
-  border-radius:var(--radius-lg);
-  padding:28px 32px;
-  margin:36px 0;
-  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
-  border:1px solid rgba(79,70,229,0.1);
-  position:relative;overflow:hidden;
-  transition:var(--transition);
-}
-.cta-banner:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px)}
-.cta-banner::before{
-  content:"";position:absolute;top:-50%;right:-20%;
-  width:300px;height:300px;border-radius:50%;
-  background:radial-gradient(circle,rgba(79,70,229,0.06) 0%,transparent 70%);
-  pointer-events:none;
-}
-.cta-icon{font-size:40px;flex-shrink:0;width:56px;height:56px;
-  background:linear-gradient(135deg,var(--primary),var(--purple));
-  border-radius:16px;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 12px rgba(79,70,229,0.25);
-}
-.cta-text{flex:1;min-width:200px}
-.cta-text h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
-.cta-text p{font-size:13px;color:var(--text-secondary);line-height:1.5}
-.cta-btn{
-  background:linear-gradient(135deg,var(--primary),var(--purple));
-  color:#fff;padding:10px 22px;border-radius:10px;
-  text-decoration:none;font-size:13.5px;font-weight:600;
-  white-space:nowrap;flex-shrink:0;
-  box-shadow:0 4px 12px rgba(79,70,229,0.3);
-  transition:var(--transition);
-  position:relative;z-index:1;
-}
-.cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(79,70,229,0.4)}
+/* ===== Section ===== */
+.section-header { margin: 32px 0 16px; display: flex; align-items: center; gap: 10px; }
+.section-header h2 { font-size: 18px; font-weight: 700; }
+.section-header .count { font-size: 12px; color: var(--text-secondary); background: #e5e7eb; padding: 2px 8px; border-radius: 10px; }
 
-/* ===== Section Headers ===== */
-.section-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin:44px 0 18px;padding-top:4px;flex-wrap:wrap;gap:10px;
-}
-.section-header h2{font-size:20px;font-weight:800;display:flex;align-items:center;gap:10px;letter-spacing:-0.2px}
-.section-header .count{
-  background:var(--primary-bg);color:var(--primary);
-  border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;
-}
+/* ===== Tool Cards ===== */
+.tools-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
-/* ===== Tools Grid ===== */
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:12px}
-
-/* ===== Tool Card ===== */
-.tool-card{
-  background:var(--card-bg);
-  border-radius:var(--radius);
-  padding:22px 24px 20px;
-  box-shadow:var(--shadow);
-  text-decoration:none;color:var(--text);
-  border:1px solid rgba(0,0,0,0.04);
-  transition:var(--transition);
-  display:flex;flex-direction:column;
-  position:relative;overflow:hidden;
+.tool-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-decoration: none;
+  color: inherit;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
 }
-.tool-card::before{
-  content:"";position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--primary),var(--accent));
-  opacity:0;transition:var(--transition);
+.tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--primary);
 }
-.tool-card:hover{
-  box-shadow:var(--shadow-lg);
-  border-color:rgba(79,70,229,0.15);
-  transform:translateY(-3px);
+.tool-card.featured:hover { border-color: var(--accent); }
+.tool-card .tool-icon {
+  font-size: 32px;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 14px;
+  flex-shrink: 0;
 }
-.tool-card:hover::before{opacity:1}
-.tool-card:active{transform:translateY(-1px)}
-
-.tool-card.featured{
-  border-left:3px solid var(--accent);
-  background:linear-gradient(135deg,#fff5f7 0%,#fff 60%,#fefce8 100%);
+.tool-card .tool-info { flex: 1; min-width: 0; }
+.tool-card .tool-info h3 {
+  font-size: 15px; font-weight: 600; margin-bottom: 3px;
+  display: flex; align-items: center; gap: 6px;
 }
-
-/* Icon */
-.tool-icon{
-  width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;margin-bottom:14px;flex-shrink:0;
-  transition:var(--transition);
-  position:relative;
-}
-.tool-card:hover .tool-icon{transform:scale(1.08)}
-/* Different icon bg colors applied via inline style */
-
-.tool-info{flex:1;display:flex;flex-direction:column;gap:6px}
-.tool-card h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.3}
-.tool-card p{font-size:13px;color:var(--text-secondary);line-height:1.55;flex:1}
+.tool-card .tool-info p { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+.tool-card .tool-arrow { font-size: 18px; color: #ccc; transition: all 0.2s; }
+.tool-card:hover .tool-arrow { color: var(--primary); transform: translateX(4px); }
+.tool-card.featured:hover .tool-arrow { color: var(--accent); }
 
 /* Badges */
-.badge{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:700;letter-spacing:0.3px;flex-shrink:0}
-.badge-new{background:#dbeafe;color:#1d4ed8}
-.badge-ai{background:linear-gradient(135deg,#fce7f3,#fdf2f8);color:#be185d;border:1px solid rgba(190,24,93,0.1)}
-.badge-hot{background:linear-gradient(135deg,#fee2e2,#fff1f2);color:#be123c;border:1px solid rgba(190,18,60,0.1)}
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+.badge-new { background: var(--accent); color: #fff; }
+.badge-hot { background: var(--accent-orange); color: #fff; }
+.badge-ai { background: var(--accent-purple); color: #fff; }
 
-/* Arrow */
-.tool-arrow{text-align:right;margin-top:12px;color:#d1d5db;font-size:18px;transition:var(--transition)}
-.tool-card:hover .tool-arrow{color:var(--primary);transform:translateX(3px)}
+/* Icon backgrounds */
+.icon-ozon { background: #e6f7ff; }
+.icon-tk { background: #fff5f7; }
+.icon-tools { background: #f0fdf4; }
+.icon-docs { background: #f5f3ff; }
 
 /* ===== Footer ===== */
-.footer{
-  background:linear-gradient(135deg,#0f172a,#1e1b4b);
-  color:rgba(255,255,255,0.6);padding:48px 24px 32px;margin-top:60px;
+.footer {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 20px;
 }
-.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px}
-.footer-col h4{color:#fff;font-size:14px;font-weight:700;margin-bottom:14px}
-.footer-col a{display:block;color:rgba(255,255,255,0.5);text-decoration:none;font-size:13px;padding:4px 0;transition:var(--transition)}
-.footer-col a:hover{color:#a5b4fc}
-.footer-bottom{
-  max-width:1200px;margin:32px auto 0;padding-top:20px;
-  border-top:1px solid rgba(255,255,255,0.08);
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
-  font-size:12.5px;color:rgba(255,255,255,0.35);
-}
-.footer-brand{display:flex;align-items:center;gap:6px;font-weight:700;color:rgba(255,255,255,0.7);font-size:14px}
+.footer a { color: var(--primary); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
 
-/* ===== Back to Top ===== */
-.back-top{
-  position:fixed;bottom:24px;right:24px;z-index:90;
-  width:44px;height:44px;border-radius:12px;
-  background:var(--primary);color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;text-decoration:none;
-  box-shadow:0 4px 12px rgba(79,70,229,0.35);
-  opacity:0;pointer-events:none;transition:var(--transition);
-  border:none;cursor:pointer;
+/* ===== Stats ===== */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 24px;
 }
-.back-top.show{opacity:1;pointer-events:auto}
-.back-top:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(79,70,229,0.45)}
+.stat { text-align: center; }
+.stat-num {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.stat-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 
 /* ===== Responsive ===== */
-@media(max-width:768px){
-  .hero{padding:48px 16px 60px}
-  .hero-stats{gap:28px}
-  .stat::after{display:none}
-  .content{padding:0 16px 32px}
-  .tools-grid{grid-template-columns:1fr}
-  .cta-banner{padding:20px 20px;gap:14px}
-  .cta-icon{width:44px;height:44px;font-size:32px;border-radius:12px}
-  .nav-links a{padding:6px 10px;font-size:12.5px}
-  .footer-inner{grid-template-columns:1fr 1fr;gap:24px}
+@media (max-width: 768px) {
+  .hero { padding: 48px 20px 64px; }
+  .hero h1 { font-size: 28px; }
+  .hero p { font-size: 14px; }
+  .container { padding: 0 16px; margin-top: -12px; }
+  .nav-links a { font-size: 13px; padding: 4px 10px; }
+  .stats { gap: 24px; }
+  .stat-num { font-size: 22px; }
+  .tool-card { padding: 16px 18px; gap: 14px; }
+  .tool-card .tool-icon { width: 48px; height: 48px; font-size: 26px; }
 }
-@media(max-width:480px){
-  .footer-inner{grid-template-columns:1fr}
-}
-
-/* ===== Animations ===== */
-@keyframes fadeInUp{
-  from{opacity:0;transform:translateY(16px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.animate-in{animation:fadeInUp 0.5s ease-out both}
 </style>
+<script src="/track.js"></script>
 </head>
 <body>
 
 <!-- Navigation -->
-<nav class="nav" id="nav">
+<nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-brand">
-      <div class="logo-icon">H</div>
-      HuaAngel <span>Tools</span>
-    </a>
+    <a href="/" class="nav-brand">🛒 <span>HuaAngel</span> Tools</a>
     <div class="nav-links">
       <a href="/" class="active">首页</a>
-      <a href="/video-studio">视频</a>
-      <a href="/dashboard">看板</a>
-      <a href="/etsy-tag-generator">Etsy</a>
-      <a href="/ozon-price-calculator">OZON</a>
-      <a href="/tiktok-script-generator">脚本</a>
-      <a href="/codex-skills.html">Codex Skill</a>
-      <a href="/pricing">定价</a>
+      <a href="/ozon-content-generator">OZON 生成器</a>
+      <a href="/ozon-price-calculator">价格计算器</a>
+      <a href="/tiktok-script-generator">TK 脚本</a>
+      <a href="/unit-converter">单位换算</a>
+      <a href="/etsy-tag-generator">Etsy Tag</a>
+      <a href="/etsy-calculator">Etsy 计算器</a>
+      <a href="/dashboard">📊 看板</a><a href="/listing-upload">📤 赛盒上传</a>
+      <a href="/user">👤 用户</a>
+      <a href="/pricing">💎 定价</a>
+      <a href="/competitor-monitor">🎯 竞品</a>
+      <a href="/customer-service">💬 客服</a>
+      <a href="/promotions">📅 营销</a>
+      <a href="/product-research">🔍 选品</a>
     </div>
   </div>
 </nav>
 
 <!-- Hero -->
 <section class="hero">
-  <div class="hero-inner">
-    <div class="hero-badge"><span class="pulse"></span>持续更新中 · v2.0</div>
-    <h1>跨境电商<br><span>智能工具集</span></h1>
-    <p>为跨境卖家打造的智能工作台——从定价到上架，从脚本到内容，一站式搞定</p>
-    <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-num">15</div>
-        <div class="stat-label">实用工具</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">7</div>
-        <div class="stat-label">AI 驱动</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">24/7</div>
-        <div class="stat-label">在线可用</div>
+  <div class="hero-badge"><span class="dot"></span>持续更新中 · v2.0</div>
+  <h1>跨境电商 <span>工具箱</span></h1>
+  <p>为跨境电商卖家打造的智能工作台——从标题到内容，从定价到脚本，一站式搞定</p>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">8</div>
+      <div class="stat-label">工具</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-label">AI 驱动</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">在线可用</div>
+    </div>
+  </div></section>
+
+<!-- Featured: AI Title Generator -->
+<style>
+.s-wrap { max-width:1000px; margin:-12px auto 0; padding:0 24px; position:relative; z-index:2; }
+.s-card { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); border-radius:16px; padding:32px 36px; color:#fff; position:relative; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.15); }
+.s-card::before { content:''; position:absolute; top:-50%;left:-50%;width:200%;height:200%; background:radial-gradient(circle at 30% 50%, rgba(96,165,250,0.08) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(254,44,85,0.05) 0%, transparent 50%); pointer-events:none; }
+.s-badge { display:inline-flex;align-items:center;gap:6px; background:rgba(254,44,85,0.15); border:1px solid rgba(254,44,85,0.25); border-radius:20px; padding:4px 14px; font-size:12px;font-weight:700; margin-bottom:16px; color:#fe2c55; position:relative;z-index:1; }
+.s-badge .d { width:6px;height:6px;background:#fe2c55;border-radius:50%;animation:pulse 2s infinite;display:inline-block; }
+.s-body { display:flex;align-items:flex-start;gap:24px; position:relative;z-index:1; }
+.s-ico { font-size:44px; width:64px;height:64px; display:flex;align-items:center;justify-content:center; background:rgba(255,255,255,0.08); border-radius:16px; flex-shrink:0; }
+.s-body h2 { font-size:22px;font-weight:800;margin-bottom:6px; }
+.s-desc { font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:14px;max-width:620px; }
+.s-tags { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px; }
+.s-tags span { display:inline-block;padding:3px 10px;background:rgba(255,255,255,0.08);border-radius:6px;font-size:11px;font-weight:500;color:rgba(255,255,255,0.7); }
+.s-btn { display:inline-flex;align-items:center;gap:6px;padding:10px 28px; background:linear-gradient(135deg,#005bff,#4f46e5); color:#fff;text-decoration:none; border-radius:10px;font-size:15px;font-weight:700; transition:all .25s; }
+.s-btn:hover { transform:translateY(-2px); box-shadow:0 4px 20px rgba(0,91,255,0.4); }
+@media(max-width:768px){ .s-wrap{padding:0 16px;margin-top:-8px} .s-card{padding:24px 20px} .s-body{flex-direction:column;gap:14px} .s-ico{width:48px;height:48px;font-size:32px} .s-body h2{font-size:18px} }
+</style>
+<div class="s-wrap">
+  <div class="s-card">
+    <div class="s-badge"><span class="d"></span> 全新上线 · AI 驱动</div>
+    <div class="s-body">
+      <div class="s-ico">🤖</div>
+      <div>
+        <h2>AI 跨平台标题生成器</h2>
+        <p class="s-desc">基于 9 大电商平台搜索算法（Amazon A10 · eBay Cassini · Walmart · Etsy LQS · TikTok Shop · OZON · 美客多 · 速卖通 · Shopify）+ 关键词研究引擎，一键生成高转化、不堆砌、平台合规的商品标题。</p>
+        <div class="s-tags"><span>Amazon</span><span>eBay</span><span>Walmart</span><span>Etsy</span><span>速卖通</span><span>TikTok Shop</span><span>OZON</span><span>美客多</span><span>Shopify</span></div>
+        <a href="/ai-title-generator" class="s-btn">立即使用 →</a>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<div class="content">
 
-  <!-- CTA Banner -->
-  <div class="cta-banner animate-in">
-    <div class="cta-icon">🤖</div>
-    <div class="cta-text">
-      <h3>Codex 电商运营 Skill 推荐集</h3>
-      <p>精选 41 个 Codex Skill，覆盖选品、内容制作、数据分析、自动化运营全链路，供电商运营者参考。</p>
-    </div>
-    <a href="/codex-skills.html" class="cta-btn">查看推荐 →</a>
-  </div>
+<!-- Tools -->
+<div class="container">
 
-  <!-- 视频创作 -->
+  <!-- OZON 专区 -->
   <div class="section-header">
-    <h2>🎬 视频创作</h2>
-    <span class="count">2</span>
+    <h2>🛒 OZON 运营工具</h2>
+    <span class="count">3</span>
   </div>
   <div class="tools-grid">
-    <a href="/video-studio" class="tool-card featured">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">🎬</div>
-      <div class="tool-info">
-        <h3>视频创作工作台 <span class="badge badge-new">NEW</span> <span class="badge badge-ai">AI</span></h3>
-        <p>视频复刻 · 脚本生成 · 选品分析 · 爆款趋势 · ClipCat 灵感</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-    <a href="/tiktok-script-generator" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">📝</div>
-      <div class="tool-info">
-        <h3>TikTok 带货脚本生成器 <span class="badge badge-ai">AI</span></h3>
-        <p>上传商品信息，自动生成带货口播脚本 + 视频标题 + Hashtags</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-  </div>
 
-  <!-- OZON 运营 -->
-  <div class="section-header">
-    <h2>🛍️ OZON 运营</h2>
-    <span class="count">2</span>
-  </div>
-  <div class="tools-grid">
-    <a href="/ozon-content-generator" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#e0e7ff,#c7d2fe)">📝</div>
+    <a href="/ozon-content-generator" class="tool-card featured">
+      <div class="tool-icon icon-tk">🤖</div>
       <div class="tool-info">
-        <h3>OZON 内容生成器 <span class="badge badge-ai">AI</span></h3>
+        <h3>OZON 内容生成器 <span class="badge badge-new">NEW</span> <span class="badge badge-ai">AI</span></h3>
         <p>输入产品信息，一键生成俄语标题 / 描述 / 关键词标签</p>
       </div>
       <div class="tool-arrow">→</div>
     </a>
+
     <a href="/ozon-price-calculator" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">🧮</div>
+      <div class="tool-icon icon-ozon">🧮</div>
       <div class="tool-info">
         <h3>OZON 售价计算器</h3>
         <p>FBO 全链路成本分解、利润率实时计算、竞品定价参考</p>
       </div>
       <div class="tool-arrow">→</div>
     </a>
+
   </div>
 
-  <!-- Etsy 运营 -->
+  <!-- 内容创作 -->
   <div class="section-header">
-    <h2>🎀 Etsy 运营</h2>
+    <h2>🎬 内容创作工具</h2>
     <span class="count">2</span>
   </div>
   <div class="tools-grid">
-    <a href="/etsy-tag-generator" class="tool-card featured">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">🏷️</div>
+
+    <a href="/tiktok-script-generator" class="tool-card">
+      <div class="tool-icon icon-tk">🎬</div>
+      <div class="tool-info">
+        <h3>TikTok 带货脚本生成器 <span class="badge badge-ai">AI</span></h3>
+        <p>上传商品图片，自动生成带货口播脚本 + 视频标题 + Hashtags</p>
+      </div>
+      <div class="tool-arrow">→</div>
+    </a>
+
+  </div>
+
+    <!-- Etsy 专区 -->
+  <div class="section-header">
+    <h2>🧮 Etsy 运营工具</h2>
+    <span class="count">2</span>
+  </div>
+  <div class="tools-grid">
+
+        <a href="/etsy-tag-generator" class="tool-card featured">
+      <div class="tool-icon icon-ozon" style="background:#fef3ed">🏷️</div>
       <div class="tool-info">
         <h3>Etsy 13 Tag 智能生成器 <span class="badge badge-new">NEW</span> <span class="badge badge-ai">AI</span></h3>
         <p>基于 Etsy 搜索算法 + 长尾关键词分析 + 竞品标签分析，一键生成 13 个优化产品标签</p>
       </div>
       <div class="tool-arrow">→</div>
     </a>
-    <a href="/etsy-calculator" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0)">💰</div>
+
+    <a href="/etsy-calculator" class="tool-card featured">
+      <div class="tool-icon icon-ozon" style="background:#fef3ed">💰</div>
       <div class="tool-info">
         <h3>Etsy Fee & Profit 计算器 <span class="badge badge-new">NEW</span></h3>
-        <p>全方位费用分解：交易费 / 支付手续费 / 运费 / Offsite Ads，实时计算净利润与建议售价</p>
+        <p>全方位费用分解：交易费 / 支付手续费 / 运费手续费 / Offsite Ads，实时计算净利润与建议售价</p>
       </div>
       <div class="tool-arrow">→</div>
     </a>
-  </div>
 
-  <!-- AI 工具 -->
-  <div class="section-header">
-    <h2>🤖 AI 工具</h2>
-    <span class="count">3</span>
-  </div>
-  <div class="tools-grid">
-    <a href="/ai-title-generator" class="tool-card featured">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe)">🤖</div>
-      <div class="tool-info">
-        <h3>AI 标题生成器 <span class="badge badge-ai">AI</span></h3>
-        <p>智能生成高转化标题，支持多语言、多平台适配</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-    <a href="/product-research" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe)">🧠</div>
-      <div class="tool-info">
-        <h3>AI 产品研究助手 <span class="badge badge-ai">AI</span></h3>
-        <p>市场洞察 · 竞品分析 · 趋势预测 · 选品建议</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-    <a href="/customer-service" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd)">💬</div>
-      <div class="tool-info">
-        <h3>AI 客户服务 <span class="badge badge-ai">AI</span></h3>
-        <p>智能客服 · 自动回复 · 多语言支持 · 7×24 在线</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-  </div>
-
-  <!-- 数据与营销 -->
-  <div class="section-header">
-    <h2>📊 数据与营销</h2>
-    <span class="count">3</span>
-  </div>
-  <div class="tools-grid">
-    <a href="/dashboard" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">📊</div>
-      <div class="tool-info">
-        <h3>数据看板</h3>
-        <p>核心指标总览 · 趋势图表 · 数据可视化</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-    <a href="/competitor-monitor" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#e0e7ff,#c7d2fe)">🔍</div>
-      <div class="tool-info">
-        <h3>竞品监控</h3>
-        <p>追踪竞品动态 · 分析对手策略 · 发现市场机会</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-    <a href="/promotions" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">📅</div>
-      <div class="tool-info">
-        <h3>营销活动管理</h3>
-        <p>活动日历 · 效果分析 · 策略优化 · 自动化运营</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-  </div>
-
-  <!-- 账号与定价 -->
-  <div class="section-header">
-    <h2>👤 账号与定价</h2>
-    <span class="count">2</span>
-  </div>
-  <div class="tools-grid">
-    <a href="/pricing" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#f3e8ff,#e9d5ff)">💳</div>
-      <div class="tool-info">
-        <h3>定价方案</h3>
-        <p>套餐对比 · 功能说明 · 升级指南</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
-    <a href="/user" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#f3e8ff,#e9d5ff)">👤</div>
-      <div class="tool-info">
-        <h3>用户管理</h3>
-        <p>个人信息 · 账号设置 · 使用记录</p>
-      </div>
-      <div class="tool-arrow">→</div>
-    </a>
   </div>
 
   <!-- 通用工具 -->
   <div class="section-header">
-    <h2>🛠️ 通用工具</h2>
+    <h2>🔧 通用工具</h2>
     <span class="count">1</span>
   </div>
   <div class="tools-grid">
+
     <a href="/unit-converter" class="tool-card">
-      <div class="tool-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">📏</div>
+      <div class="tool-icon icon-tools">📐</div>
       <div class="tool-info">
         <h3>单位换算器</h3>
         <p>重量 KG/LBS、长度 CM/INCH、货币 RMB→USD/RUB/JPY 实时换算</p>
       </div>
       <div class="tool-arrow">→</div>
     </a>
+      <a href="/ai-title-generator">AI 标题</a>
+
+
   </div>
 
 </div>
 
-<!-- Footer -->
 <footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-col">
-      <div class="footer-brand" style="margin-bottom:14px">
-        <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#818cf8,#f472b6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff">H</div>
-        HuaAngel Tools
-      </div>
-      <p style="font-size:13px;line-height:1.6;color:rgba(255,255,255,0.45)">跨境卖家的效率工作台<br>从选品到运营，一站式智能工具</p>
-    </div>
-    <div class="footer-col">
-      <h4>工具</h4>
-      <a href="/video-studio">视频创作</a>
-      <a href="/etsy-tag-generator">Etsy 工具</a>
-      <a href="/ozon-price-calculator">OZON 工具</a>
-      <a href="/codex-skills.html">Codex Skill</a>
-    </div>
-    <div class="footer-col">
-      <h4>资源</h4>
-      <a href="/pricing">定价方案</a>
-      <a href="/dashboard">数据看板</a>
-      <a href="/customer-service">AI 客服</a>
-    </div>
-    <div class="footer-col">
-      <h4>关于</h4>
-      <a href="/">首页</a>
-      <a href="/pricing">定价</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>© 2024 HuaAngel Tools · 跨境卖家的效率工作台</span>
-    <span><a href="https://www.huaangel.com" style="color:rgba(255,255,255,0.35);text-decoration:none">www.huaangel.com</a></span>
-  </div>
+  <p>🛒 <strong>HuaAngel Tools</strong> · 跨境卖家的效率工作台</p>
+  <p style="margin-top:4px"><a href="https://www.huaangel.com">www.huaangel.com</a></p>
 </footer>
 
-<!-- Back to Top -->
-<button class="back-top" id="backTop" title="回到顶部">↑</button>
-
-<script>
-// Sticky nav shadow on scroll
-const nav=document.getElementById('nav');
-const backTop=document.getElementById('backTop');
-window.addEventListener('scroll',()=>{
-  nav.classList.toggle('scrolled',window.scrollY>20);
-  backTop.classList.toggle('show',window.scrollY>400);
-});
-backTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-
-// Intersection Observer for fade-in animation
-const observer=new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){e.target.classList.add('animate-in');observer.unobserve(e.target)}
-  });
-},{threshold:0.1});
-document.querySelectorAll('.tool-card,.cta-banner').forEach(el=>observer.observe(el));
-</script>
-
-<!-- BANGBOAI Widget -->
-<style>
-@keyframes bf{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.bb{position:fixed;bottom:84px;right:24px;width:56px;height:56px;border-radius:50%;
-  background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;cursor:pointer;
-  box-shadow:0 4px 16px rgba(102,126,234,.4);z-index:999999;font-size:24px;
-  transition:transform .2s;display:flex;align-items:center;justify-content:center;font-weight:700}
-.bb:hover{transform:scale(1.1)}
-.bw{position:fixed;bottom:150px;right:24px;width:380px;height:560px;
-  background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);
-  z-index:999999;display:none;flex-direction:column;overflow:hidden;
-  animation:bf .3s ease;max-width:calc(100vw - 48px);max-height:calc(100vh - 180px)}
-.bw.o{display:flex}
-.bh{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;
-  padding:14px 18px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
-.bc{background:none;border:none;color:#fff;cursor:pointer;font-size:16px;opacity:.8}
-.bm{flex:1;overflow-y:auto;padding:14px;background:#f5f7fb;font-size:13px;line-height:1.5}
-.bm .m{margin-bottom:12px;animation:bf .3s ease;clear:both}
-.bm .m.b{text-align:left}.bm .m.u{text-align:right}
-.bm .m .c{display:inline-block;padding:10px 14px;border-radius:14px;max-width:85%;word-break:break-word}
-.bm .m.b .c{background:#fff;color:#333;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.bm .m.u .c{background:#667eea;color:#fff;border-bottom-right-radius:4px}
-.bi{display:flex;padding:10px 12px;border-top:1px solid #eee;gap:8px}
-.bi input{flex:1;padding:9px 14px;border:2px solid #e0e0e0;border-radius:20px;outline:none;font-size:13px}
-.bi input:focus{border-color:#667eea}
-.bi button{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;
-  border:none;border-radius:20px;padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600}
-@media(max-width:480px){.bw{right:12px;left:12px;width:auto;bottom:140px;height:55vh}}
-</style>
-<button class="bb" onclick="bt()" id="bbBtn" title="BANGBOAI">B</button>
-<div class="bw" id="bbWin">
-  <div class="bh"><span>BANGBOAI</span><button class="bc" onclick="bt()">X</button></div>
-  <div class="bm" id="bm">
-    <div class="m b"><div class="c">你好！我是 BANGBOAI，跨平台跨境电商运营智能体。有什么可以帮你的？</div></div>
-  </div>
-  <div class="bi">
-    <input id="bi" placeholder="输入问题..." onkeydown="if(event.key=='Enter')bs()">
-    <button onclick="bs()">发送</button>
-  </div>
-</div>
-<script>
-var BU=window.BANGBOAI_API_URL||'/api/bangboai/chat';
-function bt(){var w=document.getElementById('bbWin'),b=document.getElementById('bbBtn');w.classList.contains('o')?(w.classList.remove('o'),b.style.display='flex'):(w.classList.add('o'),b.style.display='none')}
-function bs(){var i=document.getElementById('bi'),q=i.value.trim();if(!q)return;i.value='';ba(q,'u');var t=bd();fetch(BU,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q})}).then(function(r){return r.json()}).then(function(d){t.parentNode.removeChild(t);ba(d.answer||'(无响应)','b')}).catch(function(e){t.parentNode.removeChild(t);ba('网络错误，请重试','b')})}
-function ba(t,r){var d=document.createElement('div');d.className='m '+r;d.innerHTML='<div class="c">'+t.replace(/\n/g,'<br>')+'</div>';document.getElementById('bm').appendChild(d);d.scrollIntoView({behavior:'smooth'})}
-function bd(){var d=document.createElement('div');d.className='m b';d.innerHTML='<div class="c" style="color:#999">思考中...</div>';document.getElementById('bm').appendChild(d);d.scrollIntoView({behavior:'smooth'});return d}
-</script>
 </body>
 </html>
+
+
+

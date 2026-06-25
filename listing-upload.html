@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>赛盒ERP上传 - HuaAngel Tools</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f0f2f5;--card:#fff;--t:#1a1a2e;--t2:#666;--p:#005bff;--g:#00a854;--a:#fe2c55;--hdr:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);--r:12px;--s:0 2px 8px rgba(0,0,0,0.06)}
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--t)}
+.nav{background:var(--hdr);padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-size:18px;font-weight:700}
+.nav-brand span{color:#60a5fa}
+.nav-links{display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;padding:6px 14px;border-radius:8px;font-size:14px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.12)}
+.hero{background:var(--hdr);padding:40px 24px;text-align:center;color:#fff;border-radius:0 0 32px 32px}
+.hero h1{font-size:26px;font-weight:800}
+.hero h1 span{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:14px;color:rgba(255,255,255,0.5)}
+.container{max-width:900px;margin:-16px auto 40px;padding:0 20px;position:relative;z-index:1}
+.card{background:var(--card);border-radius:var(--r);padding:20px;box-shadow:var(--s);margin-bottom:16px}
+.card h3{font-size:15px;font-weight:700;margin-bottom:12px}
+.row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.row .fld{flex:1;min-width:150px}
+.lbl{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:4px;display:block}
+textarea,input{width:100%;padding:8px 10px;font-size:13px;border:1px solid #e0e0e0;border-radius:6px;background:var(--bg);color:var(--t);font-family:inherit}
+.btn{padding:10px 24px;font-size:14px;font-weight:600;border-radius:8px;border:none;cursor:pointer;font-family:inherit}
+.btn-p{background:var(--p);color:#fff}.btn-g{background:var(--g);color:#fff}
+.st{display:none;padding:10px 16px;border-radius:7px;font-size:13px;margin:10px 0}
+.st.s{display:block;background:#e8f4ee;color:var(--g)}.st.e{display:block;background:#fce8e6;color:var(--a)}.st.l{display:block;background:#e3f0fc;color:var(--p)}
+pre{background:#f5f5f5;padding:10px;border-radius:6px;font-size:11px;overflow:auto;max-height:200px;display:none}
+</style>
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+<a href="/" class="nav-brand">Hua<span>Angel</span></a>
+<div class="nav-links">
+<a href="/">首页</a><a href="/dashboard">📊 看板</a><a href="/listing-upload" class="active">📤 赛盒上传</a>
+<a href="/ai-title-generator">🤖 标题</a><a href="/product-research">🔍 选品</a>
+<a href="/competitor-monitor">🎯 竞品</a><a href="/customer-service">💬 客服</a>
+<a href="/promotions">📅 营销</a><a href="/pricing">💎 定价</a><a href="/user">👤 用户</a>
+</div></div></div>
+<div class="hero"><h1>📤 <span>赛盒ERP</span> Listing 上传</h1><p>输入Listing内容和系统SKU，通过API写入赛盒ERP。</p></div>
+<div class="container">
+<div class="card"><h3>认证 &amp; SKU</h3>
+<div class="row"><div class="fld"><label class="lbl">系统SKU</label><input id="sku" placeholder="例如 2410501"></div>
+<div class="fld"><label class="lbl">密码</label><input type="password" id="pwd" value="LOELcase3322"></div>
+<div class="fld" style="flex:0"><label class="lbl" style="visibility:hidden">测试</label><button class="btn btn-g" id="btnTest" style="width:100%;padding:8px 16px;font-size:13px">测试连接</button></div></div></div>
+<div class="card"><h3>Listing 内容</h3>
+<div class="row"><div class="fld"><label class="lbl">标题 (Title)</label><textarea id="title" rows="2" placeholder="Product Title"></textarea></div></div>
+<div class="row"><div class="fld"><label class="lbl">卖点 (每行一个)</label><textarea id="features" rows="4" placeholder="Feature 1&#10;Feature 2&#10;Feature 3"></textarea></div>
+<div class="fld"><label class="lbl">描述</label><textarea id="desc" rows="4" placeholder="Description..."></textarea></div></div>
+<div class="row"><div class="fld"><label class="lbl">产品名(可选)</label><input id="pname" placeholder="留空用标题"></div>
+<div class="fld" style="flex:0"><label class="lbl">售价</label><input id="price" value="29.99" style="width:100px"></div></div></div>
+<button class="btn btn-p" id="btnSend" style="width:100%;margin-bottom:16px">📤 上传到赛盒ERP</button>
+<div id="st"></div><pre id="detail"></pre>
+<div class="card"><h3>📋 从其他工具粘贴</h3>
+<p style="font-size:12px;color:var(--t2);margin-bottom:8px">从HUAANGEL标题生成器或Listing Pipeline复制内容粘贴到下面：</p>
+<div class="row"><div class="fld"><label class="lbl">标题</label><textarea id="pt" rows="1"></textarea></div></div>
+<div class="row"><div class="fld"><label class="lbl">卖点</label><textarea id="pb" rows="3"></textarea></div>
+<div class="fld"><label class="lbl">描述</label><textarea id="pd" rows="3"></textarea></div></div>
+<button class="btn btn-g" id="btnFill" style="padding:6px 16px;font-size:12px;width:auto">填入上方</button></div></div>
+<script>
+var API="https://gg16.irobotbox.com/Api/API_ProductInfoManage.asmx";
+function esc(s){if(!s)return "";return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function st(msg,type,detail){
+  var el=document.getElementById("st");el.className="st "+type;el.innerHTML=msg;el.style.display="block";
+  var d=document.getElementById("detail");
+  if(detail){d.style.display="block";d.textContent=detail}else{d.style.display="none"}
+}
+document.getElementById("btnTest").onclick=function(){
+  st("测试连接中...","l");
+  fetch(API,{method:"POST",headers:{"Content-Type":"text/xml; charset=utf-8","SOAPAction":"http://tempuri.org/CheckUserLogin"},
+  body:'<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><CheckUserLogin xmlns="http://tempuri.org/"><request><CustomerID>1502</CustomerID><UserName>leimianhu@loeldeal.com</UserName><Password>LOELcase3322</Password></request></CheckUserLogin></soap:Body></soap:Envelope>'})
+  .then(function(r){return r.text()})
+  .then(function(t){t.indexOf("OK")>=0?st("✅ 连接成功！用户已验证","s"):st("❌ 连接失败","e",t)})
+  .catch(function(e){st("❌ 网络错误","e",e.message)})
+};
+document.getElementById("btnSend").onclick=function(){
+  var sku=document.getElementById("sku").value.trim();
+  var pwd=document.getElementById("pwd").value.trim();
+  var title=document.getElementById("title").value.trim();
+  var features=document.getElementById("features").value.trim();
+  var desc=document.getElementById("desc").value.trim();
+  var pname=document.getElementById("pname").value.trim()||title;
+  var price=document.getElementById("price").value.trim()||"0";
+  if(!sku||!title){st("❌ 请填写SKU和标题","e");return}
+  st("⏳ 写入中... SKU: "+sku,"l");
+  fetch(API,{method:"POST",headers:{"Content-Type":"text/xml; charset=utf-8","SOAPAction":"http://tempuri.org/ProcessUpdateProduct"},
+  body:'<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><ProcessUpdateProduct xmlns="http://tempuri.org/"><request><CustomerID>1502</CustomerID><UserName>leimianhu@loeldeal.com</UserName><Password>'+esc(pwd)+'</Password><ImportProductList><ApiImportProductInfo><SKU>'+esc(sku)+'</SKU><ClientSKU>'+esc(sku)+'</ClientSKU><ProductName>'+esc(title)+'</ProductName><ProductNameCN>'+esc(title)+'</ProductNameCN><MateDescription>'+esc(desc)+'</MateDescription><ProductDescription>'+esc(desc)+'</ProductDescription><FeatureList>'+esc(features)+'</FeatureList><SalePrice>'+price+'</SalePrice><ComeSource>2</ComeSource><UnitName>个</UnitName></ApiImportProductInfo></ImportProductList></request></ProcessUpdateProduct></soap:Body></soap:Envelope>'})
+  .then(function(r){return r.text()})
+  .then(function(t){t.indexOf("OK")>=0&&t.indexOf("SkuUpdateList")>=0?st("✅ 写入成功！","s"):st("❌ 写入失败","e",t.substring(0,600))})
+  .catch(function(e){st("❌ 网络错误","e",e.message)})
+};
+document.getElementById("btnFill").onclick=function(){
+  var t=document.getElementById("pt").value;
+  var b=document.getElementById("pb").value;
+  var d=document.getElementById("pd").value;
+  if(t)document.getElementById("title").value=t;
+  if(!document.getElementById("pname").value)document.getElementById("pname").value=t;
+  if(b)document.getElementById("features").value=b;
+  if(d)document.getElementById("desc").value=d;
+  st("✅ 已填入","s")
+};
+</script>
+</body>
+</html>
