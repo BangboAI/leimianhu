@@ -1,0 +1,16 @@
+{
+  "host": "gg16.irobotbox.com",
+  "customerId": "1502",
+  "username": "",
+  "password": "",
+  "days": 30,
+  "format": "text",
+  "platforms": {
+    "amazon": { "type": 1, "enabled": true },
+    "walmart": { "type": 45, "enabled": true },
+    "tiktok": { "type": 104, "enabled": true },
+    "etsy": { "type": 57, "enabled": false },
+    "ozon": { "type": 122, "enabled": true },
+    "shopify": { "type": 50, "enabled": false }
+  }
+}
