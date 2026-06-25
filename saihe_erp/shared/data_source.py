@@ -158,11 +158,11 @@ class SaiheAPIClient(DataSource):
         start_str = start.strftime(fmt)
         end_str = now.strftime(fmt)
 
-        types = platform_types or [0]
+        types = platform_types or DEFAULT_PLATFORMS
         all_orders = []
 
         for pt in types:
-            logger.info(f"拉取平台 {PLATFORM_MAP.get(pt, pt)} 订单...")
+            logger.info(f"拉取平台类型 {pt} ({PLATFORM_MAP.get(pt, 'Other')}) 订单...")
             token = 0
             page = 0
             while page < 20:
@@ -318,3 +318,7 @@ def save_orders_to_csv(orders: list[SaiheOrder], output_dir: str) -> str:
 
     logger.info(f"订单已保存: {path}")
     return str(path)
+logger = setup_logger("data_source")
+
+# Default platform types (instead of All=0 which often returns empty)
+DEFAULT_PLATFORMS = [1, 45, 104, 57, 122, 50]  # Amazon, Walmart, TikTok, Etsy, Ozon, Shopify
