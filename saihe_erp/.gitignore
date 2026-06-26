@@ -1,0 +1,4 @@
+﻿# Generated data files
+data/
+*.json
+!config-template.json

@@ -235,7 +235,7 @@ function fmtReport(r, prevR, platName) {
   var t1=r.ranked&&r.ranked[0];if(t1)l.push('  1. Hero: '+(t1.cs||t1.sku)+' ($'+t1.usd.toFixed(2)+', '+(CATEGORY_LABELS[t1.cat]||'')+')');
   var c1=r.cross&&r.cross[0];if(c1)l.push('  2. Cross: '+(c1.cs||c1.sku)+' ('+Object.keys(c1.plats).length+' platforms)');
   var h1=r.hmargin&&r.hmargin[0];if(h1)l.push('  3. High Margin: '+(h1.cs||h1.sku)+' ('+(h1.m*100).toFixed(0)+'% margin)');
-  if(r.storeCatMatrix){var mcats=Object.entries(r.storeCatMatrix).sort(function(a,b){return(b[1]&&b[1][0]?b[1][0][1]:0)-(a[1]&&a[1][0]?a[1][0][1]:0);})[0];if(mcats)l.push('  4. Focus: '+(CATEGORY_LABELS[topCat[1][0][0]]||topCat[1][0][0])+' (store:'+topCat[0]+')');}
+  if(r.storeCatMatrix){var mcats=Object.entries(r.storeCatMatrix).sort(function(a,b){return(b[1]&&b[1][0]?b[1][0][1]:0)-(a[1]&&a[1][0]?a[1][0][1]:0);})[0];if(mcats)l.push('  4. Focus: '+(CATEGORY_LABELS[mcats[1][0][0]]||mcats[1][0][0])+' (store:'+mcats[0]+')');}
 return l.join('\n');
 }
 function fmtJson(r){
