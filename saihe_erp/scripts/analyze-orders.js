@@ -12,6 +12,7 @@
  *   Amazon(1), Walmart(45), TikTok(104), Etsy(57), Ozon(122), Shopify(50)
  */
 const https = require('https');
+const cm = require('./cost-model.js');
 const args = process.argv.slice(2);
 function getPlatform(storeName){var n=storeName||"";if(/walmart|WALMART/.test(n))return"Walmart";if(/amazon|AMAZON|BANGBO/.test(n))return"Amazon";if(/TK$/.test(n)||/TikTok/.test(n))return"TikTok";if(/etzy|Etsy/.test(n))return"Etsy";if(/ozon|Ozon/.test(n))return"Ozon";if(/shopify|Shopify/.test(n))return"Shopify";return"Other";}
 function getArg(flag, env, def) {
@@ -219,7 +220,17 @@ function fmtReport(r, prevR, platName) {
       l.push('  '+icon+' | '+(t.cs||t.sku||'').substring(0,18).padEnd(18)+' | $'+t.currentRev.toFixed(0).padStart(6)+' | $'+t.prevRev.toFixed(0).padStart(6)+' | '+String(t.growth).padStart(6)+' | '+t.action);
     });
   }
-  // Decision Suggestions
+  // Platform Cost Structure
+  if (r.platformCosts && r.platformCosts.length > 0) {
+    l.push(''); l.push('--- Platform Cost Structure ---');
+    l.push('Platform'.padEnd(20) + 'Revenue'.padEnd(12) + 'Cost'.padEnd(12) + 'Profit'.padEnd(12) + 'Margin'.padEnd(8) + 'Orders');
+    for (var pi = 0; pi < r.platformCosts.length; pi++) {
+      var pc = r.platformCosts[pi];
+      var pct = (pc.margin * 100).toFixed(1) + '%';
+      l.push('  ' + pc.label.substring(0,18).padEnd(20) + String.fromCharCode(36) + pc.revenue.toFixed(0).padStart(8) + ' ' + String.fromCharCode(36) + pc.totalCost.toFixed(0).padStart(8) + ' ' + String.fromCharCode(36) + pc.profit.toFixed(0).padStart(8) + ' ' + pct.padStart(6) + ' ' + pc.orders);
+    }
+  }
+  // Decision Suggestions  // Decision Suggestions
   l.push(''); l.push('--- Decision Suggestions ---');
   var t1=r.ranked&&r.ranked[0];if(t1)l.push('  1. Hero: '+(t1.cs||t1.sku)+' ($'+t1.usd.toFixed(2)+', '+(CATEGORY_LABELS[t1.cat]||'')+')');
   var c1=r.cross&&r.cross[0];if(c1)l.push('  2. Cross: '+(c1.cs||c1.sku)+' ('+Object.keys(c1.plats).length+' platforms)');
@@ -315,6 +326,16 @@ function fmtHtml(r, prevR, platName) {
   html += "<h2>TOP 15 \u9AD8\u6F5C\u4EA7\u54C1</h2><table><tr><th>SKU</th><th>ASIN</th><th>\u6807\u9898</th><th>\u9500\u91CF</th><th>\u8425\u6536</th><th>\u7C7B\u76EE</th></tr>" + prodRows + "</table>";
   if (crossRows) {
     html += "<h2>\u8DE8\u5E73\u53F0SKU</h2><table><tr><th>SKU</th><th>\u5E73\u53F0</th><th>\u8425\u6536</th></tr>" + crossRows + "</table>";
+  if (r.platformCosts && r.platformCosts.length > 0) {
+    var platCostRows = "";
+    for (var pi = 0; pi < r.platformCosts.length; pi++) {
+      var pc = r.platformCosts[pi];
+      var marginColor = pc.margin > 0.2 ? '#00b894' : (pc.margin > 0 ? '#fdcb6e' : '#d63031');
+      platCostRows += '<tr><td>' + pc.label + '</td><td class="rev">' + String.fromCharCode(36) + pc.revenue.toFixed(0) + '</td><td class="rev">' + String.fromCharCode(36) + pc.totalCost.toFixed(0) + '</td><td class="rev" style="color:' + marginColor + '">' + String.fromCharCode(36) + pc.profit.toFixed(0) + '</td><td class="rev" style="color:' + marginColor + '">' + (pc.margin*100).toFixed(1) + '%</td><td>' + pc.orders + '</td></tr>';
+    }
+    html += '<h2>\u5E73\u53F0\u6210\u672C\u7ED3\u6784</h2><table><tr><th>\u5E73\u53F0</th><th>\u8425\u6536</th><th>\u6210\u672C</th><th>\u5229\u6DA6</th><th>\u5229\u6DA6\u7387</th><th>\u8BA2\u5355</th></tr>' + platCostRows + '</table>';
+  }
+
   }
   html += "<div class=\"footer\">\u751F\u6210\u65F6\u95F4: " + new Date().toLocaleString() + " | Saihe ERP Order Analyzer v2</div>";
   html += "</body></html>";
@@ -342,7 +363,33 @@ function computeTrends(currRanked, prevRanked) {
   trends.sort(function(a,b){var ag=typeof a.growth==="number"?a.growth:-9999;var bg=typeof b.growth==="number"?b.growth:-9999;return bg-ag;});
   return trends;
 }
-async function main(){if(!CONFIG.username||!CONFIG.password){process.stderr.write('Missing credentials.\n');process.exit(1);}const now=new Date(),days=CONFIG.days;const st=new Date(Date.now()-days*86400000);const stPrev=new Date(Date.now()-2*days*86400000);function fd(d){var m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),mi=String(d.getMinutes()).padStart(2,'0'),s=String(d.getSeconds()).padStart(2,'0');return d.getFullYear()+'-'+m+'-'+dd+' '+h+':'+mi+':'+s;}process.stderr.write('Fetching current: '+fd(st)+' -> '+fd(now)+'\n');var curr=await fetchAll(fd(st),fd(now));process.stderr.write(curr.length+' orders.\n');process.stderr.write('Fetching previous: '+fd(stPrev)+' -> '+fd(st)+'\n');var prev=await fetchAll(fd(stPrev),fd(st));process.stderr.write(prev.length+' orders.\n');var r=analyze(curr),rp=prev.length>0?analyze(prev):null;var pt=rp?computeTrends(r.ranked,rp.ranked):[];var r2={...r,productTrends:pt};var fmap={json:fmtJson,html:fmtHtml};console.log(fmap[CONFIG.format]?fmap[CONFIG.format](r,rp,PLATFORMS.map(p=>p.name).join(', ')):fmtReport(r,rp,PLATFORMS.map(p=>p.name).join(', ')));}
+
+function computePlatformCosts(orders) {
+  if (!orders || orders.length === 0) return [];
+  var platData = {};
+  for (var i = 0; i < orders.length; i++) {
+    var o = orders[i];
+    var fType = cm.detectFulfillmentType(o);
+    if (!platData[fType]) platData[fType] = { orders: 0, revenue: 0, totalCost: 0, profit: 0 };
+    var rev = cm.toUsd(o.price * o.qty, o.currency);
+    var analysis = cm.buildCostAnalysis(o, fType);
+    if (analysis.error) continue;
+    platData[fType].orders += o.qty;
+    platData[fType].revenue += rev;
+    platData[fType].totalCost += analysis.totalCost;
+    platData[fType].profit += analysis.unitProfit * o.qty;
+    platData[fType].margin = platData[fType].revenue > 0 ? platData[fType].profit / platData[fType].revenue : 0;
+  }
+  var result = [];
+  for (var key in platData) {
+    var d = platData[key];
+    var label = (cm.PLATFORM_COST_MODELS[key] || {}).label || key;
+    result.push({ key: key, label: label, orders: d.orders, revenue: Math.round(d.revenue * 100) / 100, totalCost: Math.round(d.totalCost * 100) / 100, profit: Math.round(d.profit * 100) / 100, margin: d.margin });
+  }
+  result.sort(function(a,b) { return b.revenue - a.revenue; });
+  return result;
+}
+
+async function main(){if(!CONFIG.username||!CONFIG.password){process.stderr.write('Missing credentials.\n');process.exit(1);}const now=new Date(),days=CONFIG.days;const st=new Date(Date.now()-days*86400000);const stPrev=new Date(Date.now()-2*days*86400000);function fd(d){var m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),mi=String(d.getMinutes()).padStart(2,'0'),s=String(d.getSeconds()).padStart(2,'0');return d.getFullYear()+'-'+m+'-'+dd+' '+h+':'+mi+':'+s;}process.stderr.write('Fetching current: '+fd(st)+' -> '+fd(now)+'\n');var curr=await fetchAll(fd(st),fd(now));process.stderr.write(curr.length+' orders.\n');process.stderr.write('Fetching previous: '+fd(stPrev)+' -> '+fd(st)+'\n');var prev=await fetchAll(fd(stPrev),fd(st));process.stderr.write(prev.length+' orders.\n');var r=analyze(curr),rp=prev.length>0?analyze(prev):null;var pt=rp?computeTrends(r.ranked,rp.ranked):[];var pc=computePlatformCosts(curr);r.platformCosts=pc;r.productTrends=pt;var fmap={json:fmtJson,html:fmtHtml};console.log(fmap[CONFIG.format]?fmap[CONFIG.format](r,rp,PLATFORMS.map(p=>p.name).join(', ')):fmtReport(r,rp,PLATFORMS.map(p=>p.name).join(', ')));}
 
 main().catch(function(e){process.stderr.write('Error: '+e.message+'\n');process.exit(1);});
-
