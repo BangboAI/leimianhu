@@ -13,6 +13,7 @@
  */
 const https = require('https');
 const args = process.argv.slice(2);
+function getPlatform(storeName){var n=storeName||"";if(/walmart|WALMART/.test(n))return"Walmart";if(/amazon|AMAZON|BANGBO/.test(n))return"Amazon";if(/TK$/.test(n)||/TikTok/.test(n))return"TikTok";if(/etzy|Etsy/.test(n))return"Etsy";if(/ozon|Ozon/.test(n))return"Ozon";if(/shopify|Shopify/.test(n))return"Shopify";return"Other";}
 function getArg(flag, env, def) {
   const idx = args.indexOf(flag);
   return idx >= 0 ? args[idx + 1] : (process.env[env] || def);
@@ -84,7 +85,7 @@ function parseOrders(xml) {
     const b = blocks[i].split('</ApiOrderInfo>')[0];
     const tp = parseFloat(extract(b, 'TotalPrice')) || 0;
     if (tp <= 0) continue;
-    const store = extract(b, 'OrderSourceName');
+    const store = extract(b, 'OrderSourceName');const isFBA = extract(b, 'IsFBAOrder') === 'true';
     const currency = extract(b, 'Currency');
     const items = b.split('<ApiOrderList>');
     for (let j = 1; j < items.length; j++) {
